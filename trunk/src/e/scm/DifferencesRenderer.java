@@ -3,7 +3,7 @@ package e.scm;
 import java.awt.*;
 import javax.swing.*;
 
-public class DifferencesRenderer extends DefaultListCellRenderer {
+public class DifferencesRenderer extends e.gui.EListCellRenderer {
     /**
      * The sole instance of this class.
      */
@@ -13,6 +13,7 @@ public class DifferencesRenderer extends DefaultListCellRenderer {
      * Prevents the creation of useless instances.
      */
     private DifferencesRenderer() {
+        super(false);
     }
     
     /**
