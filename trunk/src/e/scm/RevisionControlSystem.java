@@ -247,7 +247,7 @@ public abstract class RevisionControlSystem {
     /**
      * Used by CVS and Subversion.
      */
-    public void scheduleNewFiles(String commandName, List/*<FileStatus>*/ fileStatuses) {
+    public void scheduleNewFiles(String commandName, boolean useNonRecursiveSwitch, List/*<FileStatus>*/ fileStatuses) {
         List newFiles = justNewFiles(fileStatuses);
         if (newFiles.isEmpty()) {
             return;
@@ -255,7 +255,9 @@ public abstract class RevisionControlSystem {
         ArrayList command = new ArrayList();
         command.add(commandName);
         command.add("add");
-        command.add("--non-recursive");
+        if (useNonRecursiveSwitch) {
+            command.add("--non-recursive");
+        }
         addFilenames(command, newFiles);
         execAndDump(command);
     }
