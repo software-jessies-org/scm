@@ -320,6 +320,8 @@ public class RevisionWindow extends JFrame {
                 int desiredBottomIndex = index +
                     (annotationView.getLastVisibleIndex() -
                      annotationView.getFirstVisibleIndex()) / 2;
+                desiredBottomIndex = Math.min(desiredBottomIndex,
+                    annotationView.getModel().getSize() - 1);
                 annotationView.ensureIndexIsVisible(desiredBottomIndex);
             }
         });
