@@ -45,9 +45,17 @@ public class Patch {
                     patchLineParser.parseToLine(sourceLine);
                 } else if (patchLine.startsWith(" ")) {
                     patchLineParser.parseContextLine(sourceLine);
-                } else if (patchLine.startsWith("=")) {
+                } else if (patchLine.startsWith("=====") || patchLine.startsWith("Index: ") || patchLine.startsWith("RCS file: ") || patchLine.startsWith("retrieving revision ") || patchLine.startsWith("diff ")) {
                     // Ignore lines like this for the minute:
+                    // bk:
                     // ===== makerules/vars-not-previously-included.make 1.33 vs 1.104 =====
+                    // Index: src/e/scm/RevisionWindow.java
+                    // svn:
+                    // ===================================================================
+                    // cvs:
+                    // RCS file: /home/repositories/cvsroot/edit/src/e/edit/InsertNewlineAction.java,v
+                    // retrieving revision 1.7
+                    // diff -u -r1.7 -r1.9
                 } else {
                     throw new RuntimeException("Malformed patch line \"" + patchLine + "\"");
                 }
@@ -91,7 +99,8 @@ public class Patch {
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = ProcessUtilities.backQuote(directory, command, lines, errors);
-        if (status != 0 || errors.size() > 0) {
+        // CVS returns the number of differences as the status or some such idiocy.
+        if (errors.size() > 0) {
             System.err.println("Differences command failed - TODO: provide feedback");
         }
         parsePatch(isPatchReversed, lines, new LineCounter());
