@@ -22,6 +22,7 @@ public class RevisionWindow extends JFrame {
         this.filename = filename;
         
         revisionsList = new JList();
+        revisionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         revisionsList.setFont(new Font("Monaco", Font.PLAIN, 10));
         revisionsList.addListSelectionListener(new RevisionListSelectionListener());
 
@@ -149,10 +150,10 @@ public class RevisionWindow extends JFrame {
                 revisionCommentArea.setText(revision.comment);
                 revisionCommentArea.setCaretPosition(0);
                 showAnnotationsForRevision(revision);
-            } else if (values.length == 2) {
+            } else {
                 // Show differences between two revisions.
                 Revision newerRevision = (Revision) values[0];
-                Revision olderRevision = (Revision) values[1];
+                Revision olderRevision = (Revision) values[values.length - 1];
                 // FIXME: should we join all the revision comments and show that?
                 revisionCommentArea.setText("<differences between " + olderRevision.number + " and " + newerRevision.number + ">");
                 showDifferencesBetweenRevisions(olderRevision, newerRevision);
