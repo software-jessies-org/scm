@@ -8,7 +8,11 @@ public class CheckInTool {
         if (arguments.length > 0) {
             System.exit(1);
         }
-        new CheckInWindow();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new CheckInWindow();
+            }
+        });
     }
 
     /**
