@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -8,6 +9,8 @@ public class RevisionWindow extends JFrame {
     private static final Font FONT = new Font("Monaco", Font.PLAIN, 10);
 
     private String filename;
+
+    private RevisionControlSystem backEnd;
     
     private AnnotationModel history;
     private RevisionListModel revisions;
@@ -20,6 +23,7 @@ public class RevisionWindow extends JFrame {
     public RevisionWindow(String filename, int initialLineNumber) {
         super(filename);
         this.filename = filename;
+        this.backEnd = guessWhichRevisionControlSystem();
         
         revisionsList = new JList();
         revisionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -67,24 +71,43 @@ public class RevisionWindow extends JFrame {
             });
         }
     }
+
+    /**
+     * Attempts to guess which revision control system the file we're
+     * interested in is managed by. We do this simply on the basis of
+     * whether there's a CVS or an SCCS directory in the same directory
+     * as the file.
+     */
+    private RevisionControlSystem guessWhichRevisionControlSystem() {
+        File file = new File(new File(filename).getAbsolutePath());
+        File directory = new File(file.getParent());
+        String[] siblings = directory.list();
+        for (int i = 0; i < siblings.length; ++i) {
+            if (siblings[i].equals("CVS")) {
+                return new Cvs();
+            } else if (siblings[i].equals("SCCS")) {
+                return new BitKeeper();
+            }
+        }
+        // We know this is wrong, but CVS is likely to be installed,
+        // and will give a reasonably good error when invoked.
+        return new Cvs();
+    }
     
     private void showAnnotationsForRevision(Revision revision) {
         setStatus("Getting annotations for revision...");
         /* FIXME: do rest in separate thread. */
-        String[] command = new String[] { "cvs", "annotate", "-r", revision.number, filename };
+        String[] command = backEnd.getAnnotateCommand(revision, filename);
         ArrayList errors = new ArrayList();
         String[] lines = ProcessUtilities.backQuote(command, errors);
         clearStatus();
 
-        if (errors.size() > 3 || ((String) errors.get(errors.size() - 2)).startsWith("Annotations for ") == false || ((String) errors.get(errors.size() - 1)).startsWith("***************") == false) {
+        if (backEnd instanceof Cvs && (errors.size() > 3 || ((String) errors.get(errors.size() - 2)).startsWith("Annotations for ") == false || ((String) errors.get(errors.size() - 1)).startsWith("***************") == false)) {
             showToolError(annotationView, errors);
             return;
         }
 
-        history = new AnnotationModel();
-        for (int i = 0; i < lines.length; ++i) {
-            history.add(new AnnotatedLine(revisions, lines[i]));
-        }
+        history = backEnd.parseAnnotations(revisions, lines);
         annotationView.setModel(history);
         annotationView.setCellRenderer(new AnnotatedLineRenderer());
     }
@@ -92,7 +115,7 @@ public class RevisionWindow extends JFrame {
     private void showDifferencesBetweenRevisions(Revision olderRevision, Revision newerRevision) {
         setStatus("Getting differences between revisions...");
         /* FIXME: do rest in separate thread. */
-        String[] command = new String[] { "cvs", "diff", "-u", "-kk", "-r", olderRevision.number, "-r", newerRevision.number, filename };
+        String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename);
         ArrayList errors = new ArrayList();
         String[] lines = ProcessUtilities.backQuote(command, errors);
         clearStatus();
@@ -113,7 +136,7 @@ public class RevisionWindow extends JFrame {
     private void initRevisions(String filename) {
         setStatus("Getting list of revisions...");
         /* FIXME: do rest in separate thread. */
-        String[] command = new String[] { "cvs", "log", filename };
+        String[] command = backEnd.getLogCommand(filename);
         ArrayList errors = new ArrayList();
         String[] lines = ProcessUtilities.backQuote(command, errors);
         clearStatus();
@@ -123,29 +146,7 @@ public class RevisionWindow extends JFrame {
             return;
         }
 
-        String separator = "----------------------------";
-        String endMarker = "=============================================================================";
-        int i = 0;
-        for (; i < lines.length && lines[i].equals(separator) == false; ++i) {
-            // Skip header.
-        }
-        
-        revisions = new RevisionListModel();
-        while (i < lines.length && lines[i].equals(endMarker) == false) {
-            if (lines[i].equals(separator)) {
-                i++;
-                continue;
-            }
-            String number = lines[i++];
-            number = number.substring("revision ".length());
-            String info = lines[i++];
-            StringBuffer comment = new StringBuffer();
-            while (i < lines.length && lines[i].equals(endMarker) == false && lines[i].equals(separator) == false) {
-                comment.append(lines[i++]);
-                comment.append("\n");
-            }
-            revisions.add(new Revision(number, info, comment.toString()));
-        }
+        revisions = backEnd.parseLog(lines);
         revisionsList.setModel(revisions);
     }
 
