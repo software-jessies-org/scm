@@ -7,11 +7,13 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import javax.swing.*;
+import e.gui.*;
 import e.util.*;
 
 public class PatchView extends JList {
     private ListCellRenderer defaultCellRenderer;
     public PatchView() {
+        setCellRenderer(new EListCellRenderer(false));
         this.defaultCellRenderer = getCellRenderer();
         
         setVisibleRowCount(34);
