@@ -26,7 +26,21 @@ public class FileStatus {
         return state;
     }
     
+    public String getStateString() {
+        switch (state) {
+            case NEW: return "?";
+            case ADDED: return "+";
+            case REMOVED: return "-";
+            case MODIFIED: return "M";
+            case CONTAINS_CONFLICTS: return "C";
+            case MISSING: return "(missing)";
+            case WRONG_KIND: return "(wrong kind)";
+            case NOT_RECOGNIZED_BY_BACK_END: return "(unrecognized)";
+        }
+        return "(invalid state #" + state + ")";
+    }
+    
     public String toString() {
-        return state + " " + name;
+        return getStateString() + " " + name;
     }
 }
