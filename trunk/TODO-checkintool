@@ -19,6 +19,8 @@
 * When we "cvs update" to find out what local changes we've got, we should
   (a) ignore successfully merged remote changes and (b) warn about merge
   conflicts.
+  Not only conflicts; if you've pulled and are unaware, you probably want
+  to quit and rebuild before committing.
 
 * Should we force an "svn update"? Or does saving/restoring the comment
   field cover the remote-changes scenario well enough?
