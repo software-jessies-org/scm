@@ -72,36 +72,58 @@ public class RevisionWindow extends JFrame {
         setStatus("Getting annotations for revision...");
         /* FIXME: do rest in separate thread. */
         String[] command = new String[] { "cvs", "annotate", "-r", revision.number, filename };
-        String[] lines = ProcessUtilities.backQuote(command);
+        ArrayList errors = new ArrayList();
+        String[] lines = ProcessUtilities.backQuote(command, errors);
+        clearStatus();
+
+        if (errors.size() != 2 || ((String) errors.get(0)).startsWith("Annotations for ") == false || ((String) errors.get(1)).startsWith("***************") == false) {
+            System.err.println(errors.size());
+            showToolError(annotationView, errors);
+            return;
+        }
+
         history = new AnnotationModel();
         for (int i = 0; i < lines.length; ++i) {
             history.add(new AnnotatedLine(revisions, lines[i]));
         }
         annotationView.setModel(history);
         annotationView.setCellRenderer(new AnnotatedLineRenderer());
-        clearStatus();
     }
     
     private void showDifferencesBetweenRevisions(Revision olderRevision, Revision newerRevision) {
         setStatus("Getting differences between revisions...");
         /* FIXME: do rest in separate thread. */
         String[] command = new String[] { "cvs", "diff", "-u", "-kk", "-r", olderRevision.number, "-r", newerRevision.number, filename };
-        String[] lines = ProcessUtilities.backQuote(command);
+        ArrayList errors = new ArrayList();
+        String[] lines = ProcessUtilities.backQuote(command, errors);
+        clearStatus();
+
+        if (errors.size() > 0) {
+            showToolError(revisionsList, errors);
+            return;
+        }
+
         DefaultListModel differences = new DefaultListModel();
         for (int i = 0; i < lines.length; ++i) {
             differences.addElement(lines[i]);
         }
         annotationView.setModel(differences);
         annotationView.setCellRenderer(new DifferencesRenderer());
-        clearStatus();
     }
 
     private void initRevisions(String filename) {
         setStatus("Getting list of revisions...");
         /* FIXME: do rest in separate thread. */
         String[] command = new String[] { "cvs", "log", filename };
-        String[] lines = ProcessUtilities.backQuote(command);
+        ArrayList errors = new ArrayList();
+        String[] lines = ProcessUtilities.backQuote(command, errors);
+        clearStatus();
         
+        if (errors.size() > 0) {
+            showToolError(revisionsList, errors);
+            return;
+        }
+
         String separator = "----------------------------";
         String endMarker = "=============================================================================";
         int i = 0;
@@ -125,16 +147,10 @@ public class RevisionWindow extends JFrame {
             }
             revisions.add(new Revision(number, info, comment.toString()));
         }
-        clearStatus();
-
-        if (revisions.getSize() > 0) {
-            revisionsList.setModel(revisions);
-        } else {
-            showToolError(revisionsList, lines);
-        }
+        revisionsList.setModel(revisions);
     }
 
-    private void showToolError(JList list, String[] lines) {
+    private void showToolError(JList list, ArrayList lines) {
         list.setModel(new ToolErrorListModel(lines));
         list.setCellRenderer(new ToolErrorRenderer());
     }

@@ -40,8 +40,9 @@ public class AnnotatedLineRenderer extends DefaultListCellRenderer {
     }
 
     private String toolTipForRevision(Revision revision) {
+        final String comment = revision.comment;
         return "<html>" +
-               revision.comment.replaceAll(" ", "&nbsp;").replaceAll("\n", "<p>") +
+               comment.replaceAll(" ", "&nbsp;").replaceAll("\n", "<p>") +
                "</html>";
     }
 }

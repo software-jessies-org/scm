@@ -5,18 +5,17 @@ import java.util.*;
 
 public class ProcessUtilities {
     /**
-     * Returns the lines output to standard output, followed by the lines
-     * output to standard error, by 'command' when run.
-     *
-     * FIXME: we should probably return stdout and stderr separately.
+     * Returns the lines output to standard output by 'command' when run.
+     * Lines written to standard error are appended to 'errors'.
+     * FIXME: should errors *we* detect go in the return value, or in errors?
      */
-    public static String[] backQuote(String[] command) {
+    public static String[] backQuote(String[] command, ArrayList errors) {
         ArrayList result = new ArrayList();
         try {
             Process p = Runtime.getRuntime().exec(command);
             p.getOutputStream().close();
             readLinesFromStream(result, p.getInputStream());
-            readLinesFromStream(result, p.getErrorStream());
+            readLinesFromStream(errors, p.getErrorStream());
         } catch (Exception ex) {
             ex.printStackTrace();
             result.add(ex.getMessage());
