@@ -184,6 +184,7 @@ public abstract class RevisionControlSystem {
     public void execAndDump(List command) {
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
+        System.err.println("Running " + StringUtilities.join(command, " "));
         int status = ProcessUtilities.backQuote(repositoryRoot, (String[]) command.toArray(new String[command.size()]), lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             System.out.println(lines.get(i));
