@@ -1,5 +1,4 @@
 import java.text.*;
-import java.util.*;
 import java.util.regex.*;
 
 public class AnnotatedLine {
@@ -11,19 +10,14 @@ public class AnnotatedLine {
 
     /** The revision number this line belongs to. */
     public Revision revision;
-    /** The username of the person who last changed this line. */
-    public String author;
-    /** The ISO date when this line was last changed. */
-    public String date;
+
     /** The source code for this line. */
     public String source;
 
     /** The formatted form suitable for direct presentation to the user. */
     public String formattedLine;
 
-    /** The number of days since this line was last changed. */
-    public int age;
-
+    /** Whether this line should use the alternate background color to distinguish it from the previous line, which was in a different revision. */
     public boolean useAlternateBackgroundColor;
 
     private AnnotatedLine() {
@@ -37,14 +31,6 @@ public class AnnotatedLine {
 
         AnnotatedLine result = new AnnotatedLine();
         result.revision = revisions.fromNumber(matcher.group(1));
-        result.author = matcher.group(2);
-        try {
-            Date cvsDate = INPUT_DATE_FORMAT.parse(matcher.group(3));
-            result.date = OUTPUT_DATE_FORMAT.format(cvsDate);
-            result.age = (int) ((NOW - cvsDate.getTime()) / (1000L * 60 * 60 * 24));
-        } catch (ParseException ex) {
-            result.date = "xxxx-xx-xx";
-        }
         result.source = matcher.group(4);
         result.prepareFormattedLine(revisions);
         return result;
@@ -58,16 +44,13 @@ public class AnnotatedLine {
 
         AnnotatedLine result = new AnnotatedLine();
         result.revision = revisions.fromNumber(matcher.group(2));
-        result.author = matcher.group(1);
-        result.date = "xxxx-xx-xx";
-        result.age = 0;
         result.source = matcher.group(3);
         result.prepareFormattedLine(revisions);
         return result;
     }
 
     private void prepareFormattedLine(RevisionListModel revisions) {
-        formattedLine = justify(author, revisions.getMaxAuthorNameLength()) + " " +
+        formattedLine = justify(revision.author, revisions.getMaxAuthorNameLength()) + " " +
                         justify(revision.number, revisions.getMaxRevisionNumberLength()) + ":" +
                         expandTabs(source);
     }
