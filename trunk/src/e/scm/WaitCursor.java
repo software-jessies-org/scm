@@ -16,7 +16,7 @@ public class WaitCursor {
     /**
      * If we're waiting long enough, we provide more feedback, via this window.
      */
-    private static JWindow sheet;
+    private static JDialog sheet;
     
     /**
      * This timer is used to decide when to show the informational sheet.
@@ -83,9 +83,10 @@ public class WaitCursor {
         content.setBorder(progressBar.getBorder());
         
         // Create the sheet itself.
-        sheet = new JWindow(frameOf(glassPane));
+        sheet = new JDialog(frameOf(glassPane));
         sheet.setContentPane(content);
         sheet.setSize(new Dimension(400, 120));
+        sheet.setUndecorated(true);
         
         // Line it up with the middle of the top of the window.
         Point location = glassPane.getLocationOnScreen();
