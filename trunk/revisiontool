@@ -1,2 +1,4 @@
 #!/bin/bash
-exec java -cp `dirname $0`/classes e.scm.RevisionTool "$@"
+tool_dir=`dirname $0`/classes
+salma_hayek_dir=$tool_dir/../../../salma-hayek/classes
+exec java -cp $tool_dir:$salma_hayek_dir e.scm.RevisionTool "$@"

@@ -237,6 +237,7 @@ public class RevisionWindow extends JFrame {
 
     private void initRevisionsList() {
         revisionsList = new JList();
+        revisionsList.setCellRenderer(new e.gui.EListCellRenderer());
         revisionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         revisionsList.setFont(FONT);
         revisionsList.addListSelectionListener(new RevisionListSelectionListener());
