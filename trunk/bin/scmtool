@@ -8,13 +8,11 @@ class_path=$class_path:$tools_dir/scm.jar
 
 shift
 case "`uname`" in
-Linux)
-    class_path=$class_path:$tools_dir/../salma-hayek/MRJ141Stubs.jar
-    ;;
 Darwin)
     os_specific_options=-Xdock:name=$tool_name
     ;;
 *)
+    class_path=$class_path:$tools_dir/../salma-hayek/MRJ141Stubs.jar
     ;;
 esac
 
