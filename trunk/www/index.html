@@ -95,6 +95,52 @@ to follow forked histories in SCM, a decision made to make it easier to
 navigate straight-line histories.
 </ul>
 
+<h2>Writing check-in comments</h2>
+
+<p>When you start CheckInTool, it will tell you what to do next. The idea is
+that you check a file you want to commit, then type the comment corresponding
+to that file, then repeat for all the other files you want to include in the
+change set.
+
+<p>It turns out to often be convenient to group files. Rather than repeating
+a comment, just group the affected files together. The GNU style allows you to
+repeat a filename if you have more than one thing to say about it, but
+CheckInTool doesn't really help you with that: you'll have to copy and paste
+the name yourself. Another common practice is to show related sub-changes and
+their relation by writing ellipses between chunks of the story.
+
+<p>Here's an example of the kind of comment CheckInTool will naturally help you
+write:
+<blockquote><pre>
+src/e/scm/WaitCursor.java: making this a class full of static data and methods
+was stupid. To cope with nested tasks, change it to something you instantiate...
+
+src/e/scm/BlockingWorker.java:
+src/e/scm/PatchView.java:
+src/e/scm/RevisionWindow.java: ...and change all the callers. 
+</pre></blockquote>
+<p>You can write anything you like, of course, but you'll get less help.
+
+<p>The text area is 80 columns wide, but the text is only soft-wrapped. If you
+want line breaks, you'll have to type them yourself.
+
+<p>BitKeeper supports giving a different comment to each file in a change set,
+and yet another comment to the set as a whole. SCM doesn't support this. One
+reason is that CVS and Subversion don't. But more than that, experience
+suggests that this freedom isn't useful, and does cause problems. One common
+case is that people accidentally hide important details by pasting the same
+comment for most of the files, but editing one or more of the copies. This is
+very easily missed when you're reading the history. Another common case is
+where important detail is hidden in the change set comment, which isn't
+visible when you're looking at one file's history. In all cases, it's
+unnecessarily awkward to see the commentary on the change set as a whole. You
+could argue that this is a weakness of BitMover's tools, but I think it's a
+weakness of the idea itself. The dialog style of commenting works better, and
+fits the idea of a change set as a coherent group of changes.
+
+<p>In effect, CheckInTool forces you to write only a change set comment, which
+it then applies to each file, and to the change set.
+
 <h2>How do I install it?</h2>
 
 <p>Good question. The distribution is here (<a href="scm.tgz">scm.tgz</a>),
