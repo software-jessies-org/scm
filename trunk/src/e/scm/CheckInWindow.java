@@ -365,11 +365,17 @@ public class CheckInWindow extends JFrame {
         new BlockingWorker(statusesTable, "Getting file statuses...") {
             List oldIncludedFiles;
             List statuses;
+            Exception failure;
             
             public void work() {
                 oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : null;
                 commitButton.setEnabled(false);
-                statuses = backEnd.getStatuses(getWaitCursor());
+                try {
+                    statuses = backEnd.getStatuses(getWaitCursor());
+                } catch (Exception ex) {
+                    statuses = new ArrayList();
+                    failure = ex;
+                }
                 statuses = removeScmDotFiles(statuses);
                 Collections.sort(statuses);
                 statusesTableModel = new StatusesTableModel(statuses);
@@ -391,6 +397,12 @@ public class CheckInWindow extends JFrame {
                     DefaultListModel model = new DefaultListModel();
                     model.addElement("(Nothing to check in.)");
                     patchView.setModel(model);
+                }
+                
+                if (failure != null) {
+                    String message = failure.getMessage();
+                    message += "\n";
+                    SimpleDialog.showAlert(CheckInWindow.this, "Back-end problem", message);
                 }
             }
         };

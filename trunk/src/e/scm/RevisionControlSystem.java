@@ -179,7 +179,7 @@ public abstract class RevisionControlSystem {
     
     // This only copes with spaces in commands, not other shell special punctuation and specifically not ".
     // Fix it when it bites you.
-    private String quoteCommand(List command) {
+    private static String quoteCommand(List command) {
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < command.size(); ++i) {
             if (i > 0) {
@@ -201,11 +201,12 @@ public abstract class RevisionControlSystem {
      * Executes a command in the given directory, and dumps all the output from it.
      * Useful until we do something funkier.
      */
-    public void execAndDump(List command) {
+    public void execAndDump(List commandAsList) {
+        String[] command = (String[]) commandAsList.toArray(new String[commandAsList.size()]);
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        System.err.println("Running " + quoteCommand(command));
-        int status = ProcessUtilities.backQuote(repositoryRoot, (String[]) command.toArray(new String[command.size()]), lines, errors);
+        System.err.println("Running " + quoteCommand(commandAsList));
+        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             System.out.println(lines.get(i));
         }
@@ -213,8 +214,16 @@ public abstract class RevisionControlSystem {
             System.err.println(errors.get(i));
         }
         if (status != 0) {
-            throw new RuntimeException("[Command '" + StringUtilities.join(command, " ") + "' returned status " + status + ".]");
+            throwError(status, command, errors);
         }
+    }
+    
+    public static void throwError(int status, String[] command, List errors) {
+        String message = "Command '" + quoteCommand(Arrays.asList(command)) + "' returned status " + status + ".";
+        if (errors.size() > 0) {
+            message += " Errors were:\n\n" + StringUtilities.join(errors, "\n");
+        }
+        throw new RuntimeException(message);
     }
     
     public static void addFilenames(Collection collection, List/*<FileStatus>*/ fileStatuses) {

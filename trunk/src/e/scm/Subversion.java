@@ -113,6 +113,9 @@ public class Subversion extends RevisionControlSystem {
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
+        if (status != 0) {
+            throwError(status, command, errors);
+        }
         
         ArrayList statuses = new ArrayList();
         Pattern pattern = Pattern.compile("^(.)....\\s+(.+)$");
