@@ -81,7 +81,10 @@ public class RevisionWindow extends JFrame {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     annotationView.setSelectedIndex(index);
-                    annotationView.ensureIndexIsVisible(index);
+                    int desiredBottomIndex = index +
+                        (annotationView.getLastVisibleIndex() -
+                         annotationView.getFirstVisibleIndex()) / 2;
+                    annotationView.ensureIndexIsVisible(desiredBottomIndex);
                 }
             });
         } else {

@@ -1,6 +1,8 @@
 
 * Add a pseudo-revision for the current file state, if the file's been
-  modified since it was last committed.
+  modified since it was last committed. How do we tell if it's modified?
+  We can do the diff easily by missing off the "new revision" part of the
+  command-line.
 
 * Show decent progress feedback and keep processing events while talking
   to CVS.
