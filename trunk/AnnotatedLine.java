@@ -93,6 +93,6 @@ public class AnnotatedLine {
     }
 
     public String toString() {
-        return date + " " + author + "(" + revision + ")" + ":" + source;
+        return formattedLine;
     }
 }
