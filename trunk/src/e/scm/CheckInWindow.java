@@ -146,19 +146,7 @@ public class CheckInWindow extends JFrame {
         lastPatchViewUpdateTime = updateTime;
         
         if (status.getState() == FileStatus.NEW) {
-            DefaultListModel model = new DefaultListModel();
-            if (file.isDirectory()) {
-                model.addElement("(" + status.getName() + " is a directory.)");
-            } else {
-                String[] lines = StringUtilities.readLinesFromFile(file.getAbsolutePath());
-                for (int i = 0; i < lines.length; ++i) {
-                    model.addElement(lines[i]);
-                }
-                if (model.getSize() == 0) {
-                    model.addElement("(" + status.getName() + " is empty.)");
-                }
-            }
-            patchView.setModel(model);
+            patchView.showNewFile(backEnd, status);
         } else {
             patchView.showPatch(backEnd, null, null, status.getName());
         }

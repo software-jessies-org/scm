@@ -3,14 +3,17 @@ package e.scm;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import javax.swing.*;
 import e.util.*;
 
 public class PatchView extends JList {
+    private ListCellRenderer defaultCellRenderer;
     public PatchView() {
-        setCellRenderer(DifferencesRenderer.INSTANCE);
+        this.defaultCellRenderer = getCellRenderer();
+        
         setVisibleRowCount(34);
         
         // JList has half an implementation of copy.
@@ -64,10 +67,31 @@ public class PatchView extends JList {
         for (int i = 0; i < lines.size(); ++i) {
             differences.addElement((String) lines.get(i));
         }
+        setCellRenderer(DifferencesRenderer.INSTANCE);
         setModel(differences);
         
         // We can't easily retain the context when switching to differences.
         // As an extension, though, we could do this.
+        ensureIndexIsVisible(0);
+    }
+    
+    void showNewFile(RevisionControlSystem backEnd, final FileStatus status) {
+        DefaultListModel model = new DefaultListModel();
+        File file = new File(backEnd.getRoot(), status.getName());
+        if (file.isDirectory()) {
+            model.addElement("(" + status.getName() + " is a directory.)");
+        } else {
+            String[] lines = StringUtilities.readLinesFromFile(file.getAbsolutePath());
+            for (int i = 0; i < lines.length; ++i) {
+                model.addElement(lines[i]);
+            }
+            if (model.getSize() == 0) {
+                model.addElement("(" + status.getName() + " is empty.)");
+            }
+        }
+
+        setCellRenderer(defaultCellRenderer);
+        setModel(model);
         ensureIndexIsVisible(0);
     }
     
