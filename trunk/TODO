@@ -60,8 +60,6 @@
 * Add go to line functionality (not usually useful because you'd do it on the
   command line, or have your editor do it for you).
 
-* Follow symlinks.
-
 * For a given line, make it possible (and easy) to find out automatically
   when that line was removed. Search forward through revisions until we
   can't find the line.

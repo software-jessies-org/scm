@@ -33,9 +33,12 @@ public class RevisionWindow extends JFrame {
     
     public RevisionWindow(String filename, int initialLineNumber) {
         super(filename);
-        this.filename = filename;
+        setFilename(filename);
         this.backEnd = guessWhichRevisionControlSystem();
-        
+        makeUserInterface(initialLineNumber);
+    }
+
+    private void makeUserInterface(int initialLineNumber) {
         revisionsList = new JList();
         revisionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         revisionsList.setFont(FONT);
@@ -113,6 +116,21 @@ public class RevisionWindow extends JFrame {
             });
         } else {
             showSummaryOfAllRevisions();
+        }
+    }
+
+    /**
+     * Follows symbolic links, so we get the revision history associated
+     * with the target.
+     */
+    private void setFilename(String filename) {
+        try {
+            File file = new File(filename);
+            String canonicalFilename = file.getCanonicalPath();
+            this.filename = canonicalFilename;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            System.exit(1);
         }
     }
 
