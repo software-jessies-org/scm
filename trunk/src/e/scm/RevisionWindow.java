@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import e.util.*;
 
 public class RevisionWindow extends JFrame {
     private static final Font FONT;

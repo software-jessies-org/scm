@@ -5,6 +5,7 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import e.util.*;
 
 public class PatchView extends JList {
     public PatchView() {

@@ -3,6 +3,7 @@ package e.scm;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
+import e.util.*;
 
 public class BitKeeper implements RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
