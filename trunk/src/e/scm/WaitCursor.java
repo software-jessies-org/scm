@@ -3,6 +3,7 @@ package e.scm;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import e.util.*;
 
 public class WaitCursor {
     private static final Cursor DEFAULT_CURSOR =
@@ -134,9 +135,14 @@ public class WaitCursor {
     
     /** Lines the sheet up with the middle of the top of the parent window. */
     private void repositionSheet() {
-        Point location = sheet.getOwner().getLocationOnScreen();
-        location.y += sheet.getOwner().getInsets().top;
-        location.x += (sheet.getOwner().getWidth() - sheet.getWidth()) / 2;
+        Window owner = sheet.getOwner();
+        Point location = owner.getLocationOnScreen();
+        if (GuiUtilities.isMacOs()) {
+            location.y += owner.getInsets().top;
+        } else {
+            location.y += (owner.getHeight() - sheet.getHeight()) / 2;
+        }
+        location.x += (owner.getWidth() - sheet.getWidth()) / 2;
         sheet.setLocation(location);
     }
 
