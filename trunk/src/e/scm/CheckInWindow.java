@@ -175,8 +175,16 @@ public class CheckInWindow extends JFrame {
 
     private void revert() {
         patchView.setModel(new DefaultListModel());
-        FileStatus file = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
-        backEnd.revert(repositoryRoot, file.getName());
+        FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
+        if (fileStatus.getState() == FileStatus.NEW) {
+            // If the file isn't under version control, we'll have to remove
+            // it ourselves...
+            File file = FileUtilities.fileFromParentAndString(repositoryRoot.toString(), fileStatus.getName());
+            boolean deleted = file.delete();
+            System.err.println(deleted);
+        } else {
+            backEnd.revert(repositoryRoot, fileStatus.getName());
+        }
         updateFileStatuses();
     }
     
