@@ -16,15 +16,16 @@
   (Store the line number in a field from the constructor, and blank it out
   when we've done the setting later?)
 
-* Use some kind of two-element selection model for the revisions list. Color
-  the selected items so that if there's only one, it's red, and the second
-  one is blue. (To correspond to the diff colors. The 'one item selected'
-  case is less obviously right.)
+* Should we color the selected revisions so that if there's an interval
+  selected, the earliest revision is shown in red, and the latest is shown
+  in blue to correspond to the diff colors.
 
 * Use a JTextPane for the checkin comments, and allow some kind of filter
   to be specified by the user to rewrite references to bugs as links to
   bug database entries or whatever; be able to launch a browser when these
-  are clicked on.
+  are clicked on. It would also be nice to recognize other filenames in
+  GNU-style checkin comments, and have links that caused a RevisionTool
+  window to open for that file.
 
 * Add search functionality. Usual C-D, C-F, C-G trio. I don't know how we
   can do Edit-like alpha highlighting, which is a shame.
@@ -36,12 +37,6 @@
   copy checkin comments from the JTextArea.) Do we need an explicit patch
   export facility if we can just copy/paste?
 
-* Show checkin comments for other revisions when you hover, so you don't
-  *have* to look at another revision when you're looking at an annotated
-  file to get some idea of whether you're interested in that revision.
-  Here's an example of bonsai doing something similar:
-  http://bonsai.mozilla.org/cvsblame.cgi?file=mozilla/camino/src/browser/CocoaPromptService.mm&root=/cvsroot
-
 * Auto-detect whether we're in a CVS or BitKeeper repository; for now, if
   we're in a BitKeeper repository, we can just invoke "bk revtool" and quit.
 
@@ -51,4 +46,5 @@
 * Follow symlinks.
 
 * For a given line, make it possible (and easy) to find out automatically
-  when that line was removed.
+  when that line was removed. Search forward through revisions until we
+  can't find the line.
