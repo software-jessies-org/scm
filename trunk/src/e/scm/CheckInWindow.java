@@ -378,11 +378,6 @@ public class CheckInWindow extends JFrame {
         }
     }
     
-    private void showToolError(JList list, ArrayList lines) {
-        list.setCellRenderer(new ToolErrorRenderer());
-        list.setModel(new ToolErrorListModel(lines));
-    }
-    
     public void clearStatus() {
         setStatus("");
     }

@@ -319,10 +319,10 @@ public class RevisionWindow extends JFrame {
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = 0;
+        String[] command = backEnd.getAnnotateCommand(revision, filePath);
         try {
             WaitCursor.start(this);
             /* FIXME: do this in separate thread. */
-            String[] command = backEnd.getAnnotateCommand(revision, filePath);
             status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
         } finally {
             WaitCursor.stop(this);
@@ -331,7 +331,7 @@ public class RevisionWindow extends JFrame {
 
         // CVS writes junk to standard error even on success.
         if (status != 0) {
-            showToolError(annotationView, errors, status);
+            showToolError(annotationView, errors, command, status);
             return;
         }
 
@@ -523,9 +523,9 @@ public class RevisionWindow extends JFrame {
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = 0;
+        String[] command = backEnd.getLogCommand(filePath);
         try {
             WaitCursor.start(this);
-            String[] command = backEnd.getLogCommand(filePath);
             status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
             // When there's an error, it's useful to dump out the directory, command and environment.
         } finally {
@@ -534,7 +534,7 @@ public class RevisionWindow extends JFrame {
         }
         
         if (status != 0 || errors.size() > 0) {
-            showToolError(revisionsList, errors, status);
+            showToolError(revisionsList, errors, command, status);
             return;
         }
 
@@ -555,9 +555,9 @@ public class RevisionWindow extends JFrame {
         list.setModel(new ToolErrorListModel(lines));
     }
     
-    private void showToolError(JList list, ArrayList lines, int status) {
-        if (lines.size() == 0) {
-            lines.add("Unknown error with status " + status);
+    private void showToolError(JList list, ArrayList lines, String[] command, int status) {
+        if (status != 0) {
+            lines.add("[Command '" + StringUtilities.join(command, " ") + "' returned status " + status + ".]");
         }
         showToolError(list, lines);
     }

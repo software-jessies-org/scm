@@ -54,7 +54,7 @@ public class PatchView extends JList {
         
         // CVS returns a non-zero exit status if there were any differences.
         if (errors.size() > 0) {
-            //showToolError(revisionsList, errors);
+            lines.addAll(errors);
             return;
         }
         
