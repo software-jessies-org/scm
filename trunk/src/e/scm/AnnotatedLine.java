@@ -26,8 +26,12 @@ public class AnnotatedLine {
             return null;
         }
         
+        String revisionId = matcher.group(revisionGroup);
         AnnotatedLine result = new AnnotatedLine();
-        result.revision = revisions.fromNumber(matcher.group(revisionGroup));
+        result.revision = revisions.fromNumber(revisionId);
+        if (result.revision == null) {
+            throw new IllegalArgumentException("No revision '" + revisionId + "'");
+        }
         result.source = matcher.group(sourceGroup);
         result.prepareFormattedLine(revisions);
         return result;

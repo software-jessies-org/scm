@@ -76,7 +76,6 @@ public class Subversion extends RevisionControlSystem {
                 if (lines[i].equals(separator) == false) {
                     Log.warn("expected separator line when parsing log");
                 }
-                ++i; // Skip separator line.
                 result.add(new Revision(number, date, author, comment.toString()));
             }
         }
