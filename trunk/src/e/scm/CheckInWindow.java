@@ -134,38 +134,40 @@ public class CheckInWindow extends JFrame {
         statusesTable.setIntercellSpacing(new Dimension());
         statusesTable.setShowGrid(false);
     }
-
+    
+    private class RevertAction extends AbstractAction {
+        RevertAction() {
+            super("Revert");
+        }
+        public void actionPerformed(ActionEvent e) {
+            revert();
+        }
+    }
+    
+    private class HistoryAction extends AbstractAction {
+        HistoryAction() {
+            super("Show History...");
+        }
+        public void actionPerformed(ActionEvent e) {
+            showHistory();
+        }
+    }
+    
+    private class RefreshAction extends AbstractAction {
+        RefreshAction() {
+            super("Refresh");
+        }
+        public void actionPerformed(ActionEvent e) {
+            updateFileStatuses();
+        }
+    }
+    
     private void initStatusesTableContextMenu() {
-        // FIXME: with Java 1.5, we can simplify this, I think.
-        final PopupMenu contextMenu = new PopupMenu();
-        
-        MenuItem revertItem = new MenuItem("Revert");
-        revertItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                revert();
-            }
-        });
-        contextMenu.add(revertItem);
-        
+        final EPopupMenu contextMenu = new EPopupMenu();
+        contextMenu.add(new RevertAction());
         contextMenu.addSeparator();
-        
-        MenuItem historyItem = new MenuItem("Show History...");
-        historyItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showHistory();
-            }
-        });
-        contextMenu.add(historyItem);
-        
-        MenuItem refreshItem = new MenuItem("Refresh");
-        refreshItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                updateFileStatuses();
-            }
-        });
-        contextMenu.add(refreshItem);
-        
-        statusesTable.add(contextMenu);
+        contextMenu.add(new HistoryAction());
+        contextMenu.add(new RefreshAction());
         statusesTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 maybeShowContextMenu(e);
