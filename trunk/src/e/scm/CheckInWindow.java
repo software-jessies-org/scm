@@ -302,18 +302,16 @@ public class CheckInWindow extends JFrame {
     }
 
     private void updateFileStatuses() {
-        setStatus("Getting file statuses...");
         Thread worker = new Thread() {
             public void run() {
                 List oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : new ArrayList();
                 List statuses = null;
                 try {
-                    WaitCursor.start(statusesTable);
+                    WaitCursor.start(statusesTable, "Getting file statuses...");
                     commitButton.setEnabled(false);
                     statuses = backEnd.getStatuses();
                 } finally {
                     WaitCursor.stop(statusesTable);
-                    clearStatus();
                 }
                 Collections.sort(statuses);
                 statusesTableModel = new StatusesTableModel(statuses);

@@ -315,18 +315,16 @@ public class RevisionWindow extends JFrame {
     }
     
     private void showAnnotationsForRevision(Revision revision, int lineNumber) {
-        setStatus("Getting annotations for revision...");
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = 0;
         String[] command = backEnd.getAnnotateCommand(revision, filePath);
         try {
-            WaitCursor.start(this);
+            WaitCursor.start(this, "Getting annotations for revision...");
             /* FIXME: do this in separate thread. */
             status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
         } finally {
             WaitCursor.stop(this);
-            clearStatus();
         }
 
         // CVS writes junk to standard error even on success.
@@ -351,12 +349,11 @@ public class RevisionWindow extends JFrame {
             int status = 0;
             /* FIXME: do this in separate thread. */
             try {
-                WaitCursor.start(this);
+                WaitCursor.start(this, "Getting local modifications...");
                 String[] command = backEnd.getDifferencesCommand(null, Revision.LOCAL_REVISION, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, patchLines, errors);
             } finally {
                 WaitCursor.stop(this);
-                clearStatus();
             }
             
             // CVS returns a non-zero exit status if there were any differences.
@@ -447,18 +444,16 @@ public class RevisionWindow extends JFrame {
     }
     
     private void showDifferencesBetweenRevisions(Revision olderRevision, Revision newerRevision) {
-        setStatus("Getting differences between revisions...");
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = 0;
         /* FIXME: do this in separate thread. */
         try {
-            WaitCursor.start(this);
+            WaitCursor.start(this, "Getting differences between revisions...");
             String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
             status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
         } finally {
             WaitCursor.stop(this);
-            clearStatus();
         }
 
         // CVS returns a non-zero exit status if there were any differences.
@@ -518,19 +513,17 @@ public class RevisionWindow extends JFrame {
     }
 
     private void readListOfRevisions() {
-        setStatus("Getting list of revisions...");
         /* FIXME: do rest in separate thread. */
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = 0;
         String[] command = backEnd.getLogCommand(filePath);
         try {
-            WaitCursor.start(this);
+            WaitCursor.start(this, "Getting list of revisions...");
             status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
             // When there's an error, it's useful to dump out the directory, command and environment.
         } finally {
             WaitCursor.stop(this);
-            clearStatus();
         }
         
         if (status != 0 || errors.size() > 0) {

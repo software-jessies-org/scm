@@ -45,7 +45,7 @@ public class PatchView extends JList {
         ArrayList errors = new ArrayList();
         int status = 0;
         try {
-            WaitCursor.start(this);
+            WaitCursor.start(this, "Getting patch...");
             String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename);
             status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
         } finally {
