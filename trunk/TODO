@@ -117,3 +117,5 @@
   can't find the line. Relatedly: for a given line, make it easy to find
   out automatically when that line was introduced.
 
+* Subversion's move breaks Subversion's diff; we need to track name changes
+  back through time.
