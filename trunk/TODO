@@ -60,10 +60,6 @@
 * Add go to line functionality (not usually useful because you'd do it on the
   command line, or have your editor do it for you).
 
-* Add C-A and C-C to the JList, so we can copy text out of it. (We can already
-  copy checkin comments from the JTextArea.) Do we need an explicit patch
-  export facility if we can just copy/paste?
-
 * Follow symlinks.
 
 * For a given line, make it possible (and easy) to find out automatically

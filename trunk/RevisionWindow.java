@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
@@ -58,6 +59,12 @@ public class RevisionWindow extends JFrame {
         annotationView = new JList(new AnnotationModel());
         annotationView.setFont(FONT);
         annotationView.setVisibleRowCount(34);
+        ActionMap actionMap = annotationView.getActionMap();
+        actionMap.put("copy", new AbstractAction("copy") {
+            public void actionPerformed(ActionEvent e) {
+                copyAnnotationViewSelectionToClipboard();
+            }
+        });
         
         doubleClickListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -161,6 +168,23 @@ public class RevisionWindow extends JFrame {
         annotationView.setModel(EMPTY_LIST_MODEL);
         annotationView.setCellRenderer(renderer);
         annotationView.setModel(listModel);
+    }
+
+    private void copyAnnotationViewSelectionToClipboard() {
+        // Make a StringSelection corresponding to the selected lines.
+        StringBuffer buffer = new StringBuffer();
+        Object[] selectedLines = annotationView.getSelectedValues();
+        for (int i = 0; i < selectedLines.length; ++i) {
+            String line = selectedLines[i].toString();
+            buffer.append(line);
+            buffer.append('\n');
+        }
+        StringSelection selection = new StringSelection(buffer.toString());
+
+        // Set the clipboard (and X11's nasty hacky semi-duplicate).
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        toolkit.getSystemClipboard().setContents(selection, selection);
+        toolkit.getSystemSelection().setContents(selection, selection);
     }
     
     private void showDifferencesBetweenRevisions(Revision olderRevision, Revision newerRevision) {
