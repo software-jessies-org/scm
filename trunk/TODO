@@ -1,4 +1,19 @@
 
+* martind: Double-clicking on a line in the annotated view should take
+  you to the revision corresponding to that line (and keep that line
+  visible).
+
+* martind: The revisions aren't sorted numerically - which I don't care
+  about in itself - but finding 1.34 in the list is then a job for the
+  computer.
+
+* martind: I'm wanting to see the change that this line was part of. When
+  I've been looking at a diff and I go back to looking at the latest
+  version, it would be much more useful to show me the part of the
+  latest version that the diff referred to.
+
+* martind: Wot no search?
+
 * Add a pseudo-revision for the current file state, if the file's been
   modified since it was last committed. How do we tell if it's modified?
   We can do the diff easily by missing off the "new revision" part of the
