@@ -1,7 +1,11 @@
 package e.scm;
 
+import e.util.*;
+
 public class CheckInTool {
     public static void main(String[] arguments) {
+        Log.setApplicationName("CheckInTool");
+
         final RevisionControlSystem backEnd = RevisionControlSystem.forPath(System.getProperty("user.dir"));
         if (backEnd == null) {
             System.err.println("Not in a directory that is under revision control.");

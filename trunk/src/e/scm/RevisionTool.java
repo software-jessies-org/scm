@@ -1,11 +1,14 @@
 package e.scm;
 
 import java.util.regex.*;
+import e.util.*;
 
 public class RevisionTool {
     private static final Pattern GREP_ADDRESS = Pattern.compile("(.*):([0-9]+):?.*");
 
     public static void main(String[] args) {
+        Log.setApplicationName("RevisionTool");
+
         if (args.length == 0) {
             System.err.println("No file specified.");
             System.exit(1);
