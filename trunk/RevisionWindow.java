@@ -31,9 +31,14 @@ public class RevisionWindow extends JFrame {
                     Object value = annotationView.getModel().getElementAt(i);
                     if (value instanceof AnnotatedLine) {
                         AnnotatedLine annotatedLine = (AnnotatedLine) value;
-                        selectRevision(annotatedLine.revision);
-                        final int lineNumber = 1 + i; // FIXME: this needs to take the patch between the current and the target revisions into account; the line may have a different line number in the target revision.
-                        showAnnotationsForRevision(annotatedLine.revision, lineNumber);
+                        
+                        Revision fromRevision = getSelectedRevision();
+                        Revision toRevision = annotatedLine.revision;
+                        Patch patch = new Patch(fromRevision, toRevision);
+                        final int lineNumber = patch.translateLineNumberInFromRevision(1 + i);
+                        
+                        selectRevision(toRevision);
+                        showAnnotationsForRevision(toRevision, lineNumber);
                     }
                 }
             }
