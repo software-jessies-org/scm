@@ -174,9 +174,17 @@ public class RevisionWindow extends JFrame {
             changeSetButton.setEnabled(false);
         }
 
+        JButton showLogButton = new JButton("Show Log");
+        showLogButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showLog();
+            }
+        });
+
         JPanel statusPanel = new JPanel(new BorderLayout());
         statusPanel.add(statusLine, BorderLayout.CENTER);
         statusPanel.add(changeSetButton, BorderLayout.EAST);
+        statusPanel.add(showLogButton, BorderLayout.WEST);
 
         JPanel contentPane = new JPanel(new BorderLayout());
         contentPane.setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
@@ -209,12 +217,17 @@ public class RevisionWindow extends JFrame {
     }
 
     private void initRevisionCommentArea() {
-        revisionCommentArea = new JTextArea(8, 80);
-        revisionCommentArea.setDragEnabled(false);
-        revisionCommentArea.setEditable(false);
-        revisionCommentArea.setFont(FONT);
-        revisionCommentArea.setWrapStyleWord(true);
-        revisionCommentArea.setLineWrap(true);
+        revisionCommentArea = makeTextArea(8);
+    }
+
+    private JTextArea makeTextArea(final int rowCount) {
+        JTextArea textArea = new JTextArea(rowCount, 80);
+        textArea.setDragEnabled(false);
+        textArea.setEditable(false);
+        textArea.setFont(FONT);
+        textArea.setWrapStyleWord(true);
+        textArea.setLineWrap(true);
+        return textArea;
     }
 
     /**
@@ -368,7 +381,7 @@ public class RevisionWindow extends JFrame {
         annotationView.ensureIndexIsVisible(0);
     }
 
-    private void showSummaryOfAllRevisions() {
+    private String summaryOfAllRevisions() {
         StringBuffer summary = new StringBuffer();
         for (int i = 0; i < revisions.getSize(); ++i) {
             Revision revision = (Revision) revisions.getElementAt(i);
@@ -379,9 +392,28 @@ public class RevisionWindow extends JFrame {
             summary.append(revision.comment);
             summary.append("\n");
         }
-        revisionCommentArea.setText(summary.toString());
+        return summary.toString();
+    }
+
+    private void showSummaryOfAllRevisions() {
+        revisionCommentArea.setText(summaryOfAllRevisions());
         revisionCommentArea.setCaretPosition(0);
         annotationView.setModel(EMPTY_LIST_MODEL);
+    }
+
+    private void showLog() {
+        JTextArea summary = makeTextArea(20);
+        summary.setText(summaryOfAllRevisions());
+        summary.setCaretPosition(0);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(new JScrollPane(summary), BorderLayout.CENTER);
+
+        JFrame frame = new JFrame("Revisions of " + filename);
+        frame.setContentPane(panel);
+        frame.pack();
+        frame.setLocationRelativeTo(this);
+        frame.setVisible(true);
     }
 
     public Revision getSelectedRevision() {

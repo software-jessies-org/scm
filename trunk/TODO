@@ -1,7 +1,4 @@
-* Some way to see a text area containing all the revision comments listed
-  one after the other.
-
-* When we can correctly go from a line in a patch to the corresponding
+* wHEN WE can correctly go from a line in a patch to the corresponding
   line in a revision, use that logic to fix the annotation view's
   behavior when switching revisions; currently it just goes to the
   same-numbered line in the target revision (there's a FIXME).
