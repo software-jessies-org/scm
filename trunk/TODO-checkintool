@@ -2,7 +2,9 @@
   bk sfiles. Also need to cope better with the fact that "cvs update" is
   capable of producing a bunch of irrelevant output.
 
-* We need a way to remove files. ("rm x; cvsvn rm x".) Or do we? Can we
+* We need a way to remove files. ("rm x; cvsvn rm x".) Ed points out that
+  there's "cvs rm -f x", which doesn't require the file to have been removed
+  from the local file system first. Do we really need anything here? Can we
   actually provide a better interface than just doing this on the command
   line? I'm not sure I can think of one.
 
