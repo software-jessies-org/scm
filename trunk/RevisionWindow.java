@@ -145,8 +145,22 @@ public class RevisionWindow extends JFrame {
         }
 
         history = backEnd.parseAnnotations(revisions, lines);
-        annotationView.setModel(history);
-        annotationView.setCellRenderer(new AnnotatedLineRenderer());
+        switchAnnotationView(history, new AnnotatedLineRenderer());
+    }
+
+    private static final ListModel EMPTY_LIST_MODEL = new DefaultListModel();
+
+    /**
+     * Switches the annotation view's list model and cell renderer. This
+     * is slightly more involved than it first seems, because the renderer
+     * may make assumptions about its associated list model. So we put in
+     * an empty list model, switch to a renderer suitable for the incoming
+     * list model, and only then set the new model.
+     */
+    private void switchAnnotationView(ListModel listModel, ListCellRenderer renderer) {
+        annotationView.setModel(EMPTY_LIST_MODEL);
+        annotationView.setCellRenderer(renderer);
+        annotationView.setModel(listModel);
     }
     
     private void showDifferencesBetweenRevisions(Revision olderRevision, Revision newerRevision) {
@@ -166,8 +180,7 @@ public class RevisionWindow extends JFrame {
         for (int i = 0; i < lines.length; ++i) {
             differences.addElement(lines[i]);
         }
-        annotationView.setModel(differences);
-        annotationView.setCellRenderer(new DifferencesRenderer());
+        switchAnnotationView(differences, new DifferencesRenderer());
 
         // We can't easily retain the context when switching to differences.
         // As an extension, though, we could do this.
@@ -187,7 +200,7 @@ public class RevisionWindow extends JFrame {
         }
         revisionCommentArea.setText(summary.toString());
         revisionCommentArea.setCaretPosition(0);
-        annotationView.setModel(new DefaultListModel());
+        annotationView.setModel(EMPTY_LIST_MODEL);
     }
 
     private void initRevisions(String filename) {
@@ -208,8 +221,8 @@ public class RevisionWindow extends JFrame {
     }
 
     private void showToolError(JList list, ArrayList lines) {
-        list.setModel(new ToolErrorListModel(lines));
         list.setCellRenderer(new ToolErrorRenderer());
+        list.setModel(new ToolErrorListModel(lines));
     }
     
     public void clearStatus() {
