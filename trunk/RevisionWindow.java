@@ -151,6 +151,10 @@ public class RevisionWindow extends JFrame {
         }
         annotationView.setModel(differences);
         annotationView.setCellRenderer(new DifferencesRenderer());
+
+        // We can't easily retain the context when switching to differences.
+        // As an extension, though, we could do this.
+        annotationView.ensureIndexIsVisible(0);
     }
 
     private void showSummaryOfAllRevisions() {
