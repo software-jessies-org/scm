@@ -22,3 +22,5 @@
 
 * Should we force an "svn update"? Or does saving/restoring the comment
   field cover the remote-changes scenario well enough?
+
+* Menu option to refresh the list of interesting files.
