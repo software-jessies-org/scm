@@ -71,7 +71,16 @@ public class WaitCursor {
 
         hideSheet();
     }
-
+    
+    public void setProgressValue(final int value) {
+        progressBar.setValue(value);
+    }
+    
+    public void setProgressMaximum(final int value) {
+        progressBar.setMaximum(value);
+        progressBar.setIndeterminate(false);
+    }
+    
     private synchronized void hideSheet() {
         // Work around Sun bug 4995929 for Java 1.4.2 users.
         progressBar.setIndeterminate(false);

@@ -125,7 +125,7 @@ public class Cvs extends RevisionControlSystem {
         execAndDump(command);
     }
 
-    public List getStatuses() {
+    public List getStatuses(WaitCursor waitCursor) {
         String[] command = new String[] { "cvs", "-q", "update", "-dP" };
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();

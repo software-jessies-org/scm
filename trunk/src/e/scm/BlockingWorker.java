@@ -7,6 +7,7 @@ public abstract class BlockingWorker extends Thread {
     private Component component;
     private String message;
     private Exception caughtException;
+    private WaitCursor waitCursor;
     
     public BlockingWorker(Component component, String message) {
         this.component = component;
@@ -15,7 +16,7 @@ public abstract class BlockingWorker extends Thread {
     }
     
     public final void run() {
-        WaitCursor waitCursor = new WaitCursor(component, message);
+        waitCursor = new WaitCursor(component, message);
         try {
             waitCursor.start();
             work();
@@ -33,6 +34,10 @@ public abstract class BlockingWorker extends Thread {
                 }
             }
         });
+    }
+    
+    public WaitCursor getWaitCursor() {
+        return waitCursor;
     }
     
     /**

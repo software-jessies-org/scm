@@ -169,7 +169,7 @@ public abstract class RevisionControlSystem {
      * Returns status information for all the added, deleted, modified or
      * unmanaged files and directories in the repository.
      */
-    public abstract List getStatuses();
+    public abstract List getStatuses(WaitCursor waitCursor);
     
     /**
      * Commits the files from the given list of FileStatus objects using the comment

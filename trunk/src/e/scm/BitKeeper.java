@@ -1,5 +1,6 @@
 package e.scm;
 
+import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import e.util.*;
@@ -106,11 +107,52 @@ public class BitKeeper extends RevisionControlSystem {
         execAndDump(command);
     }
     
-    public List getStatuses() {
-        String[] command = new String[] { "bk", "sfiles", "-ct", "-g", "-x", "-v", "-p" };
+    /**
+     * Returns the number of files in the repository, so we can give determinate progress.
+     */
+    private int getRepositoryFileCount() {
+        String[] command = new String[] { "bk", "prs", "-hr+", "-d:HASHCOUNT:" };
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
+        if (status != 0 || lines.size() != 1) {
+            return -1;
+        }
+        String line = (String) lines.get(0);
+        return Integer.parseInt(line);
+    }
+    
+    public List getStatuses(final WaitCursor waitCursor) {
+        // Switch to a determinate progress bar as soon as possible...
+        int fileCount = getRepositoryFileCount();
+        waitCursor.setProgressMaximum(fileCount);
+        
+        // Create a temporary file for the interesting output; we'll get progress information on standard out.
+        File temporaryFile = null;
+        try {
+            temporaryFile = File.createTempFile("scm-BitKeeper-", null);
+            temporaryFile.deleteOnExit();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        
+        String[] command = new String[] { "bk", "sfiles", "-ct", "-g", "-x", "-v", "-p", "-o" + temporaryFile.toString() };
+        ProcessUtilities.LineListener outputListener = new ProcessUtilities.LineListener() {
+            public void processLine(String line) {
+                // Update the progress bar based on BitKeeper's progress feedback.
+                int value = Integer.parseInt(line.substring(0, line.indexOf(' ')));
+                waitCursor.setProgressValue(value);
+            }
+        };
+        ProcessUtilities.LineListener errorListener = new ProcessUtilities.LineListener() {
+            public void processLine(String line) {
+                System.err.println(line);
+            }
+        };
+        int status = ProcessUtilities.backQuote(getRoot(), command, outputListener, errorListener);
+        
+        // Read in BitKeeper's real output.
+        List lines = Arrays.asList(StringUtilities.readLinesFromFile(temporaryFile.toString()));
         
         ArrayList statuses = new ArrayList();
         Pattern pattern = Pattern.compile("^(.{4})\\s+(.+)(@[0-9.]+)?$");
@@ -148,6 +190,7 @@ public class BitKeeper extends RevisionControlSystem {
                 statuses.add(new FileStatus(canonicalState, name));
             }
         }
+        temporaryFile.delete();
         return statuses;
     }
     

@@ -313,7 +313,7 @@ public class CheckInWindow extends JFrame {
             public void work() {
                 oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : new ArrayList();
                 commitButton.setEnabled(false);
-                statuses = backEnd.getStatuses();
+                statuses = backEnd.getStatuses(getWaitCursor());
                 Collections.sort(statuses);
                 statusesTableModel = new StatusesTableModel(statuses);
             }
