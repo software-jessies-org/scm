@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -63,11 +64,11 @@ public class Cvs implements RevisionControlSystem {
         return result;
     }
 
-    public boolean isLocallyModified(String filename) {
+    public boolean isLocallyModified(File repositoryRoot, String filename) {
         String[] command = new String[] { "cvs", "status", filename };
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(command, lines, errors);
+        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             String line = (String) lines.get(i);
             if (line.indexOf("Status: Locally Modified") != -1) {

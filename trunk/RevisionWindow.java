@@ -120,7 +120,8 @@ public class RevisionWindow extends JFrame {
             }
         };
 
-    private String filename;
+    private File repositoryRoot;
+    private String filePath;
 
     private RevisionControlSystem backEnd;
     
@@ -138,7 +139,7 @@ public class RevisionWindow extends JFrame {
         this.backEnd = guessWhichRevisionControlSystem();
         makeUserInterface(initialLineNumber);
 
-        readListOfRevisions(filename);
+        readListOfRevisions();
         if (initialLineNumber != 0) {
             showAnnotationsForRevision(revisions.getLatestInRepository(), initialLineNumber);
         } else {
@@ -168,7 +169,7 @@ public class RevisionWindow extends JFrame {
         if (backEnd.supportsChangeSets()) {
             changeSetButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    backEnd.showChangeSet(filename, getSelectedRevision());
+                    backEnd.showChangeSet(filePath, getSelectedRevision());
                 }
             });
         } else {
@@ -232,21 +233,55 @@ public class RevisionWindow extends JFrame {
     }
 
     /**
+     * Works out the repository root from the filename and keeps a path
+     * to the file relative to the repository root.
+     *
      * Follows symbolic links, so we get the revision history associated
      * with the target.
      */
     private void setFilename(String filename) {
-        this.filename = filename;
         try {
             File file = new File(filename);
             String absoluteFilename = file.getAbsolutePath();
             String canonicalFilename = file.getCanonicalPath();
             if (canonicalFilename.equals(absoluteFilename) == false) {
-                this.filename = canonicalFilename;
+                filename = canonicalFilename;
+            } else {
+                filename = absoluteFilename;
             }
+            this.repositoryRoot = getRepositoryRoot(filename);
+            this.filePath = filename.substring(repositoryRoot.toString().length() + File.separator.length());
         } catch (IOException ex) {
             ex.printStackTrace();
             System.exit(1);
+        }
+    }
+    
+    private File getRepositoryRoot(String filename) {
+        String clue = null;
+        
+        File file = new File(new File(filename).getAbsolutePath());
+        File directory = new File(file.getParent());
+        String[] siblings = directory.list();
+        for (int i = 0; i < siblings.length; ++i) {
+            if (siblings[i].equals("CVS")) {
+                clue = "CVS";
+            } else if (siblings[i].equals("SCCS")) {
+                clue = "SCCS";
+            }
+        }
+        
+        File root = directory;
+        while (true) {
+            File newRoot = new File(root.getParent());
+            if (newRoot.exists() == false || newRoot.isDirectory() == false) {
+                return root;
+            }
+            File scmDirectory = new File(newRoot, clue);
+            if (scmDirectory.exists() == false || scmDirectory.isDirectory() == false) {
+                return root;
+            }
+            root = newRoot;
         }
     }
 
@@ -257,9 +292,7 @@ public class RevisionWindow extends JFrame {
      * as the file.
      */
     private RevisionControlSystem guessWhichRevisionControlSystem() {
-        File file = new File(new File(filename).getAbsolutePath());
-        File directory = new File(file.getParent());
-        String[] siblings = directory.list();
+        String[] siblings = repositoryRoot.list();
         for (int i = 0; i < siblings.length; ++i) {
             if (siblings[i].equals("CVS")) {
                 return new Cvs();
@@ -280,8 +313,8 @@ public class RevisionWindow extends JFrame {
         try {
             WaitCursor.start(this);
             /* FIXME: do this in separate thread. */
-            String[] command = backEnd.getAnnotateCommand(revision, filename);
-            status = ProcessUtilities.backQuote(command, lines, errors);
+            String[] command = backEnd.getAnnotateCommand(revision, filePath);
+            status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
         } finally {
             WaitCursor.stop(this);
             clearStatus();
@@ -372,8 +405,8 @@ public class RevisionWindow extends JFrame {
         /* FIXME: do this in separate thread. */
         try {
             WaitCursor.start(this);
-            String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename);
-            status = ProcessUtilities.backQuote(command, lines, errors);
+            String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
+            status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
         } finally {
             WaitCursor.stop(this);
             clearStatus();
@@ -424,7 +457,7 @@ public class RevisionWindow extends JFrame {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(new JScrollPane(summary), BorderLayout.CENTER);
 
-        JFrame frame = new JFrame("Revisions of " + filename);
+        JFrame frame = new JFrame("Revisions of " + filePath);
         frame.setContentPane(panel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
@@ -436,7 +469,7 @@ public class RevisionWindow extends JFrame {
         return (Revision) revisionsList.getSelectedValue();
     }
 
-    private void readListOfRevisions(String filename) {
+    private void readListOfRevisions() {
         setStatus("Getting list of revisions...");
         /* FIXME: do rest in separate thread. */
         ArrayList lines = new ArrayList();
@@ -444,8 +477,8 @@ public class RevisionWindow extends JFrame {
         int status = 0;
         try {
             WaitCursor.start(this);
-            String[] command = backEnd.getLogCommand(filename);
-            status = ProcessUtilities.backQuote(command, lines, errors);
+            String[] command = backEnd.getLogCommand(filePath);
+            status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
         } finally {
             WaitCursor.stop(this);
             clearStatus();
@@ -457,7 +490,7 @@ public class RevisionWindow extends JFrame {
         }
 
         revisions = backEnd.parseLog(lines);
-        if (backEnd.isLocallyModified(filename)) {
+        if (backEnd.isLocallyModified(repositoryRoot, filePath)) {
             revisions.addLocalRevision(Revision.LOCAL_REVISION);
         }
         revisionsList.setModel(revisions);

@@ -10,10 +10,10 @@ public class ProcessUtilities {
      * Lines written to standard error are appended to 'errors'.
      * FIXME: should errors *we* detect go in 'lines', or in 'errors'?
      */
-    public static int backQuote(String[] command, ArrayList lines, ArrayList errors) {
+    public static int backQuote(File directory, String[] command, ArrayList lines, ArrayList errors) {
         ArrayList result = new ArrayList();
         try {
-            Process p = Runtime.getRuntime().exec(command);
+            Process p = Runtime.getRuntime().exec(command, null, directory);
             p.getOutputStream().close();
             readLinesFromStream(lines, p.getInputStream());
             readLinesFromStream(errors, p.getErrorStream());

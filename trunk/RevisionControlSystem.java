@@ -1,5 +1,12 @@
+import java.io.File;
 import java.util.List;
 
+/**
+ * The interface to various revision control systems.
+ *
+ * Filenames will be relative to the repository root, for the
+ * benefit of systems as stupid as CVS.
+ */
 public interface RevisionControlSystem {
     /**
      * Returns a command that gets the annotated form of the given revision
@@ -31,7 +38,7 @@ public interface RevisionControlSystem {
     /**
      * Tests whether a given file has been locally modified.
      */
-    public boolean isLocallyModified(String filename);
+    public boolean isLocallyModified(File repositoryRoot, String filename);
 
     /**
      * Tests whether this revision control system supports the notion of

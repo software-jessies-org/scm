@@ -20,11 +20,6 @@
   behavior when switching revisions; currently it just goes to the
   same-numbered line in the target revision (there's a FIXME).
 
-* To be usable from Edit on a CVS repository, we can't use the absolute
-  pathnames Edit gives us; we need a name within the repository. Not sure
-  what the best way of working this out is. Wonder if Subversion needs
-  the same? (BitKeeper doesn't.)
-
 * It would be better than translating tabs to spaces if we could actually
   render tabs properly in our JList's cell renderer. At least, what I'm
   trying to say is that it will suck if copying and pasting from our
