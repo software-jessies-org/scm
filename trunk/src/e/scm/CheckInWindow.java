@@ -348,8 +348,26 @@ public class CheckInWindow extends JFrame {
             String name = fileStatus.getName() + ": ";
             String checkInComment = checkInCommentArea.getText();
             if (checkInComment.indexOf(name) == -1) {
-                if (checkInComment.length() > 0 && !checkInComment.endsWith("\n")) {
-                    name = "\n" + name;
+                /**
+                 * We want to encourage check-in comments like this:
+                 * 
+                 * src/dir/file.cpp:
+                 * src/dir/file.h: comment here.
+                 * 
+                 * src/dir/header.h: a separate comment.
+                 * 
+                 * with just a newline between adjacent filenames, but a
+                 * blank line if you've actually added a comment.
+                 */
+                if (checkInComment.length() > 0) {
+                    if (checkInComment.endsWith(": ")) {
+                        name = "\n" + name;
+                    } else {
+                        if (checkInComment.endsWith("\n") == false) {
+                            name = "\n" + name;
+                        }
+                        name = "\n" + name;
+                    }
                 }
                 checkInCommentArea.append(name);
             }
