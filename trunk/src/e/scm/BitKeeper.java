@@ -34,23 +34,31 @@ public class BitKeeper implements RevisionControlSystem {
         return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 2, 3);
     }
 
+    //D 1.2 04/02/15 13:02:22+00:00 elliotth@mercury.local 3 2 4/0/356
+    //D 1.144 01/03/28 11:56:53-00:00 hughc 145 144 0/3/3528
+    private static final Pattern LOG_PATTERN = Pattern.compile("^D ([0-9.]+) (\\d\\d)/(\\d\\d)/(\\d\\d) \\S+ ([^@ ]+).*");
+
     public RevisionListModel parseLog(List linesList) {
         String[] lines = (String[]) linesList.toArray(new String[linesList.size()]);
 
         String separator = "------------------------------------------------";
         RevisionListModel result = new RevisionListModel();
-        String description = null;
-        String comment = "";
         for (int i = 0; i < lines.length; ++i) {
-            if (lines[i].startsWith("D ")) {
-                description = lines[i];
-            } else if (lines[i].startsWith("C ")) {
-                comment += lines[i].substring(2) + '\n';
-            }
             if (lines[i].equals(separator)) {
-                result.add(new Revision(description, comment));
-                description = null;
-                comment = "";
+                continue;
+            }
+            
+            Matcher matcher = LOG_PATTERN.matcher(lines[i]);
+            if (matcher.matches()) {
+                String number = matcher.group(1);
+                String author = matcher.group(5);
+                String date = "20" + matcher.group(2) + "-" + matcher.group(3) + "-" + matcher.group(4);
+                StringBuffer comment = new StringBuffer();
+                while (i < lines.length && lines[i].equals(separator) == false) {
+                    comment.append(lines[i++].substring(2));
+                    comment.append("\n");
+                }
+                result.add(new Revision(number, date, author, comment.toString()));
             }
         }
         return result;
