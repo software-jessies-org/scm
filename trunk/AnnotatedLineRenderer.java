@@ -7,12 +7,20 @@ public class AnnotatedLineRenderer extends DefaultListCellRenderer {
     private static final float[] NEW_COLOR = Color.RGBtoHSB(0, 0, 255, null);
     private static final int DAYS_TO_BLACK = 31;
 
+    private RevisionWindow revisionWindow;
+
+    public AnnotatedLineRenderer(RevisionWindow parentRevisionWindow) {
+        this.revisionWindow = parentRevisionWindow;
+    }
+
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean isFocused) {
         super.getListCellRendererComponent(list, value, index, isSelected, isFocused);
+
         AnnotatedLine line = (AnnotatedLine) value;
         setText(line.formattedLine);
         setToolTipText(toolTipForRevision(line.revision));
-        setForeground(colorForAge(line.age));
+        setForeground((revisionWindow.getSelectedRevision() == line.revision) ? Color.blue : Color.black);
+
         return this;
     }
 

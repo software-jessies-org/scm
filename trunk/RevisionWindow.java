@@ -18,8 +18,8 @@ public class RevisionWindow extends JFrame {
         }
     }
 
-    private static final AnnotatedLineRenderer ANNOTATED_LINE_RENDERER =
-        new AnnotatedLineRenderer();
+    private final AnnotatedLineRenderer annotatedLineRenderer =
+        new AnnotatedLineRenderer(this);
     private static final DifferencesRenderer DIFFERENCES_RENDERER =
         new DifferencesRenderer();
 
@@ -247,7 +247,7 @@ public class RevisionWindow extends JFrame {
         }
 
         history = backEnd.parseAnnotations(revisions, lines);
-        switchAnnotationView(history, ANNOTATED_LINE_RENDERER, annotationsDoubleClickListener);
+        switchAnnotationView(history, annotatedLineRenderer, annotationsDoubleClickListener);
         showSpecificLineInAnnotations(lineNumber);
     }
 
@@ -342,6 +342,10 @@ public class RevisionWindow extends JFrame {
         revisionCommentArea.setText(summary.toString());
         revisionCommentArea.setCaretPosition(0);
         annotationView.setModel(EMPTY_LIST_MODEL);
+    }
+
+    public Revision getSelectedRevision() {
+        return (Revision) revisionsList.getSelectedValue();
     }
 
     private void initRevisions(String filename) {

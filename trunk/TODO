@@ -64,3 +64,9 @@
   when that line was removed. Search forward through revisions until we
   can't find the line. Relatedly: for a given line, make it easy to find
   out automatically when that line was introduced.
+
+* We should have a way (if we're dealing with BitKeeper) to call csettool.
+  For file.cpp revision 1.3, we want this:
+
+    bk csettool -r`bk r2c -r1.3 file.cpp` -ffile.cpp@1.3
+
