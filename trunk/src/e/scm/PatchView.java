@@ -71,7 +71,7 @@ public class PatchView extends JList {
         for (int i = 0; i < lines.size(); ++i) {
             differences.addElement((String) lines.get(i));
         }
-        setCellRenderer(DifferencesRenderer.INSTANCE);
+        setCellRenderer(PatchListCellRenderer.INSTANCE);
         setModel(differences);
         
         // We can't easily retain the context when switching to differences.

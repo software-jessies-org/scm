@@ -531,7 +531,7 @@ public class RevisionWindow extends JFrame {
                 for (int i = 0; i < lines.size(); ++i) {
                     differences.addElement((String) lines.get(i));
                 }
-                switchAnnotationView(differences, DifferencesRenderer.INSTANCE, differencesDoubleClickListener);
+                switchAnnotationView(differences, PatchListCellRenderer.INSTANCE, differencesDoubleClickListener);
                 
                 // We can't easily retain the context when switching to differences.
                 // As an extension, though, we could do this.
