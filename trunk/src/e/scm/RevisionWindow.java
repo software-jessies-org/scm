@@ -397,12 +397,13 @@ public class RevisionWindow extends JFrame {
             ArrayList errors = new ArrayList();
             int status = 0;
             /* FIXME: do this in separate thread. */
+            WaitCursor waitCursor = new WaitCursor(this, "Getting local modifications...");
             try {
-                WaitCursor.start(this, "Getting local modifications...");
+                waitCursor.start();
                 String[] command = backEnd.getDifferencesCommand(null, Revision.LOCAL_REVISION, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, patchLines, errors);
             } finally {
-                WaitCursor.stop(this);
+                waitCursor.stop();
             }
             
             // CVS returns a non-zero exit status if there were any differences.

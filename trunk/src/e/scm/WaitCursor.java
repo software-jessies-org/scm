@@ -16,7 +16,7 @@ public class WaitCursor {
     /**
      * Makes sure that the sheet follows its parent around.
      */
-    private static final ComponentListener SHEET_PARENT_LISTENER = new ComponentAdapter() {
+    private final ComponentListener sheetParentListener = new ComponentAdapter() {
         public void componentMoved(ComponentEvent e) {
             repositionSheet();
         }
@@ -29,34 +29,42 @@ public class WaitCursor {
     /**
      * If we're waiting long enough, we provide more feedback, via this window.
      */
-    private static JDialog sheet;
+    private JDialog sheet;
     
     /**
      * This timer is used to decide when to show the informational sheet.
      */
-    private static Timer sheetTimer;
+    private Timer sheetTimer;
     
     /**
      * To work around a Sun bug in Java 1.4.2, it's useful to keep a progress bar.
      */
-    private static JProgressBar progressBar = new JProgressBar();
+    private JProgressBar progressBar = new JProgressBar();
     
-    public static synchronized void start(Object component, String message) {
-        Component glassPane = getGlassPane(component);
+    private Object component;
+    private String message;
+    private Component glassPane;
+    
+    public WaitCursor(Object component, String message) {
+        this.component = component;
+        this.message = message;
+        this.glassPane = getGlassPane();
+    }
+    
+    public synchronized void start() {
         glassPane.setCursor(WAIT_CURSOR);
         glassPane.addMouseListener(MOUSE_EVENT_SWALLOWER);
         glassPane.setVisible(true);
         
-        scheduleSheetAppearance(glassPane, message);
+        scheduleSheetAppearance();
     }
     
-    public static synchronized void stop(Object component) {
+    public synchronized void stop() {
         if (sheetTimer != null) {
             sheetTimer.stop();
             sheetTimer = null;
         }
         
-        Component glassPane = getGlassPane(component);
         glassPane.setCursor(DEFAULT_CURSOR);
         glassPane.removeMouseListener(MOUSE_EVENT_SWALLOWER);
         glassPane.setVisible(false);
@@ -64,12 +72,12 @@ public class WaitCursor {
         hideSheet();
     }
 
-    private static synchronized void hideSheet() {
+    private synchronized void hideSheet() {
         // Work around Sun bug 4995929 for Java 1.4.2 users.
         progressBar.setIndeterminate(false);
         
         if (sheet != null) {
-            sheet.getOwner().removeComponentListener(SHEET_PARENT_LISTENER);
+            sheet.getOwner().removeComponentListener(sheetParentListener);
             sheet.setVisible(false);
             sheet.dispose();
             sheet = null;
@@ -81,23 +89,23 @@ public class WaitCursor {
      * We can't bring up the explanatory sheet immediately, because we don't know how long
      * we'll be waiting. If we're not waiting long enough, we'd just be causing annoying flashing.
      */
-    private static void scheduleSheetAppearance(final Component glassPane, final String message) {
+    private void scheduleSheetAppearance() {
         sheetTimer = new Timer(500, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showSheet(glassPane, message);
+                showSheet();
             }
         });
         sheetTimer.setRepeats(false);
         sheetTimer.start();
     }
     
-    private static synchronized void showSheet(final Component glassPane, final String message) {
+    private synchronized void showSheet() {
         hideSheet();
-        createSheet(glassPane, message);
+        createSheet();
         sheet.setVisible(true);
     }
     
-    private static synchronized void createSheet(final Component glassPane, final String message) {
+    private synchronized void createSheet() {
         // Create the content.
         progressBar.setIndeterminate(true);
         JComponent content = new JPanel(new BorderLayout(20, 20));
@@ -111,19 +119,19 @@ public class WaitCursor {
         sheet.setSize(new Dimension(400, 120));
         sheet.setUndecorated(true);
         
-        sheet.getOwner().addComponentListener(SHEET_PARENT_LISTENER);
+        sheet.getOwner().addComponentListener(sheetParentListener);
         repositionSheet();
     }
     
     /** Lines the sheet up with the middle of the top of the parent window. */
-    private static void repositionSheet() {
+    private void repositionSheet() {
         Point location = sheet.getOwner().getLocationOnScreen();
         location.y += sheet.getOwner().getInsets().top;
         location.x += (sheet.getOwner().getWidth() - sheet.getWidth()) / 2;
         sheet.setLocation(location);
     }
 
-    private static Component getGlassPane(Object component) {
+    private Component getGlassPane() {
         RootPaneContainer container = null;
         if (component instanceof RootPaneContainer) {
             container = (RootPaneContainer) component;
@@ -147,9 +155,5 @@ public class WaitCursor {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         panel.add(component);
         return panel;
-    }
-
-    private WaitCursor() {
-        // Prevent instantiation.
     }
 }

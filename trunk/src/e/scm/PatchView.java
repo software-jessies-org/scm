@@ -44,12 +44,13 @@ public class PatchView extends JList {
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = 0;
+        WaitCursor waitCursor = new WaitCursor(this, "Getting patch...");
         try {
-            WaitCursor.start(this, "Getting patch...");
+            waitCursor.start();
             String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename);
             status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
         } finally {
-            WaitCursor.stop(this);
+            waitCursor.stop();
         }
         
         // CVS returns a non-zero exit status if there were any differences.

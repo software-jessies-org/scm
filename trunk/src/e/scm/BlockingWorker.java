@@ -15,13 +15,14 @@ public abstract class BlockingWorker extends Thread {
     }
     
     public final void run() {
+        WaitCursor waitCursor = new WaitCursor(component, message);
         try {
-            WaitCursor.start(component, message);
+            waitCursor.start();
             work();
         } catch (Exception ex) {
             caughtException = ex;
         } finally {
-            WaitCursor.stop(component);
+            waitCursor.stop();
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
