@@ -36,7 +36,7 @@ public class AnnotationModel extends AbstractListModel {
             String line = (String) patchLines.get(i);
             Matcher matcher = Patch.AT_AT_PATTERN.matcher(line);
             if (matcher.find()) {
-                String location = matcher.group(1);
+                String location = matcher.group(3);
                 lineNumber = Integer.parseInt(location);
             } else if (lineNumber > 0) {
                 if (line.startsWith("-")) {

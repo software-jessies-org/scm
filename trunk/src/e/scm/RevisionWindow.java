@@ -150,7 +150,7 @@ public class RevisionWindow extends JFrame {
                         Matcher matcher = Patch.AT_AT_PATTERN.matcher(line);
                         if (matcher.matches()) {
                             olderStartLine = Integer.parseInt(matcher.group(1));
-                            newerStartLine = Integer.parseInt(matcher.group(2));
+                            newerStartLine = Integer.parseInt(matcher.group(3));
                             break;
                         } else if (line.startsWith("+")) {
                             if (desiredRevision == newerRevision) {
