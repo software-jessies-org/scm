@@ -263,15 +263,15 @@ public class CheckInWindow extends JFrame {
             }
             
             public void finish() {
+                discardSavedState();
                 updateFileStatuses();
-                clearCheckInCommentArea();
             }
         };
     }
     
-    private void clearCheckInCommentArea() {
+    private void discardSavedState() {
         checkInCommentArea.setText("");
-        checkInCommentArea.setEnabled(false);
+        statusesTableModel = new StatusesTableModel(new ArrayList());
         updateSavedState();
     }
     
@@ -333,7 +333,6 @@ public class CheckInWindow extends JFrame {
     private void initCheckInCommentArea() {
         checkInCommentArea = makeTextArea(8);
         checkInCommentArea.setEnabled(false);
-        readSavedComment();
     }
     
     private void readSavedComment() {
@@ -355,9 +354,7 @@ public class CheckInWindow extends JFrame {
     private void updateSavedState() {
         String comment = checkInCommentArea.isEnabled() ? checkInCommentArea.getText() : "";
         updateSavedStateFile(getSavedCommentFile(), comment);
-        if (statusesTableModel != null) {
-            updateSavedStateFile(getSavedFilenamesFile(), StringUtilities.join(statusesTableModel.getIncludedFilenames(), "\n"));
-        }
+        updateSavedStateFile(getSavedFilenamesFile(), StringUtilities.join(statusesTableModel.getIncludedFilenames(), "\n"));
     }
 
     private void updateSavedStateFile(File file, String newContent) {
@@ -406,12 +403,13 @@ public class CheckInWindow extends JFrame {
     
     private void updateFileStatuses() {
         new BlockingWorker(statusesTable, "Getting file statuses...") {
-            List oldIncludedFiles;
             List statuses;
             Exception failure;
             
             public void work() {
-                oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : null;
+                if (statusesTableModel != null) {
+                    updateSavedState();
+                }
                 commitButton.setEnabled(false);
                 try {
                     statuses = backEnd.getStatuses(getWaitCursor());
@@ -429,11 +427,7 @@ public class CheckInWindow extends JFrame {
                 statusesTableModel.initColumnWidths(statusesTable);
                 statusesTableModel.addTableModelListener(new StatusesTableModelListener());
                 statusesTableModel.fireTableDataChanged();
-                if (oldIncludedFiles != null) {
-                    statusesTableModel.includeFiles(oldIncludedFiles);
-                } else {
-                    readSavedFilenames();
-                }
+                readSavedFilenames();
                 
                 /* Give some feedback to demonstrate we're not broken if there's nothing to show. */
                 boolean nothingModified = (statusesTableModel.getRowCount() == 0);
@@ -463,17 +457,20 @@ public class CheckInWindow extends JFrame {
     }
     
     private static final String INSTRUCTIONS = "\n 1. Check all those files in the list to the left that you wish to commit.\n\n 2. Edit the resulting comment in this area.\n\n 3. Click the \"Commit\" button when done.";
-    
+        
     private class StatusesTableModelListener implements TableModelListener {
         public void tableChanged(TableModelEvent e) {
             boolean haveFiles = statusesTableModel.isAtLeastOneFileIncluded();
             commitButton.setEnabled(haveFiles);
-            if (checkInCommentArea.isEnabled() == false && haveFiles) {
-                checkInCommentArea.setText("");
-            }
-            checkInCommentArea.setEnabled(haveFiles);
-            if (haveFiles == false) {
-                checkInCommentArea.setText(INSTRUCTIONS);
+
+            if (checkInCommentArea.isEnabled() != haveFiles) {
+                if (haveFiles) {
+                    readSavedComment();
+                    checkInCommentArea.setEnabled(true);
+                } else {
+                    checkInCommentArea.setEnabled(false);
+                    checkInCommentArea.setText(INSTRUCTIONS);
+                }
             }
             
             if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 0) {
