@@ -108,13 +108,13 @@ public class Subversion implements RevisionControlSystem {
                 String name = matcher.group(2);
                 int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
                 switch (state) {
-                case 'A': canonicalState = FileStatus.ADDED; break;
-                case 'C': canonicalState = FileStatus.CONTAINS_CONFLICTS; break;
-                case 'D': canonicalState = FileStatus.REMOVED; break;
-                case 'M': canonicalState = FileStatus.MODIFIED; break;
-                case '?': canonicalState = FileStatus.NEW; break;
-                case '!': canonicalState = FileStatus.MISSING; break;
-                case '~': canonicalState = FileStatus.WRONG_KIND; break;
+                    case 'A': canonicalState = FileStatus.ADDED; break;
+                    case 'C': canonicalState = FileStatus.CONTAINS_CONFLICTS; break;
+                    case 'D': canonicalState = FileStatus.REMOVED; break;
+                    case 'M': canonicalState = FileStatus.MODIFIED; break;
+                    case '?': canonicalState = FileStatus.NEW; break;
+                    case '!': canonicalState = FileStatus.MISSING; break;
+                    case '~': canonicalState = FileStatus.WRONG_KIND; break;
                 }
                 statuses.add(new FileStatus(canonicalState, name));
             } else {

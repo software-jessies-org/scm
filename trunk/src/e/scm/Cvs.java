@@ -103,6 +103,36 @@ public class Cvs implements RevisionControlSystem {
     }
     
     public List getStatuses(File repositoryRoot) {
-        throw new UnsupportedOperationException("Can't get status information for a CVS repository.");
+        String[] command = new String[] { "cvs", "update", "-dP" };
+        ArrayList lines = new ArrayList();
+        ArrayList errors = new ArrayList();
+        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+        
+        ArrayList statuses = new ArrayList();
+        Pattern pattern = Pattern.compile("^(.) (.+)$");
+        for (int i = 0; i < lines.size(); ++i) {
+            String line = (String) lines.get(i);
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find()) {
+                char state = matcher.group(1).charAt(0);
+                if (state == 'U') {
+                    continue;
+                }
+                
+                String name = matcher.group(2);
+                int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
+                switch (state) {
+                    case 'A': canonicalState = FileStatus.ADDED; break;
+                    case 'C': canonicalState = FileStatus.CONTAINS_CONFLICTS; break;
+                    case 'R': canonicalState = FileStatus.REMOVED; break;
+                    case 'M': canonicalState = FileStatus.MODIFIED; break;
+                    case '?': canonicalState = FileStatus.NEW; break;
+                }
+                statuses.add(new FileStatus(canonicalState, name));
+            } else {
+                System.err.println("CVS back end didn't understand '" + line + "'.");
+            }
+        }
+        return statuses;
     }
 }
