@@ -177,6 +177,8 @@ public abstract class RevisionControlSystem {
      */
     public abstract void commit(String comment, List/*<FileStatus>*/ fileStatuses);
     
+    // This only copes with spaces in commands, not other shell special punctuation and specifically not ".
+    // Fix it when it bites you.
     private String quoteCommand(List command) {
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < command.size(); ++i) {
