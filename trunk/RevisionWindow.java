@@ -426,6 +426,7 @@ public class RevisionWindow extends JFrame {
 
         JFrame frame = new JFrame("Revisions of " + filename);
         frame.setContentPane(panel);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
         frame.setLocationRelativeTo(this);
         frame.setVisible(true);
