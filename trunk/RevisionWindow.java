@@ -76,8 +76,7 @@ public class RevisionWindow extends JFrame {
         String[] lines = ProcessUtilities.backQuote(command, errors);
         clearStatus();
 
-        if (errors.size() != 2 || ((String) errors.get(0)).startsWith("Annotations for ") == false || ((String) errors.get(1)).startsWith("***************") == false) {
-            System.err.println(errors.size());
+        if (errors.size() > 3 || ((String) errors.get(errors.size() - 2)).startsWith("Annotations for ") == false || ((String) errors.get(errors.size() - 1)).startsWith("***************") == false) {
             showToolError(annotationView, errors);
             return;
         }
