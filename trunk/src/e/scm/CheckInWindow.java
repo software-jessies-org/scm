@@ -127,6 +127,10 @@ public class CheckInWindow extends JFrame {
                 }
             }
         });
+        
+        // Try to make JTable look a little less weird.
+        statusesTable.setIntercellSpacing(new Dimension());
+        statusesTable.setShowGrid(false);
     }
     
     private void commit() {
