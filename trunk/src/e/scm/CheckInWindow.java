@@ -24,7 +24,8 @@ public class CheckInWindow extends JFrame {
 
     private RevisionControlSystem backEnd;
     
-    private JList statusesList;
+    private JTable statusesTable;
+    private StatusesTableModel statusesTableModel;
     private JTextArea checkInCommentArea;
     private PatchView patchView;
     private JLabel statusLine = new JLabel(" ");
@@ -34,7 +35,7 @@ public class CheckInWindow extends JFrame {
         this.backEnd = RevisionWindow.guessWhichRevisionControlSystem(repositoryRoot);
         setTitle(repositoryRoot.toString());
         makeUserInterface();
-        readFileStatuses();
+        updateFileStatuses();
     }
 
     private void makeUserInterface() {
@@ -42,7 +43,7 @@ public class CheckInWindow extends JFrame {
         initCheckInCommentArea();
 
         JComponent topUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-            new JScrollPane(statusesList),
+            new JScrollPane(statusesTable),
             new JScrollPane(checkInCommentArea,
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED)
@@ -80,21 +81,24 @@ public class CheckInWindow extends JFrame {
     }
 
     private void initStatusesList() {
-        statusesList = new JList();
-        statusesList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        statusesList.setFont(FONT);
-        statusesList.addListSelectionListener(new ListSelectionListener() {
+        statusesTable = new JTable();
+        statusesTable.setTableHeader(null);
+        statusesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        statusesTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        statusesTable.setFont(FONT);
+        statusesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) {
                     return;
                 }
                 
-                FileStatus status = (FileStatus) statusesList.getSelectedValue();
+                final int selectedRow = statusesTable.getSelectedRow();
+                FileStatus status = statusesTableModel.getFileStatus(selectedRow);
                 patchView.showPatch(backEnd, repositoryRoot, null, null, status.getName());
             }
         });
     }
-
+    
     private void commit() {
         // FIXME!
     }
@@ -113,7 +117,7 @@ public class CheckInWindow extends JFrame {
         return textArea;
     }
 
-    private void readFileStatuses() {
+    private void updateFileStatuses() {
         setStatus("Getting file statuses...");
         List statuses = null;
         try {
@@ -124,13 +128,11 @@ public class CheckInWindow extends JFrame {
             clearStatus();
         }
         
-        DefaultListModel model = new DefaultListModel();
-        for (int i = 0; i < statuses.size(); ++i) {
-            model.addElement(statuses.get(i));
-        }
-        statusesList.setModel(model);
+        statusesTableModel = new StatusesTableModel(statuses);
+        statusesTable.setModel(statusesTableModel);
+        statusesTableModel.initColumnWidths(statusesTable);
     }
-
+    
     private void showToolError(JList list, ArrayList lines) {
         list.setCellRenderer(new ToolErrorRenderer());
         list.setModel(new ToolErrorListModel(lines));
