@@ -1,3 +1,3 @@
 PROJECT_NAME=scm
 
-include java.make
+include ../../salma-hayek/java.make

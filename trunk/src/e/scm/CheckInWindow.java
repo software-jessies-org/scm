@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import e.util.*;
 
 public class CheckInWindow extends JFrame {
     private static final Font FONT;
@@ -94,7 +95,16 @@ public class CheckInWindow extends JFrame {
                 
                 final int selectedRow = statusesTable.getSelectedRow();
                 FileStatus status = statusesTableModel.getFileStatus(selectedRow);
-                patchView.showPatch(backEnd, repositoryRoot, null, null, status.getName());
+                if (status.getState() == FileStatus.NEW) {
+                    DefaultListModel model = new DefaultListModel();
+                    String[] lines = StringUtilities.readLinesFromFile(new File(repositoryRoot, status.getName()).getAbsolutePath());
+                    for (int i = 0; i < lines.length; ++i) {
+                        model.addElement(lines[i]);
+                    }
+                    patchView.setModel(model);
+                } else {
+                    patchView.showPatch(backEnd, repositoryRoot, null, null, status.getName());
+                }
             }
         });
     }
