@@ -44,7 +44,7 @@ public class Subversion extends RevisionControlSystem {
     }
     
     //r74 | elliotth | 2004-04-24 12:29:26 +0100 (Sat, 24 Apr 2004) | 3 lines
-    private static final Pattern LOG_PATTERN = Pattern.compile("^r(\\d+) \\| (\\S+) \\| (\\d{4}-\\d{2}-\\d{2}) .* lines?$");
+    private static final Pattern LOG_PATTERN = Pattern.compile("^r(\\d+) \\| (\\S+) \\| (\\d{4}-\\d{2}-\\d{2}) .* \\| (\\d+) lines?$");
 
     public RevisionListModel parseLog(List linesList) {
         String[] lines = (String[]) linesList.toArray(new String[linesList.size()]);
@@ -57,16 +57,26 @@ public class Subversion extends RevisionControlSystem {
                 continue;
             }
             
-            Matcher matcher = LOG_PATTERN.matcher(lines[i]);
+            Matcher matcher = LOG_PATTERN.matcher(lines[i++]);
             if (matcher.matches()) {
                 String number = matcher.group(1);
                 String author = matcher.group(2);
                 String date = matcher.group(3);
+                
+                int commentLineCount = Integer.parseInt(matcher.group(4));
+                if (lines[i].equals("") == false) {
+                    Log.warn("expected blank line when parsing log");
+                }
+                ++i; // Skip blank line.
                 StringBuffer comment = new StringBuffer();
-                while (++i < lines.length && lines[i].equals(separator) == false) {
-                    comment.append(lines[i]);
+                for (; commentLineCount > 0; --commentLineCount) {
+                    comment.append(lines[i++]);
                     comment.append("\n");
                 }
+                if (lines[i].equals(separator) == false) {
+                    Log.warn("expected separator line when parsing log");
+                }
+                ++i; // Skip separator line.
                 result.add(new Revision(number, date, author, comment.toString()));
             }
         }
