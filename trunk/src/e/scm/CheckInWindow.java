@@ -248,7 +248,18 @@ public class CheckInWindow extends JFrame {
                     comment += "\n";
                 }
                 List/*<FileStatus>*/ filenames = statusesTableModel.getIncludedFiles();
-                backEnd.commit(comment, filenames);
+                try {
+                    backEnd.commit(comment, filenames);
+                } catch (RuntimeException ex) {
+                    // We know the button must have been enabled, or we couldn't
+                    // have got here. If the commit failed, the user is likely
+                    // to want to try again.
+                    commitButton.setEnabled(true);
+                    // Re-throw so that "finish()" isn't run, and the user can
+                    // see that something went wrong. (Though obviously, the
+                    // console isn't the best place to report that.)
+                    throw ex;
+                }
             }
             
             public void finish() {
