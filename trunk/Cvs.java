@@ -27,15 +27,17 @@ public class Cvs implements RevisionControlSystem {
         return new String[] { "cvs", "log", filename };
     }
 
-    public AnnotationModel parseAnnotations(RevisionListModel revisions, String[] lines) {
+    public AnnotationModel parseAnnotations(RevisionListModel revisions, List lines) {
         AnnotationModel result = new AnnotationModel();
-        for (int i = 0; i < lines.length; ++i) {
-            result.add(AnnotatedLine.fromCvsAnnotatedLine(revisions, lines[i]));
+        for (int i = 0; i < lines.size(); ++i) {
+            result.add(AnnotatedLine.fromCvsAnnotatedLine(revisions, (String) lines.get(i)));
         }
         return result;
     }
 
-    public RevisionListModel parseLog(String[] lines) {
+    public RevisionListModel parseLog(List linesList) {
+        String[] lines = (String[]) linesList.toArray(new String[linesList.size()]);
+
         String separator = "----------------------------";
         String endMarker = "=============================================================================";
         int i = 0;

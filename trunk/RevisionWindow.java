@@ -197,11 +197,13 @@ public class RevisionWindow extends JFrame {
         setStatus("Getting annotations for revision...");
         /* FIXME: do rest in separate thread. */
         String[] command = backEnd.getAnnotateCommand(revision, filename);
+        ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        String[] lines = ProcessUtilities.backQuote(command, errors);
+        int status = ProcessUtilities.backQuote(command, lines, errors);
         clearStatus();
 
-        if (backEnd instanceof Cvs && (errors.size() > 3 || ((String) errors.get(errors.size() - 2)).startsWith("Annotations for ") == false || ((String) errors.get(errors.size() - 1)).startsWith("***************") == false)) {
+        // CVS writes junk to standard error even on success.
+        if (status != 0) {
             showToolError(annotationView, errors);
             return;
         }
@@ -266,18 +268,20 @@ public class RevisionWindow extends JFrame {
         setStatus("Getting differences between revisions...");
         /* FIXME: do rest in separate thread. */
         String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename);
+        ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        String[] lines = ProcessUtilities.backQuote(command, errors);
+        int status = ProcessUtilities.backQuote(command, lines, errors);
         clearStatus();
 
+        // CVS returns a non-zero exit status if there were any differences.
         if (errors.size() > 0) {
             showToolError(revisionsList, errors);
             return;
         }
 
         DefaultListModel differences = new DefaultListModel();
-        for (int i = 0; i < lines.length; ++i) {
-            differences.addElement(lines[i]);
+        for (int i = 0; i < lines.size(); ++i) {
+            differences.addElement((String) lines.get(i));
         }
         switchAnnotationView(differences, DIFFERENCES_RENDERER, differencesDoubleClickListener);
 
@@ -306,11 +310,12 @@ public class RevisionWindow extends JFrame {
         setStatus("Getting list of revisions...");
         /* FIXME: do rest in separate thread. */
         String[] command = backEnd.getLogCommand(filename);
+        ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        String[] lines = ProcessUtilities.backQuote(command, errors);
+        int status = ProcessUtilities.backQuote(command, lines, errors);
         clearStatus();
         
-        if (errors.size() > 0) {
+        if (status != 0 || errors.size() > 0) {
             showToolError(revisionsList, errors);
             return;
         }

@@ -24,15 +24,17 @@ public class BitKeeper implements RevisionControlSystem {
         return new String[] { "bk", "prs", filename };
     }
 
-    public AnnotationModel parseAnnotations(RevisionListModel revisions, String[] lines) {
+    public AnnotationModel parseAnnotations(RevisionListModel revisions, List lines) {
         AnnotationModel result = new AnnotationModel();
-        for (int i = 0; i < lines.length; ++i) {
-            result.add(AnnotatedLine.fromBitKeeperAnnotatedLine(revisions, lines[i]));
+        for (int i = 0; i < lines.size(); ++i) {
+            result.add(AnnotatedLine.fromBitKeeperAnnotatedLine(revisions, (String) lines.get(i)));
         }
         return result;
     }
 
-    public RevisionListModel parseLog(String[] lines) {
+    public RevisionListModel parseLog(List linesList) {
+        String[] lines = (String[]) linesList.toArray(new String[linesList.size()]);
+
         String separator = "------------------------------------------------";
         RevisionListModel result = new RevisionListModel();
         String description = null;

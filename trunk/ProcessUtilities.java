@@ -5,22 +5,23 @@ import java.util.*;
 
 public class ProcessUtilities {
     /**
-     * Returns the lines output to standard output by 'command' when run.
+     * Runs 'command'. Returns the command's status code.
+     * Lines written to standard output are appended to 'lines'.
      * Lines written to standard error are appended to 'errors'.
-     * FIXME: should errors *we* detect go in the return value, or in errors?
+     * FIXME: should errors *we* detect go in 'lines', or in 'errors'?
      */
-    public static String[] backQuote(String[] command, ArrayList errors) {
+    public static int backQuote(String[] command, ArrayList lines, ArrayList errors) {
         ArrayList result = new ArrayList();
         try {
             Process p = Runtime.getRuntime().exec(command);
             p.getOutputStream().close();
-            readLinesFromStream(result, p.getInputStream());
+            readLinesFromStream(lines, p.getInputStream());
             readLinesFromStream(errors, p.getErrorStream());
+            return p.waitFor();
         } catch (Exception ex) {
             ex.printStackTrace();
-            result.add(ex.getMessage());
-        } finally {
-            return (String[]) result.toArray(new String[result.size()]);
+            lines.add(ex.getMessage());
+            return 1;
         }
     }
 
