@@ -145,12 +145,12 @@ public class CheckInWindow extends JFrame {
         }
     }
     
-    private class RevertFileAction extends AbstractAction {
-        RevertFileAction() {
-            super("Revert File");
+    private class DiscardChangesAction extends AbstractAction {
+        DiscardChangesAction() {
+            super("Discard Changes");
         }
         public void actionPerformed(ActionEvent e) {
-            revert();
+            discardChanges();
         }
     }
     
@@ -175,7 +175,7 @@ public class CheckInWindow extends JFrame {
     private void initStatusesTableContextMenu() {
         final EPopupMenu contextMenu = new EPopupMenu();
         contextMenu.add(new EditFileAction());
-        contextMenu.add(new RevertFileAction());
+        contextMenu.add(new DiscardChangesAction());
         contextMenu.addSeparator();
         contextMenu.add(new ShowHistoryAction());
         contextMenu.addSeparator();
@@ -221,9 +221,9 @@ public class CheckInWindow extends JFrame {
     }
     
     /**
-     * Invoked when the user chooses "Revert" from the pop-up menu.
+     * Invoked when the user chooses "Discard Changes" from the pop-up menu.
      */
-    private void revert() {
+    private void discardChanges() {
         patchView.setModel(new DefaultListModel());
         FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
         if (fileStatus.getState() == FileStatus.NEW) {
