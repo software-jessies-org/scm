@@ -3,7 +3,7 @@ package e.scm;
 import java.util.regex.*;
 
 public class RevisionTool {
-    private static final Pattern GREP_ADDRESS = Pattern.compile("(.*):([0-9]+):?");
+    private static final Pattern GREP_ADDRESS = Pattern.compile("(.*):([0-9]+):?.*");
 
     public static void main(String[] args) {
         if (args.length == 0) {
