@@ -75,7 +75,6 @@ public class CheckInWindow extends JFrame {
                 commit();
             }
         });
-        commitButton.setEnabled(false);
 
         JPanel statusPanel = new JPanel(new BorderLayout());
         statusPanel.add(statusLine, BorderLayout.CENTER);
@@ -320,6 +319,7 @@ public class CheckInWindow extends JFrame {
                 statusesTableModel.includeFiles(oldIncludedFiles);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
+                        commitButton.setEnabled(false);
                         statusesTable.setModel(statusesTableModel);
                         statusesTableModel.initColumnWidths(statusesTable);
                         statusesTableModel.addTableModelListener(new StatusesTableModelListener());
