@@ -246,6 +246,7 @@ public abstract class RevisionControlSystem {
         ArrayList command = new ArrayList();
         command.add(commandName);
         command.add("add");
+        command.add("--non-recursive");
         addFilenames(command, newFiles);
         execAndDump(command);
     }
