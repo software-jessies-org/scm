@@ -1,6 +1,7 @@
 package e.scm;
 
 import java.io.File;
+import java.io.*;
 import java.util.*;
 import e.util.*;
 
@@ -33,7 +34,13 @@ public abstract class RevisionControlSystem {
     private static File findRepositoryRoot(final String path) {
         String clue = null;
         
-        File file = new File(new File(path).getAbsolutePath());
+        String canonicalPath = path;
+        try {
+            canonicalPath = new File(path).getCanonicalPath();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        File file = new File(canonicalPath);
         File directory = file.isDirectory() ? file : new File(file.getParent());
         String[] siblings = directory.list();
         for (int i = 0; i < siblings.length; ++i) {

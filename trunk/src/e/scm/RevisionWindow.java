@@ -307,19 +307,12 @@ public class RevisionWindow extends JFrame {
     private void setFilename(String filename) {
         try {
             File file = new File(filename);
-            String absoluteFilename = file.getAbsolutePath();
-            String canonicalFilename = file.getCanonicalPath();
-            if (canonicalFilename.equals(absoluteFilename) == false) {
-                filename = canonicalFilename;
-            } else {
-                filename = absoluteFilename;
-            }
+            filename = file.getCanonicalPath();
             this.filePath = filename.substring(backEnd.getRoot().toString().length() + File.separator.length());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
-    
     
     private void showAnnotationsForRevision(Revision revision, int lineNumber) {
         setStatus("Getting annotations for revision...");
@@ -338,7 +331,7 @@ public class RevisionWindow extends JFrame {
 
         // CVS writes junk to standard error even on success.
         if (status != 0) {
-            showToolError(annotationView, errors);
+            showToolError(annotationView, errors, status);
             return;
         }
 
@@ -534,13 +527,14 @@ public class RevisionWindow extends JFrame {
             WaitCursor.start(this);
             String[] command = backEnd.getLogCommand(filePath);
             status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
+            // When there's an error, it's useful to dump out the directory, command and environment.
         } finally {
             WaitCursor.stop(this);
             clearStatus();
         }
         
         if (status != 0 || errors.size() > 0) {
-            showToolError(revisionsList, errors);
+            showToolError(revisionsList, errors, status);
             return;
         }
 
@@ -559,6 +553,13 @@ public class RevisionWindow extends JFrame {
     private void showToolError(JList list, ArrayList lines) {
         list.setCellRenderer(new ToolErrorRenderer());
         list.setModel(new ToolErrorListModel(lines));
+    }
+    
+    private void showToolError(JList list, ArrayList lines, int status) {
+        if (lines.size() == 0) {
+            lines.add("Unknown error with status " + status);
+        }
+        showToolError(list, lines);
     }
     
     public void clearStatus() {
