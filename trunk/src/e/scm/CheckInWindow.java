@@ -153,9 +153,9 @@ public class CheckInWindow extends JFrame {
         }
     }
     
-    private class RefreshAction extends AbstractAction {
-        RefreshAction() {
-            super("Refresh");
+    private class RefreshListAction extends AbstractAction {
+        RefreshListAction() {
+            super("Refresh List");
         }
         public void actionPerformed(ActionEvent e) {
             updateFileStatuses();
@@ -167,7 +167,7 @@ public class CheckInWindow extends JFrame {
         contextMenu.add(new RevertAction());
         contextMenu.addSeparator();
         contextMenu.add(new HistoryAction());
-        contextMenu.add(new RefreshAction());
+        contextMenu.add(new RefreshListAction());
         statusesTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 maybeShowContextMenu(e);
