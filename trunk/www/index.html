@@ -1,0 +1,87 @@
+<html>
+<head>
+<title>SCM</title>
+</head>
+<body>
+
+<div align="center"><h1>SCM</h1></div>
+
+<h2>Don't GUIs for revision control systems suck?</h2>
+
+<p>Yes. That's why I had to write the first good one. Most revision control
+systems (CVS and
+Subversion being prominent examples) don't come with a standard GUI. There
+are a lot of third-party GUI tools, but they tend to be overly complicated
+to use, not particularly keen to fit in with how you were already working,
+only work with one revision control system, and don't offer anything over
+the command-line tools.
+
+<p>BitKeeper manages to come with GUI tools that are actually useful. Sadly,
+they're limited to BitKeeper repositories, are somewhat idiosyncratic in
+design, look disgusting, and are missing little niceties like spelling
+checking for your comments.
+
+<p>SCM, on the other hand, is useful, simple, portable (in two senses: I use
+it on Linux and Mac OS, and I use it with BitKeeper, CVS and Subversion),
+and pretty.
+
+<h2>RevisionTool</h2>
+
+<p>RevisionTool is used to examine a file's revision history. It replaces
+<i>cvsweb</i> or <tt>bk revtool</tt>.
+
+<p>I think a lot of people underestimate
+the usefulness of a file's revision history; for me it's the main use of
+a repository &mdash; I've never wanted to compile an old version of the
+source, which seems to be a folk belief about why revision control is
+useful. RevisionTool intends to make it easy to answer the interesting
+questions about your source.
+
+<p>[picture]
+
+<h2>CheckInTool</h2>
+
+<p>CheckInTool is used to check in modifications. It replaces
+<tt>cvs/svn commit</tt> or <tt>bk citool</tt>. Its main features
+are that it lets you check in an arbitrary subset of your modified/new
+files, it doesn't require a separate 'add' step, it checks spelling in
+your check-in comment, and&nbsp;&ndash; this is the killer feature&nbsp;&ndash;
+it shows you colored diffs of what you're about to commit. This is a great
+way to avoid accidentally checking in stuff you didn't mean to.
+
+<p>[picture]
+
+<h2>I'm a BitKeeper user; what's in this for me?</h2>
+
+<p>BitKeeper already has some pretty good tools. Here's where I think SCM
+beats them:
+<ul>
+<li>More traditional (non-tk) interfaces. No purple or green in sight!
+<li>More traditional copy &amp; paste. In particular, you can easily copy
+comments to and from, and patches from RevisionTool.
+<li>Looks and works great on Mac OS X.
+<li>CheckInTool checks spelling in your check-in comments, and understands
+CamelCase, making this feature more useful to programmers than it would
+otherwise be.
+<li>CheckInTool lets you comment newly-added files; <tt>citool</tt> adds
+its own content-free comment to new files.
+</ul>
+
+<p>Of course, everything comes at a price. Here's where I think BitKeeper's
+own tools beat SCM: 
+<ul>
+<li><tt>revtool</tt> understands BitKeeper's non-linear revisions; SCM
+implicitly assumes a model more like Subversion's. It can be a lot harder
+to follow forked histories in SCM, a decision made to make it easier to
+navigate straight-line histories.
+<li><tt>citool</tt> offers better feedback while scanning a large
+repository that isn't in cache; to the extent of showing you how far
+through it is.
+</ul>
+
+<h2>How do I install it?</h2>
+
+<p>Good question.
+
+</body>
+</html>
