@@ -196,6 +196,7 @@ public class CheckInWindow extends JFrame {
     }
     
     private void commit() {
+        commitButton.setEnabled(false);
         patchView.setModel(new DefaultListModel());
         new BlockingWorker(statusesTable, "Committing changes...") {
             public void work() {
