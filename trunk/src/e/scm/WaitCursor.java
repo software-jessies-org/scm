@@ -78,6 +78,26 @@ public class WaitCursor {
     }
     
     private synchronized void hideSheet() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            unsafeHideSheet();
+            return;
+        }
+        // Avoid mutating the window on a thread other than the AWT thread.
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    unsafeHideSheet();
+                }
+            });
+        } catch (Exception ex) {
+            Log.warn("Problem hiding sheet", ex);
+        }
+    }
+    
+    /**
+     * Implements hideSheet, which you should invoke instead.
+     */
+    private void unsafeHideSheet() {
         // Work around Sun bug 4995929 for Java 1.4.2 users.
         progressBar.setIndeterminate(false);
         
