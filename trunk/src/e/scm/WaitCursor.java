@@ -40,7 +40,11 @@ public class WaitCursor {
         glassPane.setCursor(DEFAULT_CURSOR);
         glassPane.removeMouseListener(MOUSE_EVENT_SWALLOWER);
         glassPane.setVisible(false);
-        
+
+        hideSheet();
+    }
+
+    private static synchronized void hideSheet() {
         if (sheet != null) {
             sheet.setVisible(false);
             sheet.dispose();
@@ -63,7 +67,8 @@ public class WaitCursor {
         sheetTimer.start();
     }
     
-    private static void showSheet(final Component glassPane, final String message) {
+    private static synchronized void showSheet(final Component glassPane, final String message) {
+        hideSheet();
         createSheet(glassPane, message);
         sheet.setVisible(true);
     }
