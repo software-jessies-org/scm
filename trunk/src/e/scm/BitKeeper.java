@@ -123,7 +123,11 @@ public class BitKeeper extends RevisionControlSystem {
             if (matcher.find()) {
                 String state = matcher.group(1);
                 name = matcher.group(2);
-                if (state.equals("jjjj")) {
+                if (name.equals("ChangeSet")) {
+                    // There seems to be a BitKeeper implementation detail that means
+                    // that sometimes ChangeSet is included, though it shouldn't be.
+                    canonicalState = FileStatus.IGNORED;
+                } else if (state.equals("jjjj")) {
                     // Junk. Ignore.
                     canonicalState = FileStatus.IGNORED;
                 } else if (state.equals("xxxx")) {
@@ -136,10 +140,6 @@ public class BitKeeper extends RevisionControlSystem {
                     } else {
                         canonicalState = FileStatus.ADDED;
                     }
-                } else if (state.matches("[lu]   ")) {
-                    // There seems to be a BitKeeper implementation detail that means
-                    // that sometimes ChangeSet is in one of these states.
-                    canonicalState = FileStatus.IGNORED;
                 }
                 //case 'C': canonicalState = FileStatus.CONTAINS_CONFLICTS; break;
                 //case '!': canonicalState = FileStatus.MISSING; break;
