@@ -1,0 +1,12 @@
+#!/bin/bash
+tool_dir=`dirname $0`/classes
+salma_hayek_dir=$tool_dir/../../salma-hayek/classes
+
+tool_name=$1
+shift
+if [ "`uname`" == "Darwin" ]
+then
+    os_specific_options=-Xdock:name=$tool_name
+fi
+
+exec java $os_specific_options -cp $tool_dir:$salma_hayek_dir e.scm.$tool_name "$@"
