@@ -134,9 +134,7 @@ public class RevisionWindow extends JFrame {
 
         readListOfRevisions(filename);
         if (initialLineNumber != 0) {
-            // revisions[0] is the local revision.
-            // revisions[1] is the latest revision in the repository.
-            showAnnotationsForRevision((Revision) revisions.getElementAt(1), initialLineNumber);
+            showAnnotationsForRevision(revisions.getLatestInRepository(), initialLineNumber);
         } else {
             showSummaryOfAllRevisions();
         }

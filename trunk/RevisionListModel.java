@@ -59,4 +59,17 @@ public class RevisionListModel extends AbstractListModel {
     public int getMaxRevisionNumberLength() {
         return maxRevisionNumberLength;
     }
+
+    /**
+     * Returns the latest revision that isn't the pseudo-revision
+     * corresponding to local uncommitted changes.
+     */
+    public Revision getLatestInRepository() {
+        Revision revision = (Revision) data.get(0);
+        if (revision != Revision.LOCAL_REVISION) {
+            return revision;
+        }
+        revision = (Revision) data.get(1);
+        return revision;
+    }
 }
