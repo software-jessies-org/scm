@@ -25,7 +25,47 @@ public class RevisionWindow extends JFrame {
 
     private final AnnotatedLineRenderer annotatedLineRenderer =
         new AnnotatedLineRenderer(this);
-
+    
+    public List getRevisionRange(Revision fromRevision, Revision toRevision) {
+        ArrayList range = new ArrayList();
+        Revision previousRevision = fromRevision;
+        boolean withinRange = false;
+        for (int i = 0; i < revisions.getSize(); ++i) {
+            Revision revision = (Revision) revisions.getElementAt(i);
+            if (withinRange) {
+                range.add(revision);
+            }
+            if (revision == fromRevision) {
+                withinRange = true;
+            } else if (revision == toRevision) {
+                withinRange = false;
+            }
+            previousRevision = revision;
+        }
+        if (withinRange) {
+            throw new IllegalArgumentException("fromRevision must be newer than toRevision or this code needs fixing");
+        }
+        return range;
+    }
+            
+    public int translateLineNumberInOneStep(Revision fromRevision, Revision toRevision, int fromLineNumber) {
+        Patch patch = new Patch(RevisionWindow.this, backEnd, filePath, fromRevision, toRevision);
+        int toLineNumber = patch.translateLineNumberInFromRevision(fromLineNumber);
+        //System.err.println("(" + fromRevision + ") => (" + toRevision + ") maps (" + fromLineNumber + " => " + toLineNumber + ")");
+        return toLineNumber;
+    }
+    
+    public int translateLineNumberStepByStep(Revision fromRevision, Revision toRevision, int lineNumber) {
+        List revisionRange = getRevisionRange(fromRevision, toRevision);
+        Revision previousRevision = fromRevision;
+        for (int i = 1 /* sic */; i < revisionRange.size(); ++i) {
+            Revision revision = (Revision) revisionRange.get(i);
+            lineNumber = translateLineNumberInOneStep(previousRevision, revision, lineNumber);
+            previousRevision = revision;
+        }
+        return lineNumber;
+    }
+    
     private final MouseListener annotationsDoubleClickListener =
         new MouseAdapter() {
             /**
@@ -62,12 +102,10 @@ public class RevisionWindow extends JFrame {
                 if (toRevision == fromRevision) {
                     return;
                 }
-                
-                Patch patch = new Patch(fromRevision, toRevision);
-                final int lineNumber = patch.translateLineNumberInFromRevision(1 + index);
-//                System.err.println("fromRevision == " + fromRevision + ", toRevision == " + toRevision + " to line number == " + lineNumber);
+                int fromLineNumber = 1 + index;
+                int toLineNumber = translateLineNumberStepByStep(fromRevision, toRevision, fromLineNumber);
                 selectRevision(toRevision);
-                showAnnotationsForRevision(toRevision, lineNumber);
+                showAnnotationsForRevision(toRevision, toLineNumber);
             }
 
             /**
