@@ -124,10 +124,14 @@ public class RevisionWindow extends JFrame {
      * with the target.
      */
     private void setFilename(String filename) {
+        this.filename = filename;
         try {
             File file = new File(filename);
+            String absoluteFilename = file.getAbsolutePath();
             String canonicalFilename = file.getCanonicalPath();
-            this.filename = canonicalFilename;
+            if (canonicalFilename.equals(absoluteFilename) == false) {
+                this.filename = canonicalFilename;
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
             System.exit(1);
