@@ -44,7 +44,7 @@ public class Subversion extends RevisionControlSystem {
     }
     
     //r74 | elliotth | 2004-04-24 12:29:26 +0100 (Sat, 24 Apr 2004) | 3 lines
-    private static final Pattern LOG_PATTERN = Pattern.compile("^r(\\d+) \\| (\\S+) \\| (\\d{4}-\\d{2}-\\d{2}) .* lines$");
+    private static final Pattern LOG_PATTERN = Pattern.compile("^r(\\d+) \\| (\\S+) \\| (\\d{4}-\\d{2}-\\d{2}) .* lines?$");
 
     public RevisionListModel parseLog(List linesList) {
         String[] lines = (String[]) linesList.toArray(new String[linesList.size()]);
