@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.regex.*;
 import e.util.*;
 
-public class BitKeeper implements RevisionControlSystem {
+public class BitKeeper extends RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
         return new String[] {
             "bk", "annotate", "-r" + revision.number, filename
@@ -133,33 +133,21 @@ public class BitKeeper implements RevisionControlSystem {
         return statuses;
     }
     
-    public void commit(File repositoryRoot, String comment, List filenames) {
+    public void commit(File repositoryRoot, String comment, List fileStatuses) {
         ArrayList command = new ArrayList();
         command.add("bk");
         command.add("delta");
         command.add("-a"); // Allow new files to be added without a separate 'bk new <file>'.
         command.add("-y" + comment);
-        command.addAll(filenames);
-        doAndDump(repositoryRoot, command);
+        addFilenames(command, fileStatuses);
+        execAndDump(repositoryRoot, command);
         
         command = new ArrayList();
         command.add("bk");
         command.add("commit");
         command.add("-y" + comment);
-        command.addAll(filenames);
-        doAndDump(repositoryRoot, command);
+        addFilenames(command, fileStatuses);
+        execAndDump(repositoryRoot, command);
     }
     
-    private void doAndDump(File repositoryRoot, List command) {
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(repositoryRoot, (String[]) command.toArray(new String[command.size()]), lines, errors);
-        for (int i = 0; i < lines.size(); ++i) {
-            System.out.println(lines.get(i));
-        }
-        for (int i = 0; i < errors.size(); ++i) {
-            System.err.println(errors.get(i));
-        }
-        System.err.println(status);
-    }
 }

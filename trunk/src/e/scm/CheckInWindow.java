@@ -137,7 +137,7 @@ public class CheckInWindow extends JFrame {
         if (comment.endsWith("\n") == false) {
             comment += "\n";
         }
-        List filenames = statusesTableModel.getIncludedFilenames();
+        List/*<FileStatus>*/ filenames = statusesTableModel.getIncludedFiles();
         backEnd.commit(repositoryRoot, comment, filenames);
         updateFileStatuses();
         checkInCommentArea.setText("");

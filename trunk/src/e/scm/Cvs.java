@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.regex.*;
 import e.util.*;
 
-public class Cvs implements RevisionControlSystem {
+public class Cvs extends RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
         return new String[] {
             "cvs", "annotate", "-r", revision.number, filename
@@ -139,22 +139,13 @@ public class Cvs implements RevisionControlSystem {
         return statuses;
     }
     
-    public void commit(File repositoryRoot, String comment, List filenames) {
+    public void commit(File repositoryRoot, String comment, List fileStatuses) {
         ArrayList command = new ArrayList();
         command.add("cvs");
         command.add("commit");
         command.add("-m");
         command.add(comment);
-        command.addAll(filenames);
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(repositoryRoot, (String[]) command.toArray(new String[command.size()]), lines, errors);
-        for (int i = 0; i < lines.size(); ++i) {
-            System.out.println(lines.get(i));
-        }
-        for (int i = 0; i < errors.size(); ++i) {
-            System.err.println(errors.get(i));
-        }
-        System.err.println(status);
+        addFilenames(command, fileStatuses);
+        execAndDump(repositoryRoot, command);
     }
 }

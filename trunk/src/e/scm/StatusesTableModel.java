@@ -71,11 +71,11 @@ public class StatusesTableModel extends AbstractTableModel {
         fireTableCellUpdated(row, column);
     }
     
-    public List getIncludedFilenames() {
+    public List/*<FileStatus>*/ getIncludedFiles() {
         ArrayList result = new ArrayList();
         for (int i = 0; i < getRowCount(); ++i) {
             if (isIncluded[i].booleanValue()) {
-                result.add(getFileStatus(i).getName());
+                result.add(getFileStatus(i));
             }
         }
         return result;
