@@ -116,14 +116,16 @@ public class BitKeeper extends RevisionControlSystem {
         ArrayList statuses = new ArrayList();
         Pattern pattern = Pattern.compile("^(.{4})\\s+(.+)(@[0-9.]+)?$");
         for (int i = 0; i < lines.size(); ++i) {
+            int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
+            String name = null;
             String line = (String) lines.get(i);
             Matcher matcher = pattern.matcher(line);
             if (matcher.find()) {
                 String state = matcher.group(1);
-                String name = matcher.group(2);
-                int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
+                name = matcher.group(2);
                 if (state.equals("jjjj")) {
                     // Junk. Ignore.
+                    canonicalState = FileStatus.IGNORED;
                 } else if (state.equals("xxxx")) {
                     canonicalState = FileStatus.NEW;
                 } else if (state.matches(".c..")) {
@@ -134,13 +136,17 @@ public class BitKeeper extends RevisionControlSystem {
                     } else {
                         canonicalState = FileStatus.ADDED;
                     }
+                } else if (state.matches("[lu]   ")) {
+                    // There seems to be a BitKeeper implementation detail that means
+                    // that sometimes ChangeSet is in one of these states.
+                    canonicalState = FileStatus.IGNORED;
                 }
-                statuses.add(new FileStatus(canonicalState, name));
                 //case 'C': canonicalState = FileStatus.CONTAINS_CONFLICTS; break;
                 //case '!': canonicalState = FileStatus.MISSING; break;
                 //case '~': canonicalState = FileStatus.WRONG_KIND; break;
-            } else {
-                System.err.println("BitKeeper back end didn't understand '" + line + "'.");
+            }
+            if (canonicalState != FileStatus.IGNORED) {
+                statuses.add(new FileStatus(canonicalState, name));
             }
         }
         return statuses;
