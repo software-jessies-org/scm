@@ -207,9 +207,9 @@ public class RevisionWindow extends JFrame {
             
             public void findText(String searchTerm) {
                 Pattern pattern = Pattern.compile(searchTerm);
-                int currentLine = annotationView.getSelectedIndex();
+                int currentIndex = annotationView.getSelectedIndex();
                 ListModel model = annotationView.getModel();
-                for (int i = currentLine + 1; i < model.getSize(); ++i) {
+                for (int i = currentIndex + 1; i < model.getSize(); ++i) {
                     String line = model.getElementAt(i).toString();
                     if (pattern.matcher(line).find()) {
                         int lineNumber = i + 1; // Indexes are zero-based.
