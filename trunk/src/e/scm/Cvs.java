@@ -152,6 +152,8 @@ public class Cvs extends RevisionControlSystem {
                     case '?': canonicalState = FileStatus.NEW; break;
                 }
                 statuses.add(new FileStatus(canonicalState, name));
+            } else if (line.startsWith("retrieving revision ") || line.startsWith("RCS file: ") || line.startsWith("Merging differences between ")) {
+                // Ignore.
             } else {
                 System.err.println("CVS back end didn't understand '" + line + "'.");
             }
