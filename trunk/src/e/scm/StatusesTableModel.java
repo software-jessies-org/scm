@@ -7,10 +7,15 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 public class StatusesTableModel extends AbstractTableModel {
+    private Boolean[] isIncluded;
     private List statuses;
     
     public StatusesTableModel(List statuses) {
         this.statuses = statuses;
+        this.isIncluded = new Boolean[statuses.size()];
+        for (int i = 0; i < isIncluded.length; ++i) {
+            isIncluded[i] = Boolean.FALSE;
+        }
     }
     
     public int getRowCount() {
@@ -18,21 +23,23 @@ public class StatusesTableModel extends AbstractTableModel {
     }
     
     public int getColumnCount() {
-        return 2;
+        return 3;
     }
     
     public String getColumnName(int column) {
         switch (column) {
-            case 0: return "State";
-            case 1: return "Name";
+            case 0: return "Included";
+            case 1: return "State";
+            case 2: return "Name";
         }
         return "(no column " + column + ")";
     }
     
     public Object getValueAt(int row, int column) {
         switch (column) {
-            case 0: return getFileStatus(row).getStateString();
-            case 1: return getFileStatus(row).getName();
+            case 0: return isIncluded[row];
+            case 1: return getFileStatus(row).getStateString();
+            case 2: return getFileStatus(row).getName();
         }
         return "(" + row + "," + column + ")";
     }
@@ -43,10 +50,24 @@ public class StatusesTableModel extends AbstractTableModel {
     
     public Object getPrototypeFor(int column) {
         switch (column) {
-            case 0: return "M ";
-            case 1: return "SomeClass.java";
+            case 0: return Boolean.FALSE;
+            case 1: return "M ";
+            case 2: return "SomeClass.java";
         }
         return "(no column " + column + ")";
+    }
+    
+    public Class getColumnClass(int column) {
+        return (column == 0) ? Boolean.class : String.class;
+    }
+    
+    public boolean isCellEditable(int row, int column) {
+        return (column == 0);
+    }
+    
+    public void setValueAt(Object value, int row, int column) {
+        assert(column == 0);
+        isIncluded[row] = (Boolean) value;
     }
     
     public void initColumnWidths(JTable table) {
