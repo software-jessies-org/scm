@@ -314,7 +314,9 @@ public class CheckInWindow extends JFrame {
     
     private void updateSavedState() {
         updateSavedStateFile(getSavedCommentFile(), checkInCommentArea.getText());
-        updateSavedStateFile(getSavedFilenamesFile(), StringUtilities.join(statusesTableModel.getIncludedFilenames(), "\n"));
+        if (statusesTableModel != null) {
+            updateSavedStateFile(getSavedFilenamesFile(), StringUtilities.join(statusesTableModel.getIncludedFilenames(), "\n"));
+        }
     }
 
     private void updateSavedStateFile(File file, String newContent) {
