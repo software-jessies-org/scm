@@ -26,6 +26,7 @@ public class RevisionWindow extends JFrame {
         revisionsList.addListSelectionListener(new RevisionListSelectionListener());
 
         revisionCommentArea = new JTextArea(8, 80);
+        revisionCommentArea.setDragEnabled(false);
         revisionCommentArea.setEditable(false);
         revisionCommentArea.setFont(FONT);
 

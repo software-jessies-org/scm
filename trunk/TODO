@@ -2,16 +2,19 @@
 * Show decent progress feedback and keep processing events while talking
   to CVS.
 
+* Implement some kind of cache of annotated revisions, so we don't have to
+  keep going back to the server for them. Similarly diffs.
+
 * Show CVS errors. (If we try to look at a non-existant file, say, there's
   no useful feedback at the moment.)
 
 * Sort the revisions properly (cvs lists revisions with lots of dots in them
   out of order).
 
-* Finish off support for going to an initial line. Need to ensure it's
-  visible, and need to implement it in a way that will continue to work
-  when we talk to CVS asynchronously. (Store the line number in a field
-  from the constructor, and blank it out when we've done the setting later?)
+* Finish off support for going to an initial line. Need to re-implement it
+  in a way that will continue to work when we talk to CVS asynchronously.
+  (Store the line number in a field from the constructor, and blank it out
+  when we've done the setting later?)
 
 * Use some kind of two-element selection model for the revisions list. Color
   the selected items so that if there's only one, it's red, and the second
