@@ -20,8 +20,8 @@ clean:
 	@$(RM) -rf classes
 
 dist: build
-	cvs2cl.pl --hide-filenames; \
-	cd ..; \
+	svn log > ChangeLog; \
+	cd ../..; \
 	tar cvf $(TAR_FILE_OF_THE_DAY) scm/; \
 	gzip $(TAR_FILE_OF_THE_DAY); \
 	scp $(TAR_FILE_OF_THE_DAY).gz kenny:~/scm/
