@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 public class RevisionWindow extends JFrame {
-    private static final Font FONT = new Font("Monaco", Font.PLAIN, 10);
+    private static final Font FONT = new Font(System.getProperty("os.name").indexOf("Mac") != -1 ? "Monaco" : "Monospaced", Font.PLAIN, 10);
 
     private String filename;
 
@@ -27,7 +27,7 @@ public class RevisionWindow extends JFrame {
         
         revisionsList = new JList();
         revisionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        revisionsList.setFont(new Font("Monaco", Font.PLAIN, 10));
+        revisionsList.setFont(FONT);
         revisionsList.addListSelectionListener(new RevisionListSelectionListener());
 
         revisionCommentArea = new JTextArea(8, 80);
