@@ -6,4 +6,9 @@
 
 * We need a way to revert files. ("svn revert x".)
 
-* We need a way to add new files. ("cvsvn add x", "bk new x".)
+* We need a way to add new files. We should pass a List<FileStatus> to
+  commit, rather than List<String>, and "cvsvn add" any file whose state
+  is NEW.
+
+* With BitKeeper, a pending change *will* be included in the next check-in.
+  We need to have the 'included' boolean set to true, and non-editable.
