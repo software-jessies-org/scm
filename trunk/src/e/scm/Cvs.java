@@ -105,6 +105,18 @@ public class Cvs extends RevisionControlSystem {
         throw new UnsupportedOperationException("Can't show a CVS change set for " + filename + " revision " + revision.number);
     }
     
+    public void revert(File repositoryRoot, String filename) {
+        File file = FileUtilities.fileFromParentAndString(repositoryRoot.toString(), filename);
+        file.delete();
+        ArrayList command = new ArrayList();
+        command.add("cvs");
+        command.add("update");
+        command.add("-r");
+        command.add("BASE");
+        command.add(filename);
+        execAndDump(repositoryRoot, command);
+    }
+
     public List getStatuses(File repositoryRoot) {
         String[] command = new String[] { "cvs", "-q", "update", "-dP" };
         ArrayList lines = new ArrayList();

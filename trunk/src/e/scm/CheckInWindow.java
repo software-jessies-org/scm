@@ -94,6 +94,7 @@ public class CheckInWindow extends JFrame {
         statusesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         statusesTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         statusesTable.setFont(FONT);
+        initStatusesTableContextMenu();
         statusesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) {
@@ -131,6 +132,32 @@ public class CheckInWindow extends JFrame {
         statusesTable.setIntercellSpacing(new Dimension());
         statusesTable.setShowGrid(false);
     }
+
+    private void initStatusesTableContextMenu() {
+        // FIXME: with Java 1.5, we can simplify this, I think.
+        final PopupMenu contextMenu = new PopupMenu();
+        MenuItem revertItem = new MenuItem("Revert");
+        revertItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                revert();
+            }
+        });
+        contextMenu.add(revertItem);
+        statusesTable.add(contextMenu);
+        statusesTable.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                maybeShowContextMenu(e);
+            }
+            public void mouseReleased(MouseEvent e) {
+                maybeShowContextMenu(e);
+            }
+            private void maybeShowContextMenu(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    contextMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+    }
     
     private void commit() {
         String comment = checkInCommentArea.getText();
@@ -142,6 +169,12 @@ public class CheckInWindow extends JFrame {
         updateFileStatuses();
         checkInCommentArea.setText("");
         patchView.setModel(new DefaultListModel());
+    }
+
+    private void revert() {
+        FileStatus file = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
+        backEnd.revert(repositoryRoot, file.getName());
+        updateFileStatuses();
     }
     
     private void initCheckInCommentArea() {

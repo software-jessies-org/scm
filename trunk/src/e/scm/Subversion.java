@@ -94,7 +94,15 @@ public class Subversion extends RevisionControlSystem {
     public void showChangeSet(File repositoryRoot, String filename, Revision revision) {
         throw new UnsupportedOperationException("Can't show a Subversion change set for " + filename + " revision " + revision.number);
     }
-    
+
+    public void revert(File repositoryRoot, String filename) {
+        ArrayList command = new ArrayList();
+        command.add("svn");
+        command.add("revert");
+        command.add(filename);
+        execAndDump(repositoryRoot, command);
+    }
+
     public List getStatuses(File repositoryRoot) {
         String[] command = new String[] { "svn", "status" };
         ArrayList lines = new ArrayList();

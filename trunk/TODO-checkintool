@@ -6,8 +6,6 @@
   actually provide a better interface than just doing this on the command
   line? I'm not sure I can think of one.
 
-* We need a way to revert files. ("svn revert x".)
-
 * With BitKeeper, a pending change *will* be included in the next check-in.
   We need to have the 'included' boolean set to true, and non-editable.
 

@@ -60,6 +60,16 @@ public abstract class RevisionControlSystem {
     public abstract void showChangeSet(File repositoryRoot, String filename, Revision revision);
     
     //
+    // Methods relating to reverting.
+    //
+
+    /**
+     * Discards local modifications and reverts to the most recent revision
+     * in the repository.
+     */
+    public abstract void revert(File repositoryRoot, String filename);
+
+    //
     // Methods relating to checking in.
     //
     

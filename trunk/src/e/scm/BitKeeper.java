@@ -93,6 +93,17 @@ public class BitKeeper extends RevisionControlSystem {
                          filename + "` -f" + filename + "@" + revision.number;
         ProcessUtilities.spawn(repositoryRoot, new String[] { "bash", "-c", command });
     }
+
+    public void revert(File repositoryRoot, String filename) {
+        throw new UnsupportedOperationException("BitKeeper back-end can't revert");
+/*
+        ArrayList command = new ArrayList();
+        command.add("svn");
+        command.add("revert");
+        command.add(filename);
+        execAndDump(repositoryRoot, command);
+*/
+    }
     
     public List getStatuses(File repositoryRoot) {
         String[] command = new String[] { "bk", "sfiles", "-ct", "-g", "-x", "-v", "-p" };
