@@ -242,6 +242,10 @@ public class CheckInWindow extends JFrame {
          * comment when the file is marked for inclusion in this commit.
          */
         private void checkBoxUpdated(TableModelEvent e) {
+            if (statusesTableModel.isIncluded(e.getFirstRow()) == false) {
+                return;
+            }
+            
             FileStatus fileStatus = statusesTableModel.getFileStatus(e.getFirstRow());
             String name = fileStatus.getName() + ": ";
             String checkInComment = checkInCommentArea.getText();

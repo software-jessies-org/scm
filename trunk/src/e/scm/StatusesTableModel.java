@@ -87,11 +87,19 @@ public class StatusesTableModel extends AbstractTableModel {
      */
     public boolean isAtLeastOneFileIncluded() {
         for (int i = 0; i < getRowCount(); ++i) {
-            if (isIncluded[i].booleanValue()) {
+            if (isIncluded(i)) {
                 return true;
             }
         }
         return false;
+    }
+    
+    /**
+     * Tests whether the file represented by the given row is to be included
+     * in the check-in.
+     */
+    public boolean isIncluded(int row) {
+        return isIncluded[row].booleanValue();
     }
     
     public void initColumnWidths(JTable table) {
