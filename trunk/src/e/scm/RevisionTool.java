@@ -1,18 +1,11 @@
 package e.scm;
 
-import java.io.*;
 import java.util.regex.*;
 
 public class RevisionTool {
     private static final Pattern GREP_ADDRESS = Pattern.compile("(.*):([0-9]+):?");
 
     public static void main(String[] args) {
-        final File repositoryRoot = RevisionWindow.getRepositoryRoot(System.getProperty("user.dir"));
-        if (repositoryRoot == null) {
-            System.err.println("Not in a directory that is under revision control.");
-            System.exit(1);
-        }
-        
         if (args.length == 0) {
             System.err.println("No file specified.");
             System.exit(1);
