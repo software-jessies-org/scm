@@ -36,7 +36,6 @@ public class AnnotatedLineRenderer extends DefaultListCellRenderer {
         }
 
         setText(line.formattedLine);
-        setToolTipText(toolTipForRevision(line.revision));
         setForeground((revisionWindow.getSelectedRevision() == line.revision) ? Color.blue : Color.black);
 
         return this;
@@ -50,15 +49,5 @@ public class AnnotatedLineRenderer extends DefaultListCellRenderer {
             g2.setStroke(DASHED_STROKE);
             g2.drawLine(0, 0, getWidth(), 0);
         }
-    }
-
-    private String toolTipForRevision(Revision revision) {
-        final String comment = revision.comment;
-        if (comment.length() == 0) {
-            return null;
-        }
-        return "<html>" +
-               comment.replaceAll(" ", "&nbsp;").replaceAll("\n", "<p>") +
-               "</html>";
     }
 }

@@ -28,22 +28,50 @@ public class RevisionWindow extends JFrame {
 
     private final MouseListener annotationsDoubleClickListener =
         new MouseAdapter() {
+            /**
+             * Dispatches clicks and double-clicks on annotated lines.
+             */
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    final int i = annotationView.locationToIndex(e.getPoint());
-                    Object value = annotationView.getModel().getElementAt(i);
-                    if (value instanceof AnnotatedLine) {
-                        AnnotatedLine annotatedLine = (AnnotatedLine) value;
-                        
-                        Revision fromRevision = getSelectedRevision();
-                        Revision toRevision = annotatedLine.revision;
-                        Patch patch = new Patch(fromRevision, toRevision);
-                        final int lineNumber = patch.translateLineNumberInFromRevision(1 + i);
-                        
-                        selectRevision(toRevision);
-                        showAnnotationsForRevision(toRevision, lineNumber);
-                    }
+                AnnotatedLine annotatedLine = lineForEvent(e);
+                if (annotatedLine == null) {
+                    return;
                 }
+                if (e.getClickCount() == 2) {
+                    doubleClick(annotatedLine);
+                } else if (e.getClickCount() == 1) {
+                    click(annotatedLine);
+                }
+            }
+            private int index;
+            private AnnotatedLine lineForEvent(MouseEvent e) {
+                this.index = annotationView.locationToIndex(e.getPoint());
+                Object value = annotationView.getModel().getElementAt(index);
+                if (value instanceof AnnotatedLine) {
+                    return (AnnotatedLine) value;
+                }
+                return null;
+            }
+
+            /**
+             * Handles double-clicks on annotated lines by switching to the
+             * revision of that line.
+             */
+            private void doubleClick(AnnotatedLine annotatedLine) {
+                Revision fromRevision = getSelectedRevision();
+                Revision toRevision = annotatedLine.revision;
+                Patch patch = new Patch(fromRevision, toRevision);
+                final int lineNumber = patch.translateLineNumberInFromRevision(1 + index);
+                selectRevision(toRevision);
+                showAnnotationsForRevision(toRevision, lineNumber);
+            }
+
+            /**
+             * Handles single-clicks by showing the comment associated with
+             * the line's revision.
+             */
+            private void click(AnnotatedLine annotatedLine) {
+                revisionCommentArea.setText(annotatedLine.revision.comment);
+                revisionCommentArea.setCaretPosition(0);
             }
         };
 
