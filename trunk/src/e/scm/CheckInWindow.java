@@ -161,23 +161,31 @@ public class CheckInWindow extends JFrame {
 
     private void updateFileStatuses() {
         setStatus("Getting file statuses...");
-        List statuses = null;
-        try {
-            WaitCursor.start(this);
-            statuses = backEnd.getStatuses(repositoryRoot);
-        } finally {
-            WaitCursor.stop(this);
-            clearStatus();
-        }
-        
-        statusesTableModel = new StatusesTableModel(statuses);
-        statusesTable.setModel(statusesTableModel);
-        statusesTableModel.initColumnWidths(statusesTable);
-        statusesTableModel.addTableModelListener(new TableModelListener() {
-            public void tableChanged(TableModelEvent e) {
-                commitButton.setEnabled(statusesTableModel.isAtLeastOneFileIncluded());
+        Thread worker = new Thread() {
+            public void run() {
+                List statuses = null;
+                try {
+                    WaitCursor.start(statusesTable);
+                    statuses = backEnd.getStatuses(repositoryRoot);
+                } finally {
+                    WaitCursor.stop(statusesTable);
+                    clearStatus();
+                }
+                statusesTableModel = new StatusesTableModel(statuses);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        statusesTable.setModel(statusesTableModel);
+                        statusesTableModel.initColumnWidths(statusesTable);
+                        statusesTableModel.addTableModelListener(new TableModelListener() {
+                            public void tableChanged(TableModelEvent e) {
+                                commitButton.setEnabled(statusesTableModel.isAtLeastOneFileIncluded());
+                            }
+                        });
+                    }
+                });
             }
-        });
+        };
+        worker.start();
     }
     
     private void showToolError(JList list, ArrayList lines) {
