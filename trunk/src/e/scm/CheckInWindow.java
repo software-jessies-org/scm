@@ -43,9 +43,15 @@ public class CheckInWindow extends JFrame {
     private void makeUserInterface() {
         initStatusesList();
         initCheckInCommentArea();
-
-        JComponent topUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-            new JScrollPane(statusesTable),
+        
+        // Give the statuses table a sensible amount of space.
+        JScrollPane statusesScrollPane = new JScrollPane(statusesTable);
+        Dimension preferredSize = statusesScrollPane.getPreferredSize();
+        preferredSize.height = getFontMetrics(FONT).getHeight() * 10;
+        statusesScrollPane.setPreferredSize(preferredSize);
+        
+        JSplitPane topUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+            statusesScrollPane,
             new JScrollPane(checkInCommentArea,
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED)
