@@ -13,3 +13,10 @@
   case you want to quit and come back.
 
 * Sort the table entries alphabetically on filename.
+
+* When we "cvs update" to find out what local changes we've got, we should
+  (a) ignore successfully merged remote changes and (b) warn about merge
+  conflicts.
+
+* Should we force an "svn update"? Or does saving/restoring the comment
+  field cover the remote-changes scenario well enough?
