@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
+import e.gui.*;
 import e.util.*;
 
 public class CheckInWindow extends JFrame {
@@ -48,6 +49,7 @@ public class CheckInWindow extends JFrame {
         Dimension preferredSize = statusesScrollPane.getPreferredSize();
         preferredSize.height = getFontMetrics(FONT).getHeight() * 10;
         statusesScrollPane.setPreferredSize(preferredSize);
+        statusesScrollPane.getViewport().setBackground(statusesTable.getBackground());
         
         JSplitPane topUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
             statusesScrollPane,
@@ -89,7 +91,7 @@ public class CheckInWindow extends JFrame {
     }
 
     private void initStatusesList() {
-        statusesTable = new JTable();
+        statusesTable = new ETable();
         statusesTable.setTableHeader(null);
         statusesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         statusesTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
