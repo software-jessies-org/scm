@@ -369,6 +369,11 @@ public class CheckInWindow extends JFrame {
                     }
                 }
                 checkInCommentArea.append(name);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        checkInCommentArea.requestFocus();
+                    }
+                });
             }
         }
     }
