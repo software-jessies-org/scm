@@ -65,6 +65,8 @@ public class PatchView extends JList {
             return;
         }
         
+        lines = annotatePatchUsingTags(backEnd, lines);
+        
         DefaultListModel differences = new DefaultListModel();
         for (int i = 0; i < lines.size(); ++i) {
             differences.addElement((String) lines.get(i));
@@ -75,6 +77,20 @@ public class PatchView extends JList {
         // We can't easily retain the context when switching to differences.
         // As an extension, though, we could do this.
         ensureIndexIsVisible(0);
+    }
+    
+    private ArrayList annotatePatchUsingTags(RevisionControlSystem backEnd, ArrayList lines) {
+        ArrayList newLines = new ArrayList();
+        ArrayList newErrors = new ArrayList();
+        String patch = StringUtilities.join(lines, "\n") + "\n";
+        String script = FileUtilities.getSalmaHayekFile("/bin/annotate-patch.rb").toString();
+        String patchFilename = FileUtilities.createTemporaryFile("e.scm.PatchView-patch", "patch file", patch);
+        String[] command = new String[] { script,  patchFilename };
+        int status = ProcessUtilities.backQuote(backEnd.getRoot(), command, newLines, newErrors);
+        if (status != 0) {
+            return lines;
+        }
+        return newLines;
     }
     
     void showNewFile(RevisionControlSystem backEnd, final FileStatus status) {

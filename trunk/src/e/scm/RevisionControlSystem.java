@@ -233,30 +233,17 @@ public abstract class RevisionControlSystem {
         }
     }
     
-    private static String createFile(String prefix, String humanReadableName, String content) {
-        try {
-            File file = File.createTempFile("e.scm.RevisionControlSystem-" + prefix + "-", null);
-            file.deleteOnExit();
-            PrintWriter out = new PrintWriter(new FileOutputStream(file));
-            out.print(content);
-            out.close();
-            return file.toString();
-        } catch (IOException ex) {
-            throw new RuntimeException("Couldn't create " + humanReadableName + ": " + ex.getMessage());
-        }
+    protected static String createCommentFile(String comment) {
+        return FileUtilities.createTemporaryFile("e.scm.RevisionControlSystem-comment", "comment file", comment);
     }
     
-    public static String createCommentFile(String comment) {
-        return createFile("comment", "comment file", comment);
-    }
-    
-    public static String createFileListFile(List/*<FileStatus>*/ fileStatuses) {
+    protected static String createFileListFile(List/*<FileStatus>*/ fileStatuses) {
         StringBuffer content = new StringBuffer();
         for (int i = 0; i < fileStatuses.size(); ++i) {
             content.append(((FileStatus) fileStatuses.get(i)).getName());
             content.append("\n");
         }
-        return createFile("file-list", "list of files", content.toString());
+        return FileUtilities.createTemporaryFile("e.scm.RevisionControlSystem-file-list", "list of files", content.toString());
     }
     
     public static List justNewFiles(List/*<FileStatus>*/ fileStatuses) {
