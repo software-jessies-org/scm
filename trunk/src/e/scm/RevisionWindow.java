@@ -56,12 +56,24 @@ public class RevisionWindow extends JFrame {
     }
     
     public int translateLineNumberStepByStep(Revision fromRevision, Revision toRevision, int lineNumber) {
-        List revisionRange = getRevisionRange(fromRevision, toRevision);
-        Revision previousRevision = fromRevision;
-        for (int i = 1 /* sic */; i < revisionRange.size(); ++i) {
-            Revision revision = (Revision) revisionRange.get(i);
-            lineNumber = translateLineNumberInOneStep(previousRevision, revision, lineNumber);
-            previousRevision = revision;
+        try {
+            List revisionRange = getRevisionRange(fromRevision, toRevision);
+            Revision previousRevision = fromRevision;
+            for (int i = 1 /* sic */; i < revisionRange.size(); ++i) {
+                Revision revision = (Revision) revisionRange.get(i);
+                lineNumber = translateLineNumberInOneStep(previousRevision, revision, lineNumber);
+                previousRevision = revision;
+            }
+        } catch (Exception exception) {
+            // Jumping to the same line number in the target revision is crap but it's better than not jumping to
+            // the right revision and it's better than jumping to the top.
+            // The only known reason for there to be an exception is if we were asked to translate a line number
+            // into a newer revision.
+            // Although the back-end makes this difficult by insisting that diffs be asked for in old-to-new order,
+            // the Patch class contains an isPatchReversed boolean to let us work around this.
+            // Once we get round to using it.
+            System.err.println(exception);
+            exception.printStackTrace();
         }
         return lineNumber;
     }
@@ -92,7 +104,7 @@ public class RevisionWindow extends JFrame {
              * revision of that line.
              */
             private void doubleClick(AnnotatedLine annotatedLine) {
-                Revision fromRevision = getSelectedRevision();
+                Revision fromRevision = getAnnotatedRevision();
                 Revision toRevision = annotatedLine.revision;
                 if (toRevision == fromRevision) {
                     return;
@@ -175,8 +187,7 @@ public class RevisionWindow extends JFrame {
                         System.err.println("startLine=" + startLine + "  desiredLineNumber=" + desiredLineNumber);
                     }
 
-                    selectRevision(desiredRevision);
-                    showAnnotationsForRevision(desiredRevision, desiredLineNumber);
+                    selectRevision(desiredRevision, desiredLineNumber);
                 }
             }
         };
@@ -184,6 +195,11 @@ public class RevisionWindow extends JFrame {
     private String filePath;
 
     private RevisionControlSystem backEnd;
+        
+    // The revision we're annotating, if we're annotating, otherwise null.
+    private Revision annotatedRevision;
+    // Non-zero if we don't want to keep the currently selected line.
+    private int desiredLineNumber = 0;
     
     private AnnotationModel annotationModel;
     private RevisionListModel revisions;
@@ -192,6 +208,7 @@ public class RevisionWindow extends JFrame {
     private JTextArea revisionCommentArea;
     private JList annotationView;
     private JLabel statusLine = new JLabel(" ");
+    private JButton changeSetButton;
     
     public RevisionWindow(String filename, int initialLineNumber) {
         super(filename);
@@ -220,16 +237,12 @@ public class RevisionWindow extends JFrame {
             new JScrollPane(annotationView));
         ui.setBorder(null);
 
-        JButton changeSetButton = new JButton("Show Change Set");
-        if (backEnd.supportsChangeSets()) {
-            changeSetButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    backEnd.showChangeSet(filePath, getSelectedRevision());
-                }
-            });
-        } else {
-            changeSetButton.setEnabled(false);
-        }
+        changeSetButton = new JButton("Show Change Set");;
+        changeSetButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                backEnd.showChangeSet(filePath, getAnnotatedRevision());
+            }
+        });
 
         JButton showLogButton = new JButton("Show Log");
         showLogButton.addActionListener(new ActionListener() {
@@ -371,6 +384,7 @@ public class RevisionWindow extends JFrame {
                 
                 updateAnnotationModel(revision, lines);
                 showSpecificLineInAnnotations(lineNumber);
+                setAnnotatedRevision(revision);
             }
         };
     }
@@ -522,6 +536,7 @@ public class RevisionWindow extends JFrame {
                 // We can't easily retain the context when switching to differences.
                 // As an extension, though, we could do this.
                 annotationView.ensureIndexIsVisible(0);
+                setAnnotatedRevision(null);
             }
         };
     }
@@ -543,6 +558,7 @@ public class RevisionWindow extends JFrame {
     private void showSummaryOfAllRevisions() {
         showComment(summaryOfAllRevisions());
         annotationView.setModel(EMPTY_LIST_MODEL);
+        setAnnotatedRevision(null);
     }
 
     private void showLog() {
@@ -561,13 +577,12 @@ public class RevisionWindow extends JFrame {
         frame.setVisible(true);
     }
 
-    public Revision getSelectedRevision() {
-        Revision revision = (Revision) revisionsList.getSelectedValue();
-        // I can't think of an earlier place to trap this error.
-        if (revision == null) {
-            throw new IllegalArgumentException("There should be a selected revision by this point");
-        }
-        return revision;
+    public Revision getAnnotatedRevision() {
+        return annotatedRevision;
+    }
+    private void setAnnotatedRevision(Revision revision) {
+        annotatedRevision = revision;
+        changeSetButton.setEnabled(backEnd.supportsChangeSets() && annotatedRevision != null);
     }
     
     private void readListOfRevisions(final int initialLineNumber) {
@@ -592,8 +607,7 @@ public class RevisionWindow extends JFrame {
                 // This doesn't really belong in here, but it can only be invoked after the code above has finished.
                 if (initialLineNumber != 0) {
                     Revision revision = revisions.getLatestInRepository();
-                    selectRevision(revision);
-                    showAnnotationsForRevision(revision, initialLineNumber);
+                    selectRevision(revision, initialLineNumber);
                 } else {
                     showSummaryOfAllRevisions();
                 }
@@ -601,9 +615,11 @@ public class RevisionWindow extends JFrame {
         };
     }
 
-    public void selectRevision(Revision revision) {
+    public void selectRevision(Revision revision, int lineNumber) {
         revisionsList.clearSelection();
+        desiredLineNumber = lineNumber;
         revisionsList.setSelectedValue(revision, true);
+        desiredLineNumber = 0;
     }
 
     private void showToolError(JList list, ArrayList lines) {
@@ -652,9 +668,16 @@ public class RevisionWindow extends JFrame {
                 showSummaryOfAllRevisions();
             } else if (values.length == 1) {
                 // Show annotated revision.
-                Revision revision = (Revision) values[0];
-                showComment(revision.comment);
-                showAnnotationsForRevision(revision, 0);
+                Revision newRevision = (Revision) values[0];
+                showComment(newRevision.comment);
+                boolean alreadyAnnotating = getAnnotatedRevision() != null;
+                boolean overrideCurrentLineNumber = desiredLineNumber != 0;
+                if (alreadyAnnotating && overrideCurrentLineNumber == false) {
+                    int previouslySelectedLineNumber = annotationView.getSelectedIndex() + 1; // indexes are zero-based
+                    showAnnotationsForRevision(newRevision, getAnnotatedRevision(), previouslySelectedLineNumber);
+                } else {
+                    showAnnotationsForRevision(newRevision, desiredLineNumber);
+                }
             } else {
                 // Show differences between two revisions.
                 Revision newerRevision = (Revision) values[0];

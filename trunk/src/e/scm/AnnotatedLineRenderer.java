@@ -36,7 +36,7 @@ public class AnnotatedLineRenderer extends DefaultListCellRenderer {
         }
 
         setText(line.formattedLine);
-        setForeground((revisionWindow.getSelectedRevision() == line.revision) ? Color.blue : Color.black);
+        setForeground((revisionWindow.getAnnotatedRevision() == line.revision) ? Color.blue : Color.black);
 
         return this;
     }
