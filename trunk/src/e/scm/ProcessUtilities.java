@@ -1,4 +1,4 @@
-//package e.util;
+package e.scm; //FIXME: this should be merged with Edit's e.util.ProcessUtilities!
 
 import java.io.*;
 import java.util.*;

@@ -1,23 +1,27 @@
-SOURCE_FILES=$(wildcard *.java)
-TAR_FILE_OF_THE_DAY=`date +revtool-%Y-%m-%d.tar`
+SOURCE_FILES=$(shell find `pwd`/src -type f -name "*.java")
+TAR_FILE_OF_THE_DAY=`date +scm-%Y-%m-%d.tar`
 
 KNOWN_JRE_LOCATIONS+=/home/elliotth/download/j2sdk1.4.2/jre/lib/rt.jar
 KNOWN_JRE_LOCATIONS+=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
 
-BOOT_CLASS_PATH=$(wildcard $(KNOWN_JRE_LOCATIONS))
+space=$(subst a,,a a)
+BOOT_CLASS_PATH=$(subst $(space),:,$(wildcard $(KNOWN_JRE_LOCATIONS)))
 
-revtool: $(SOURCE_FILES)
-	@echo Recompiling the world...
-	@make clean; \
-	 mkdir classes; \
-	 jikes -bootclasspath $(BOOT_CLASS_PATH) -d classes/ +D +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
+.PHONY: build
+build: $(SOURCE_FILES)
+	@echo Recompiling the world... && \
+	 make clean && \
+	 mkdir -p classes && \
+	 jikes -bootclasspath $(BOOT_CLASS_PATH) -d classes/ -sourcepath src/ +D +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
+	@#javac -d classes/ -sourcepath src/ $(SOURCE_FILES)
 
+.PHONY: clean
 clean:
 	@$(RM) -rf classes
 
-dist: revtool
+dist: build
 	cvs2cl.pl --hide-filenames; \
 	cd ..; \
-	tar cvf $(TAR_FILE_OF_THE_DAY) revtool/; \
+	tar cvf $(TAR_FILE_OF_THE_DAY) scm/; \
 	gzip $(TAR_FILE_OF_THE_DAY); \
-	scp $(TAR_FILE_OF_THE_DAY).gz kenny:~/revtool/
+	scp $(TAR_FILE_OF_THE_DAY).gz kenny:~/scm/

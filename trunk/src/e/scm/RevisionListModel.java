@@ -1,3 +1,5 @@
+package e.scm;
+
 import java.util.*;
 import javax.swing.*;
 

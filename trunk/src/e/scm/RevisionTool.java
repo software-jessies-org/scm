@@ -1,3 +1,5 @@
+package e.scm;
+
 import java.util.regex.*;
 
 public class RevisionTool {
