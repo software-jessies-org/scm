@@ -1,6 +1,5 @@
 package e.scm;
 
-import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import e.util.*;
@@ -72,13 +71,13 @@ public class BitKeeper extends RevisionControlSystem {
         return result;
     }
 
-    public boolean isLocallyModified(File repositoryRoot, String filename) {
+    public boolean isLocallyModified(String filename) {
         String[] command = new String[] {
             "bk", "sfiles", "-v", "-ct", "-g", filename
         };
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             String line = (String) lines.get(i);
             if (line.indexOf("lc") == 0) {
@@ -92,26 +91,26 @@ public class BitKeeper extends RevisionControlSystem {
         return true;
     }
 
-    public void showChangeSet(File repositoryRoot, String filename, Revision revision) {
+    public void showChangeSet(String filename, Revision revision) {
         // bk csettool -r`bk r2c -r1.3 file.cpp` -ffile.cpp@1.3
         String command = "bk csettool -r`bk r2c -r" + revision.number + " " +
                          filename + "` -f" + filename + "@" + revision.number;
-        ProcessUtilities.spawn(repositoryRoot, new String[] { "bash", "-c", command });
+        ProcessUtilities.spawn(getRoot(), new String[] { "bash", "-c", command });
     }
 
-    public void revert(File repositoryRoot, String filename) {
+    public void revert(String filename) {
         ArrayList command = new ArrayList();
         command.add("bk");
         command.add("unedit");
         command.add(filename);
-        execAndDump(repositoryRoot, command);
+        execAndDump(command);
     }
     
-    public List getStatuses(File repositoryRoot) {
+    public List getStatuses() {
         String[] command = new String[] { "bk", "sfiles", "-ct", "-g", "-x", "-v", "-p" };
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         
         ArrayList statuses = new ArrayList();
         Pattern pattern = Pattern.compile("^(.{4})\\s+(.+)(@[0-9.]+)?$");
@@ -152,21 +151,20 @@ public class BitKeeper extends RevisionControlSystem {
         return statuses;
     }
     
-    public void commit(File repositoryRoot, String comment, List fileStatuses) {
+    public void commit(String comment, List fileStatuses) {
         ArrayList command = new ArrayList();
         command.add("bk");
         command.add("delta");
         command.add("-a"); // Allow new files to be added without a separate 'bk new <file>'.
         command.add("-y" + comment);
         addFilenames(command, fileStatuses);
-        execAndDump(repositoryRoot, command);
+        execAndDump(command);
         
         command = new ArrayList();
         command.add("bk");
         command.add("commit");
         command.add("-y" + comment);
         addFilenames(command, fileStatuses);
-        execAndDump(repositoryRoot, command);
+        execAndDump(command);
     }
-    
 }

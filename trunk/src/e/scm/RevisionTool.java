@@ -32,7 +32,12 @@ public class RevisionTool {
                     ++i;
                 }
             }
-            new RevisionWindow(filename, lineNumber);
+            final RevisionControlSystem backEnd = RevisionControlSystem.forPath(System.getProperty("user.dir"));
+            if (backEnd == null) {
+                System.err.println(filename + " is not in a directory that is under revision control.");
+            } else {
+                new RevisionWindow(filename, lineNumber);
+            }
         }
     }
 

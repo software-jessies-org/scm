@@ -21,8 +21,6 @@ public class CheckInWindow extends JFrame {
         }
     }
 
-    private File repositoryRoot;
-
     private RevisionControlSystem backEnd;
     
     private JTable statusesTable;
@@ -32,10 +30,9 @@ public class CheckInWindow extends JFrame {
     private JLabel statusLine = new JLabel(" ");
     private JButton commitButton;
     
-    public CheckInWindow(final File repositoryRoot) {
-        this.repositoryRoot = repositoryRoot;
-        this.backEnd = RevisionWindow.guessWhichRevisionControlSystem(repositoryRoot);
-        setTitle(repositoryRoot.toString());
+    public CheckInWindow(final RevisionControlSystem backEnd) {
+        this.backEnd = backEnd;
+        setTitle(backEnd.getRoot().toString());
         makeUserInterface();
         updateFileStatuses();
         addWindowListener(new WindowAdapter() {
@@ -116,7 +113,7 @@ public class CheckInWindow extends JFrame {
                 FileStatus status = statusesTableModel.getFileStatus(selectedRow);
                 if (status.getState() == FileStatus.NEW) {
                     DefaultListModel model = new DefaultListModel();
-                    File file = new File(repositoryRoot, status.getName());
+                    File file = new File(backEnd.getRoot(), status.getName());
                     if (file.isDirectory()) {
                         model.addElement("(" + status.getName() + " is a directory.)");
                     } else {
@@ -130,7 +127,7 @@ public class CheckInWindow extends JFrame {
                     }
                     patchView.setModel(model);
                 } else {
-                    patchView.showPatch(backEnd, repositoryRoot, null, null, status.getName());
+                    patchView.showPatch(backEnd, null, null, status.getName());
                 }
             }
         });
@@ -206,7 +203,7 @@ public class CheckInWindow extends JFrame {
             comment += "\n";
         }
         List/*<FileStatus>*/ filenames = statusesTableModel.getIncludedFiles();
-        backEnd.commit(repositoryRoot, comment, filenames);
+        backEnd.commit(comment, filenames);
         updateFileStatuses();
         clearCheckInCommentArea();
     }
@@ -225,11 +222,11 @@ public class CheckInWindow extends JFrame {
         if (fileStatus.getState() == FileStatus.NEW) {
             // If the file isn't under version control, we'll have to remove
             // it ourselves...
-            File file = FileUtilities.fileFromParentAndString(repositoryRoot.toString(), fileStatus.getName());
+            File file = FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), fileStatus.getName());
             boolean deleted = file.delete();
             System.err.println(deleted);
         } else {
-            backEnd.revert(repositoryRoot, fileStatus.getName());
+            backEnd.revert(fileStatus.getName());
         }
         updateFileStatuses();
     }
@@ -240,7 +237,7 @@ public class CheckInWindow extends JFrame {
     private void showHistory() {
         FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
         if (fileStatus.getState() != FileStatus.NEW) {
-            File file = FileUtilities.fileFromParentAndString(repositoryRoot.toString(), fileStatus.getName());
+            File file = FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), fileStatus.getName());
             new RevisionWindow(file.toString(), 1);
         }
     }
@@ -248,7 +245,7 @@ public class CheckInWindow extends JFrame {
     private void editFile() {
         FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
         String command = getEditor() + " " + fileStatus.getName();
-        ProcessUtilities.spawn(repositoryRoot, new String[] { "bash", "-c", command });
+        ProcessUtilities.spawn(backEnd.getRoot(), new String[] { "bash", "-c", command });
     }
     
     private String getEditor() {
@@ -287,7 +284,7 @@ public class CheckInWindow extends JFrame {
     }
 
     private File getSavedCommentFile() {
-        return FileUtilities.fileFromParentAndString(repositoryRoot.toString(), ".e.scm.CheckInWindow.savedComment");
+        return FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), ".e.scm.CheckInWindow.savedComment");
     }
     
     private JTextArea makeTextArea(final int rowCount) {
@@ -308,7 +305,7 @@ public class CheckInWindow extends JFrame {
                 List statuses = null;
                 try {
                     WaitCursor.start(statusesTable);
-                    statuses = backEnd.getStatuses(repositoryRoot);
+                    statuses = backEnd.getStatuses();
                 } finally {
                     WaitCursor.stop(statusesTable);
                     clearStatus();

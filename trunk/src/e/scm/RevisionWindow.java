@@ -122,7 +122,6 @@ public class RevisionWindow extends JFrame {
             }
         };
 
-    private File repositoryRoot;
     private String filePath;
 
     private RevisionControlSystem backEnd;
@@ -137,8 +136,8 @@ public class RevisionWindow extends JFrame {
     
     public RevisionWindow(String filename, int initialLineNumber) {
         super(filename);
+        this.backEnd = RevisionControlSystem.forPath(filename);
         setFilename(filename);
-        this.backEnd = guessWhichRevisionControlSystem(repositoryRoot);
         makeUserInterface(initialLineNumber);
 
         readListOfRevisions();
@@ -171,7 +170,7 @@ public class RevisionWindow extends JFrame {
         if (backEnd.supportsChangeSets()) {
             changeSetButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    backEnd.showChangeSet(repositoryRoot, filePath, getSelectedRevision());
+                    backEnd.showChangeSet(filePath, getSelectedRevision());
                 }
             });
         } else {
@@ -288,68 +287,12 @@ public class RevisionWindow extends JFrame {
             } else {
                 filename = absoluteFilename;
             }
-            this.repositoryRoot = getRepositoryRoot(filename);
-            this.filePath = filename.substring(repositoryRoot.toString().length() + File.separator.length());
+            this.filePath = filename.substring(backEnd.getRoot().toString().length() + File.separator.length());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
     
-    public static File getRepositoryRoot(String filename) {
-        String clue = null;
-        
-        File file = new File(new File(filename).getAbsolutePath());
-        File directory = file.isDirectory() ? file : new File(file.getParent());
-        String[] siblings = directory.list();
-        for (int i = 0; i < siblings.length; ++i) {
-            if (siblings[i].equals("CVS")) {
-                clue = "CVS";
-            } else if (siblings[i].equals("SCCS")) {
-                clue = "SCCS";
-            } else if (siblings[i].equals(".svn")) {
-                clue = ".svn";
-            }
-        }
-        
-        if (clue == null) {
-            return null;
-        }
-        
-        File root = directory;
-        while (true) {
-            File newRoot = new File(root.getParent());
-            if (newRoot.exists() == false || newRoot.isDirectory() == false) {
-                return root;
-            }
-            File scmDirectory = new File(newRoot, clue);
-            if (scmDirectory.exists() == false || scmDirectory.isDirectory() == false) {
-                return root;
-            }
-            root = newRoot;
-        }
-    }
-
-    /**
-     * Attempts to guess which revision control system the file we're
-     * interested in is managed by. We do this simply on the basis of
-     * whether there's a CVS, SCCS or .svn directory in the same directory
-     * as the file.
-     */
-    public static RevisionControlSystem guessWhichRevisionControlSystem(File repositoryRoot) {
-        String[] siblings = repositoryRoot.list();
-        for (int i = 0; i < siblings.length; ++i) {
-            if (siblings[i].equals("CVS")) {
-                return new Cvs();
-            } else if (siblings[i].equals("SCCS")) {
-                return new BitKeeper();
-            } else if (siblings[i].equals(".svn")) {
-                return new Subversion();
-            }
-        }
-        // We know this is wrong, but CVS is likely to be installed,
-        // and will give a reasonably good error when invoked.
-        return new Cvs();
-    }
     
     private void showAnnotationsForRevision(Revision revision, int lineNumber) {
         setStatus("Getting annotations for revision...");
@@ -360,7 +303,7 @@ public class RevisionWindow extends JFrame {
             WaitCursor.start(this);
             /* FIXME: do this in separate thread. */
             String[] command = backEnd.getAnnotateCommand(revision, filePath);
-            status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
         } finally {
             WaitCursor.stop(this);
             clearStatus();
@@ -390,7 +333,7 @@ public class RevisionWindow extends JFrame {
             try {
                 WaitCursor.start(this);
                 String[] command = backEnd.getDifferencesCommand(null, Revision.LOCAL_REVISION, filePath);
-                status = ProcessUtilities.backQuote(repositoryRoot, command, patchLines, errors);
+                status = ProcessUtilities.backQuote(backEnd.getRoot(), command, patchLines, errors);
             } finally {
                 WaitCursor.stop(this);
                 clearStatus();
@@ -492,7 +435,7 @@ public class RevisionWindow extends JFrame {
         try {
             WaitCursor.start(this);
             String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
-            status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
         } finally {
             WaitCursor.stop(this);
             clearStatus();
@@ -564,7 +507,7 @@ public class RevisionWindow extends JFrame {
         try {
             WaitCursor.start(this);
             String[] command = backEnd.getLogCommand(filePath);
-            status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
         } finally {
             WaitCursor.stop(this);
             clearStatus();
@@ -576,7 +519,7 @@ public class RevisionWindow extends JFrame {
         }
 
         revisions = backEnd.parseLog(lines);
-        if (backEnd.isLocallyModified(repositoryRoot, filePath)) {
+        if (backEnd.isLocallyModified(filePath)) {
             revisions.addLocalRevision(Revision.LOCAL_REVISION);
         }
         revisionsList.setModel(revisions);

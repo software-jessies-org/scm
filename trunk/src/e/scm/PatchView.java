@@ -40,14 +40,14 @@ public class PatchView extends JList {
         }
     }
     
-    public void showPatch(RevisionControlSystem backEnd, java.io.File repositoryRoot, Revision olderRevision, Revision newerRevision, String filename) {
+    public void showPatch(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename) {
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = 0;
         try {
             WaitCursor.start(this);
             String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename);
-            status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
         } finally {
             WaitCursor.stop(this);
         }

@@ -1,6 +1,5 @@
 package e.scm;
 
-import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import e.util.*;
@@ -74,11 +73,11 @@ public class Subversion extends RevisionControlSystem {
         return result;
     }
 
-    public boolean isLocallyModified(File repositoryRoot, String filename) {
+    public boolean isLocallyModified(String filename) {
         String[] command = new String[] { "svn", "status", filename };
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             String line = (String) lines.get(i);
             if (line.startsWith("M")) {
@@ -97,23 +96,23 @@ public class Subversion extends RevisionControlSystem {
         return false; // FIXME: learn about svn global revisions.
     }
 
-    public void showChangeSet(File repositoryRoot, String filename, Revision revision) {
+    public void showChangeSet(String filename, Revision revision) {
         throw new UnsupportedOperationException("Can't show a Subversion change set for " + filename + " revision " + revision.number);
     }
 
-    public void revert(File repositoryRoot, String filename) {
+    public void revert(String filename) {
         ArrayList command = new ArrayList();
         command.add("svn");
         command.add("revert");
         command.add(filename);
-        execAndDump(repositoryRoot, command);
+        execAndDump(command);
     }
 
-    public List getStatuses(File repositoryRoot) {
+    public List getStatuses() {
         String[] command = new String[] { "svn", "status" };
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         
         ArrayList statuses = new ArrayList();
         Pattern pattern = Pattern.compile("^(.)....\\s+(.+)$");
@@ -141,8 +140,8 @@ public class Subversion extends RevisionControlSystem {
         return statuses;
     }
     
-    public void commit(File repositoryRoot, String comment, List fileStatuses) {
-        scheduleNewFiles(repositoryRoot, "svn", fileStatuses);
+    public void commit(String comment, List fileStatuses) {
+        scheduleNewFiles("svn", fileStatuses);
         ArrayList command = new ArrayList();
         command.add("svn");
         command.add("commit");
@@ -150,6 +149,6 @@ public class Subversion extends RevisionControlSystem {
         command.add("-m");
         command.add(comment);
         addFilenames(command, fileStatuses);
-        execAndDump(repositoryRoot, command);
+        execAndDump(command);
     }
 }

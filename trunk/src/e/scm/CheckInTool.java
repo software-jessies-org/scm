@@ -1,11 +1,9 @@
 package e.scm;
 
-import java.io.*;
-
 public class CheckInTool {
     public static void main(String[] arguments) {
-        final File repositoryRoot = RevisionWindow.getRepositoryRoot(System.getProperty("user.dir"));
-        if (repositoryRoot == null) {
+        final RevisionControlSystem backEnd = RevisionControlSystem.forPath(System.getProperty("user.dir"));
+        if (backEnd == null) {
             System.err.println("Not in a directory that is under revision control.");
             System.exit(1);
         }
@@ -18,7 +16,7 @@ public class CheckInTool {
         }
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new CheckInWindow(repositoryRoot);
+                new CheckInWindow(backEnd);
             }
         });
     }

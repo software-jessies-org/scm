@@ -82,11 +82,11 @@ public class Cvs extends RevisionControlSystem {
         return result;
     }
 
-    public boolean isLocallyModified(File repositoryRoot, String filename) {
+    public boolean isLocallyModified(String filename) {
         String[] command = new String[] { "cvs", "status", filename };
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             String line = (String) lines.get(i);
             if (line.indexOf("Status: Locally Modified") != -1) {
@@ -107,12 +107,12 @@ public class Cvs extends RevisionControlSystem {
         return false;
     }
 
-    public void showChangeSet(File repositoryRoot, String filename, Revision revision) {
+    public void showChangeSet(String filename, Revision revision) {
         throw new UnsupportedOperationException("Can't show a CVS change set for " + filename + " revision " + revision.number);
     }
     
-    public void revert(File repositoryRoot, String filename) {
-        File file = FileUtilities.fileFromParentAndString(repositoryRoot.toString(), filename);
+    public void revert(String filename) {
+        File file = FileUtilities.fileFromParentAndString(getRoot().toString(), filename);
         file.delete();
         ArrayList command = new ArrayList();
         command.add("cvs");
@@ -122,14 +122,14 @@ public class Cvs extends RevisionControlSystem {
         //command.add("-r");
         //command.add("BASE");
         command.add(filename);
-        execAndDump(repositoryRoot, command);
+        execAndDump(command);
     }
 
-    public List getStatuses(File repositoryRoot) {
+    public List getStatuses() {
         String[] command = new String[] { "cvs", "-q", "update", "-dP" };
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         
         ArrayList statuses = new ArrayList();
         Pattern pattern = Pattern.compile("^(.) (.+)$");
@@ -161,14 +161,14 @@ public class Cvs extends RevisionControlSystem {
         return statuses;
     }
     
-    public void commit(File repositoryRoot, String comment, List fileStatuses) {
-        scheduleNewFiles(repositoryRoot, "cvs", fileStatuses);
+    public void commit(String comment, List fileStatuses) {
+        scheduleNewFiles("cvs", fileStatuses);
         ArrayList command = new ArrayList();
         command.add("cvs");
         command.add("commit");
         command.add("-m");
         command.add(comment);
         addFilenames(command, fileStatuses);
-        execAndDump(repositoryRoot, command);
+        execAndDump(command);
     }
 }
