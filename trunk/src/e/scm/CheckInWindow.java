@@ -40,7 +40,7 @@ public class CheckInWindow extends JFrame {
         updateFileStatuses();
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                writeSavedComment();
+                updateSavedComment();
             }
         });
     }
@@ -197,7 +197,12 @@ public class CheckInWindow extends JFrame {
         List/*<FileStatus>*/ filenames = statusesTableModel.getIncludedFiles();
         backEnd.commit(repositoryRoot, comment, filenames);
         updateFileStatuses();
+        clearCheckInCommentArea();
+    }
+    
+    private void clearCheckInCommentArea() {
         checkInCommentArea.setText("");
+        updateSavedComment();
     }
 
     /**
@@ -242,7 +247,7 @@ public class CheckInWindow extends JFrame {
         }
     }
     
-    private void writeSavedComment() {
+    private void updateSavedComment() {
         String comment = checkInCommentArea.getText();
         File savedCommentFile = getSavedCommentFile();
         if (comment.length() == 0 && savedCommentFile.exists()) {
