@@ -36,8 +36,7 @@ public class AnnotatedLine {
                 date = "xxxx-xx-xx";
             }
             source = matcher.group(4);
-            formattedLine = date + " " +
-                            justify(author, revisions.getMaxAuthorNameLength()) + " " +
+            formattedLine = justify(author, revisions.getMaxAuthorNameLength()) + " " +
                             justify(revision.number, revisions.getMaxRevisionNumberLength()) + ":" +
                             expandTabs(source);
         }
