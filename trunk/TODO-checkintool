@@ -2,7 +2,9 @@
   bk sfiles. Also need to cope better with the fact that "cvs update" is
   capable of producing a bunch of irrelevant output.
 
-* We need a way to remove files. ("rm x; cvsvn rm x".)
+* We need a way to remove files. ("rm x; cvsvn rm x".) Or do we? Can we
+  actually provide a better interface than just doing this on the command
+  line? I'm not sure I can think of one.
 
 * We need a way to revert files. ("svn revert x".)
 
@@ -11,8 +13,6 @@
 
 * Save the comment field contents in repositoryRoot/.checkintool-comment in
   case you want to quit and come back.
-
-* Sort the table entries alphabetically on filename.
 
 * When we "cvs update" to find out what local changes we've got, we should
   (a) ignore successfully merged remote changes and (b) warn about merge

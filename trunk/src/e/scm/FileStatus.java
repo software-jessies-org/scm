@@ -1,6 +1,6 @@
 package e.scm;
 
-public class FileStatus {
+public class FileStatus implements Comparable {
     public static final int NEW = 0;
     public static final int ADDED = 1;
     public static final int REMOVED = 2;
@@ -38,6 +38,14 @@ public class FileStatus {
             case NOT_RECOGNIZED_BY_BACK_END: return "(unrecognized)";
         }
         return "(invalid state #" + state + ")";
+    }
+
+    /**
+     * Allows FileStatus objects to be ordered by name.
+     */
+    public int compareTo(Object o) {
+        FileStatus other = (FileStatus) o;
+        return name.compareToIgnoreCase(other.name);
     }
     
     public String toString() {

@@ -171,6 +171,7 @@ public class CheckInWindow extends JFrame {
                     WaitCursor.stop(statusesTable);
                     clearStatus();
                 }
+                Collections.sort(statuses);
                 statusesTableModel = new StatusesTableModel(statuses);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
