@@ -54,8 +54,8 @@ public class BitKeeper implements RevisionControlSystem {
                 String author = matcher.group(5);
                 String date = "20" + matcher.group(2) + "-" + matcher.group(3) + "-" + matcher.group(4);
                 StringBuffer comment = new StringBuffer();
-                while (i < lines.length && lines[i].equals(separator) == false) {
-                    comment.append(lines[i++].substring(2));
+                while (++i < lines.length && lines[i].equals(separator) == false) {
+                    comment.append(lines[i].substring(2));
                     comment.append("\n");
                 }
                 result.add(new Revision(number, date, author, comment.toString()));

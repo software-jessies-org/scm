@@ -37,6 +37,9 @@ public class Cvs implements RevisionControlSystem {
         return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 4);
     }
     
+    //date: 2002/11/25 14:41:42;  author: ericb;  state: Exp;  lines: +12 -1
+    private static final Pattern LOG_PATTERN = Pattern.compile("^date: (\\d\\d\\d\\d)/(\\d\\d)/(\\d\\d)[^;]*;\\s+author: ([^;]+);\\s+.*");
+
     public RevisionListModel parseLog(List linesList) {
         String[] lines = (String[]) linesList.toArray(new String[linesList.size()]);
 
@@ -55,13 +58,17 @@ public class Cvs implements RevisionControlSystem {
             }
             String number = lines[i++];
             number = number.substring("revision ".length());
-            String info = lines[i++];
-            StringBuffer comment = new StringBuffer();
-            while (i < lines.length && lines[i].equals(endMarker) == false && lines[i].equals(separator) == false) {
-                comment.append(lines[i++]);
-                comment.append("\n");
+            Matcher matcher = LOG_PATTERN.matcher(lines[i++]);
+            if (matcher.matches()) {
+                String author = matcher.group(4);
+                String date = matcher.group(1) + "-" + matcher.group(2) + "-" + matcher.group(3);
+                StringBuffer comment = new StringBuffer();
+                while (i < lines.length && lines[i].equals(endMarker) == false && lines[i].equals(separator) == false) {
+                    comment.append(lines[i++]);
+                    comment.append("\n");
+                }
+                result.add(new Revision(number, date, author, comment.toString()));
             }
-            result.add(new Revision(number, info, comment.toString()));
         }
         return result;
     }

@@ -55,8 +55,8 @@ public class Subversion implements RevisionControlSystem {
                 String author = matcher.group(2);
                 String date = matcher.group(3);
                 StringBuffer comment = new StringBuffer();
-                while (i < lines.length && lines[i].equals(separator) == false) {
-                    comment.append(lines[i++]);
+                while (++i < lines.length && lines[i].equals(separator) == false) {
+                    comment.append(lines[i]);
                     comment.append("\n");
                 }
                 result.add(new Revision(number, date, author, comment.toString()));
