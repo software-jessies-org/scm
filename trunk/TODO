@@ -1,7 +1,3 @@
-* When showing a diff, it would be good if the comment area showed the
-  concatenation of the comments between the most recent revision in the
-  diff and the oldest - 1 (the comment for the oldest corresponds to the
-  change that got you there, so doesn't seem relevant).
 
 * Add a pseudo-revision for the current file state, if the file's been
   modified since it was last committed. How do we tell if it's modified?

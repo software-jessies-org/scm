@@ -222,8 +222,19 @@ public class RevisionWindow extends JFrame {
                 // Show differences between two revisions.
                 Revision newerRevision = (Revision) values[0];
                 Revision olderRevision = (Revision) values[values.length - 1];
-                // FIXME: should we join all the revision comments and show that?
-                revisionCommentArea.setText("Differences between revisions " + olderRevision.number + " and " + newerRevision.number + "\n");
+
+                StringBuffer comment = new StringBuffer();
+                comment.append("Differences between revisions ");
+                comment.append(olderRevision.number);
+                comment.append(" and ");
+                comment.append(newerRevision.number);
+                comment.append("\n");
+                for (int i = 0; i < values.length - 1; ++i) {
+                    comment.append("\n");
+                    comment.append(((Revision) values[i]).comment);
+                }
+
+                revisionCommentArea.setText(comment.toString());
                 showDifferencesBetweenRevisions(olderRevision, newerRevision);
             }
         }
