@@ -62,4 +62,5 @@
 
 * For a given line, make it possible (and easy) to find out automatically
   when that line was removed. Search forward through revisions until we
-  can't find the line.
+  can't find the line. Relatedly: for a given line, make it easy to find
+  out automatically when that line was introduced.

@@ -3,6 +3,7 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -38,6 +39,10 @@ public class RevisionWindow extends JFrame {
             }
         };
 
+    /** Matches the "@@ -111,41 +113,41 @@" lines at the start of a hunk. */
+    private static final Pattern AT_AT_PATTERN =
+        Pattern.compile("^@@ -(\\d+),\\d+ \\+(\\d+),\\d+ @@$");
+
     private final MouseListener differencesDoubleClickListener =
         new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -50,25 +55,57 @@ public class RevisionWindow extends JFrame {
                     final int index = annotationView.locationToIndex(e.getPoint());
                     String lineOfInterest = (String) model.getElementAt(index);
 
-                    // Search backwards for the previous @@ line to help find out where we are.
-                    String atAtLine = null;
-                    int linesIntoHunk = 0;
-                    for (int i = index; i >= 0; --i) {
-                        String line = (String) model.getElementAt(i);
-                        if (line.startsWith("@@ -")) {
-                            atAtLine = line;
-                            break;
-                        }
-                        ++linesIntoHunk;
+                    // Only lines removed or added can be jumped to.
+                    if (lineOfInterest.matches("^[-+].*") == false) {
+                        // FIXME: give some feedback?
+                        return;
                     }
 
-                    int olderRevisionOffset = Integer.parseInt(atAtLine.substring(4, atAtLine.indexOf(',', 4)));
-                    --olderRevisionOffset; // The line number in the @@ line actually refers to the line after.
-                    int desiredLineNumber = olderRevisionOffset + linesIntoHunk;
-
+                    // What revision are we going to?
                     Revision desiredRevision = olderRevision;
                     if (lineOfInterest.startsWith("+")) {
                         desiredRevision = newerRevision;
+                    }
+
+                    // Search backwards for the previous @@ line to help find out where we are.
+                    int newerStartLine = 0;
+                    int olderStartLine = 0;
+                    int linesIntoHunk = 0;
+                    for (int i = index; i >= 0; --i) {
+                        String line = (String) model.getElementAt(i);
+                        Matcher matcher = AT_AT_PATTERN.matcher(line);
+                        if (matcher.matches()) {
+                            olderStartLine = Integer.parseInt(matcher.group(1));
+                            newerStartLine = Integer.parseInt(matcher.group(2));
+                            break;
+                        } else if (line.startsWith("+")) {
+                            if (desiredRevision == newerRevision) {
+                                ++linesIntoHunk;
+                            }
+                        } else if (line.startsWith("-")) {
+                            if (desiredRevision == olderRevision) {
+                                ++linesIntoHunk;
+                            }
+                        } else {
+                            // Context lines count for both revisions.
+                            ++linesIntoHunk;
+                        }
+                    }
+
+                    // The line numbers in the @@ line actually refer to the
+                    // line after.
+                    --newerStartLine;
+                    --olderStartLine;
+
+                    int startLine = ((desiredRevision == olderRevision) ? olderStartLine : newerStartLine);
+                    int desiredLineNumber = startLine + linesIntoHunk;
+
+                    if (false) {
+                        // Remove this when I'm confident this code is right.
+                        System.err.println("going to " + ((desiredRevision == olderRevision) ? "older" : "newer") + " revision");
+                        System.err.println("old=" + olderStartLine + " new=" + newerStartLine);
+                        System.err.println("linesIntoHunk=" + linesIntoHunk);
+                        System.err.println("startLine=" + startLine + "  desiredLineNumber=" + desiredLineNumber);
                     }
 
                     revisionsList.setSelectedValue(desiredRevision, true);
