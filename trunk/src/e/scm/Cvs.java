@@ -47,7 +47,7 @@ public class Cvs extends RevisionControlSystem {
     }
     
     //date: 2002/11/25 14:41:42;  author: ericb;  state: Exp;  lines: +12 -1
-    private static final Pattern LOG_PATTERN = Pattern.compile("^date: (\\d\\d\\d\\d)/(\\d\\d)/(\\d\\d)[^;]*;\\s+author: ([^;]+);\\s+.*");
+    private static final Pattern LOG_PATTERN = Pattern.compile("^date: (\\d\\d\\d\\d)[-/](\\d\\d)[-/](\\d\\d)[^;]*;\\s+author: ([^;]+);\\s+.*");
 
     public RevisionListModel parseLog(List linesList) {
         String[] lines = (String[]) linesList.toArray(new String[linesList.size()]);
