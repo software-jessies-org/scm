@@ -147,6 +147,8 @@ public class CheckInWindow extends JFrame {
         });
         contextMenu.add(revertItem);
         
+        contextMenu.addSeparator();
+        
         MenuItem historyItem = new MenuItem("Show History...");
         historyItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -154,6 +156,14 @@ public class CheckInWindow extends JFrame {
             }
         });
         contextMenu.add(historyItem);
+        
+        MenuItem refreshItem = new MenuItem("Refresh");
+        refreshItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateFileStatuses();
+            }
+        });
+        contextMenu.add(refreshItem);
         
         statusesTable.add(contextMenu);
         statusesTable.addMouseListener(new MouseAdapter() {
