@@ -123,6 +123,8 @@ public class CheckInWindow extends JFrame {
         List filenames = statusesTableModel.getIncludedFilenames();
         backEnd.commit(repositoryRoot, comment, filenames);
         updateFileStatuses();
+        checkInCommentArea.setText("");
+        patchView.setModel(new DefaultListModel());
     }
     
     private void initCheckInCommentArea() {
