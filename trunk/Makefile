@@ -10,12 +10,13 @@ revtool: $(SOURCE_FILES)
 	@echo Recompiling the world...
 	@make clean; \
 	 mkdir classes; \
-	 jikes -bootclasspath $(BOOT_CLASS_PATH) -d classes +P $(SOURCE_FILES)
+	 jikes -bootclasspath $(BOOT_CLASS_PATH) -d classes +P +Pall +Pno-serial +Pno-redundant-modifiers $(SOURCE_FILES)
 
 clean:
 	@$(RM) -rf classes
 
 dist: revtool
+	cvs2cl.pl --hide-filenames; \
 	cd ..; \
 	tar cvf $(TAR_FILE_OF_THE_DAY) revtool/; \
 	gzip $(TAR_FILE_OF_THE_DAY); \

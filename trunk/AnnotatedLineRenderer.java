@@ -1,7 +1,5 @@
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.table.*;
 
 public class AnnotatedLineRenderer extends DefaultListCellRenderer {
     private static final float[] NEW_COLOR = Color.RGBtoHSB(0, 0, 255, null);
