@@ -71,6 +71,8 @@ public class RevisionWindow extends JFrame {
                     annotationView.ensureIndexIsVisible(index);
                 }
             });
+        } else {
+            showSummaryOfAllRevisions();
         }
     }
 
@@ -135,6 +137,22 @@ public class RevisionWindow extends JFrame {
         annotationView.setCellRenderer(new DifferencesRenderer());
     }
 
+    private void showSummaryOfAllRevisions() {
+        StringBuffer summary = new StringBuffer();
+        for (int i = 0; i < revisions.getSize(); ++i) {
+            Revision revision = (Revision) revisions.getElementAt(i);
+
+            summary.append(revision);
+            summary.append("\n");
+
+            summary.append(revision.comment);
+            summary.append("\n");
+        }
+        revisionCommentArea.setText(summary.toString());
+        revisionCommentArea.setCaretPosition(0);
+        annotationView.setModel(new DefaultListModel());
+    }
+
     private void initRevisions(String filename) {
         setStatus("Getting list of revisions...");
         /* FIXME: do rest in separate thread. */
@@ -173,9 +191,7 @@ public class RevisionWindow extends JFrame {
             JList list = (JList) e.getSource();
             Object[] values = list.getSelectedValues();
             if (values.length == 0) {
-                // Clear the display.
-                revisionCommentArea.setText("");
-                annotationView.setModel(new DefaultListModel());
+                showSummaryOfAllRevisions();
             } else if (values.length == 1) {
                 // Show annotated revision.
                 Revision revision = (Revision) values[0];
