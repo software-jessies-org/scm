@@ -247,8 +247,11 @@ public class RevisionWindow extends JFrame {
                 comment.append(newerRevision.number);
                 comment.append("\n");
                 for (int i = 0; i < values.length - 1; ++i) {
-                    comment.append("\n");
-                    comment.append(((Revision) values[i]).comment);
+                    Revision revision = (Revision) values[i];
+                    comment.append("\n(");
+                    comment.append(revision.number);
+                    comment.append(") ");
+                    comment.append(revision.comment);
                 }
 
                 revisionCommentArea.setText(comment.toString());
