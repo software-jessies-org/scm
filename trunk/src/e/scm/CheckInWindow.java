@@ -63,6 +63,11 @@ public class CheckInWindow extends JFrame {
         
         patchView = new PatchView();
         patchView.setFont(FONT);
+        patchView.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent e) {
+                updatePatchView();
+            }
+        });
         patchView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() != 2) {
@@ -121,6 +126,9 @@ public class CheckInWindow extends JFrame {
         statusesTable.setShowGrid(false);
     }
     
+    private File lastPatchViewFile = null;
+    private long lastPatchViewUpdateTime = 0;
+    
     private void updatePatchView() {
         final int selectedRow = statusesTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -128,9 +136,17 @@ public class CheckInWindow extends JFrame {
         }
         
         FileStatus status = statusesTableModel.getFileStatus(selectedRow);
+        File file = new File(backEnd.getRoot(), status.getName());
+        long updateTime = file.lastModified();
+        if (file.equals(lastPatchViewFile) && updateTime <= lastPatchViewUpdateTime) {
+            return;
+        }
+        
+        lastPatchViewFile = file;
+        lastPatchViewUpdateTime = updateTime;
+        
         if (status.getState() == FileStatus.NEW) {
             DefaultListModel model = new DefaultListModel();
-            File file = new File(backEnd.getRoot(), status.getName());
             if (file.isDirectory()) {
                 model.addElement("(" + status.getName() + " is a directory.)");
             } else {
