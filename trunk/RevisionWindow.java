@@ -233,12 +233,18 @@ public class RevisionWindow extends JFrame {
     
     private void showAnnotationsForRevision(Revision revision, int lineNumber) {
         setStatus("Getting annotations for revision...");
-        /* FIXME: do rest in separate thread. */
-        String[] command = backEnd.getAnnotateCommand(revision, filename);
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(command, lines, errors);
-        clearStatus();
+        int status = 0;
+        try {
+            WaitCursor.start(this);
+            /* FIXME: do this in separate thread. */
+            String[] command = backEnd.getAnnotateCommand(revision, filename);
+            status = ProcessUtilities.backQuote(command, lines, errors);
+        } finally {
+            WaitCursor.stop(this);
+            clearStatus();
+        }
 
         // CVS writes junk to standard error even on success.
         if (status != 0) {
@@ -304,12 +310,18 @@ public class RevisionWindow extends JFrame {
     
     private void showDifferencesBetweenRevisions(Revision olderRevision, Revision newerRevision) {
         setStatus("Getting differences between revisions...");
-        /* FIXME: do rest in separate thread. */
-        String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename);
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(command, lines, errors);
-        clearStatus();
+        int status = 0;
+        /* FIXME: do this in separate thread. */
+        try {
+            WaitCursor.start(this);
+            String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename);
+            status = ProcessUtilities.backQuote(command, lines, errors);
+        } finally {
+            WaitCursor.stop(this);
+            clearStatus();
+        }
 
         // CVS returns a non-zero exit status if there were any differences.
         if (errors.size() > 0) {
@@ -351,11 +363,17 @@ public class RevisionWindow extends JFrame {
     private void initRevisions(String filename) {
         setStatus("Getting list of revisions...");
         /* FIXME: do rest in separate thread. */
-        String[] command = backEnd.getLogCommand(filename);
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        int status = ProcessUtilities.backQuote(command, lines, errors);
-        clearStatus();
+        int status = 0;
+        try {
+            WaitCursor.start(this);
+            String[] command = backEnd.getLogCommand(filename);
+            status = ProcessUtilities.backQuote(command, lines, errors);
+        } finally {
+            WaitCursor.stop(this);
+            clearStatus();
+        }
         
         if (status != 0 || errors.size() > 0) {
             showToolError(revisionsList, errors);
