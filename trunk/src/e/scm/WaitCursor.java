@@ -124,6 +124,14 @@ public class WaitCursor {
         sheet.setSize(new Dimension(400, 120));
         sheet.setUndecorated(true);
         
+        // Ensure we defer focus to our parent.
+        sheet.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent e) {
+                sheet.getOwner().requestFocus();
+            }
+        });
+        
+        // Ensure we follow our parent around, as if attached.
         sheet.getOwner().addComponentListener(sheetParentListener);
         repositionSheet();
     }
