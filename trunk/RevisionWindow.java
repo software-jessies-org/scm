@@ -172,7 +172,11 @@ public class RevisionWindow extends JFrame {
         public void valueChanged(ListSelectionEvent e) {
             JList list = (JList) e.getSource();
             Object[] values = list.getSelectedValues();
-            if (values.length == 1) {
+            if (values.length == 0) {
+                // Clear the display.
+                revisionCommentArea.setText("");
+                annotationView.setModel(new DefaultListModel());
+            } else if (values.length == 1) {
                 // Show annotated revision.
                 Revision revision = (Revision) values[0];
                 revisionCommentArea.setText(revision.comment);
@@ -183,7 +187,7 @@ public class RevisionWindow extends JFrame {
                 Revision newerRevision = (Revision) values[0];
                 Revision olderRevision = (Revision) values[values.length - 1];
                 // FIXME: should we join all the revision comments and show that?
-                revisionCommentArea.setText("<differences between " + olderRevision.number + " and " + newerRevision.number + ">");
+                revisionCommentArea.setText("Differences between revisions " + olderRevision.number + " and " + newerRevision.number + "\n");
                 showDifferencesBetweenRevisions(olderRevision, newerRevision);
             }
         }
