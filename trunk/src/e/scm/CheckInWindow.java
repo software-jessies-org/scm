@@ -140,17 +140,26 @@ public class CheckInWindow extends JFrame {
         statusesTable.setShowGrid(false);
     }
     
-    private class RevertAction extends AbstractAction {
-        RevertAction() {
-            super("Revert");
+    private class EditFileAction extends AbstractAction {
+        EditFileAction() {
+            super("Edit File");
+        }
+        public void actionPerformed(ActionEvent e) {
+            editFile();
+        }
+    }
+    
+    private class RevertFileAction extends AbstractAction {
+        RevertFileAction() {
+            super("Revert File");
         }
         public void actionPerformed(ActionEvent e) {
             revert();
         }
     }
     
-    private class HistoryAction extends AbstractAction {
-        HistoryAction() {
+    private class ShowHistoryAction extends AbstractAction {
+        ShowHistoryAction() {
             super("Show History...");
         }
         public void actionPerformed(ActionEvent e) {
@@ -169,9 +178,11 @@ public class CheckInWindow extends JFrame {
     
     private void initStatusesTableContextMenu() {
         final EPopupMenu contextMenu = new EPopupMenu();
-        contextMenu.add(new RevertAction());
+        contextMenu.add(new EditFileAction());
+        contextMenu.add(new RevertFileAction());
         contextMenu.addSeparator();
-        contextMenu.add(new HistoryAction());
+        contextMenu.add(new ShowHistoryAction());
+        contextMenu.addSeparator();
         contextMenu.add(new RefreshListAction());
         statusesTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -232,6 +243,23 @@ public class CheckInWindow extends JFrame {
             File file = FileUtilities.fileFromParentAndString(repositoryRoot.toString(), fileStatus.getName());
             new RevisionWindow(file.toString(), 1);
         }
+    }
+    
+    private void editFile() {
+        FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
+        String command = getEditor() + " " + fileStatus.getName();
+        ProcessUtilities.spawn(repositoryRoot, new String[] { "bash", "-c", command });
+    }
+    
+    private String getEditor() {
+        String result = System.getenv("SCM_EDITOR");
+        if (result == null) {
+            result = System.getenv("EDITOR");
+        }
+        if (result == null) {
+            result = "vi";
+        }
+        return result;
     }
     
     private void initCheckInCommentArea() {
