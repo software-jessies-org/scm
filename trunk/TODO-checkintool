@@ -13,6 +13,12 @@
   (Martin claims this isn't true with "bk citool", so there must be some
   way to work around it.)
 
+* When you create a new directory, some revision control systems don't seem
+  to consider the files below that point until you add the directory.
+  BitKeeper's "bk sfiles" won't show such files, and nor will CVS'
+  "cvs update". I guess we'll have to manually go look inside new directories
+  for potentially interesting files.
+
 * When we "cvs update" to find out what local changes we've got, we should
   (a) ignore successfully merged remote changes and (b) warn about merge
   conflicts.
