@@ -11,7 +11,10 @@ And these back-ends:
  Subversion
 
 scm is free software. See the file COPYING for copying permission.
-All source files are copyright (C) 2004, Elliott Hughes where not
+All source files are copyright (C) 2004-2005, Elliott Hughes where not
 otherwise attributed.
+
+Send bug reports to software@jessies.org, being sure to include the
+word "SCM" in your Subject: line.
 
 Enjoy!
