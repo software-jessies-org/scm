@@ -1,4 +1,7 @@
 
+* Add a pseudo-revision for the current file state, if the file's been
+  modified since it was last committed.
+
 * Show decent progress feedback and keep processing events while talking
   to CVS.
 

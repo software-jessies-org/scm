@@ -125,8 +125,18 @@ public class RevisionWindow extends JFrame {
             }
             revisions.add(new Revision(number, info, comment.toString()));
         }
-        revisionsList.setModel(revisions);
         clearStatus();
+
+        if (revisions.getSize() > 0) {
+            revisionsList.setModel(revisions);
+        } else {
+            showToolError(revisionsList, lines);
+        }
+    }
+
+    private void showToolError(JList list, String[] lines) {
+        list.setModel(new ToolErrorListModel(lines));
+        list.setCellRenderer(new ToolErrorRenderer());
     }
     
     public void clearStatus() {
