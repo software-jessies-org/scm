@@ -61,6 +61,7 @@ public class RevisionWindow extends JFrame {
                 Revision toRevision = annotatedLine.revision;
                 Patch patch = new Patch(fromRevision, toRevision);
                 final int lineNumber = patch.translateLineNumberInFromRevision(1 + index);
+//                System.err.println("fromRevision == " + fromRevision + ", toRevision == " + toRevision + " to line number == " + lineNumber);
                 selectRevision(toRevision);
                 showAnnotationsForRevision(toRevision, lineNumber);
             }
@@ -512,7 +513,12 @@ public class RevisionWindow extends JFrame {
     }
 
     public Revision getSelectedRevision() {
-        return (Revision) revisionsList.getSelectedValue();
+        Revision revision = (Revision) revisionsList.getSelectedValue();
+        // I can't think of an earlier place to trap this error.
+        if (revision == null) {
+            throw new IllegalArgumentException("There should be a selected revision by this point");
+        }
+        return revision;
     }
     
     private void readListOfRevisions(final int initialLineNumber) {
@@ -536,7 +542,9 @@ public class RevisionWindow extends JFrame {
                 
                 // This doesn't really belong in here, but it can only be invoked after the code above has finished.
                 if (initialLineNumber != 0) {
-                    showAnnotationsForRevision(revisions.getLatestInRepository(), initialLineNumber);
+                    Revision revision = revisions.getLatestInRepository();
+                    selectRevision(revision);
+                    showAnnotationsForRevision(revision, initialLineNumber);
                 } else {
                     showSummaryOfAllRevisions();
                 }
