@@ -30,15 +30,20 @@ public class RevisionWindow extends JFrame {
         revisionCommentArea.setEditable(false);
         revisionCommentArea.setFont(FONT);
 
-        JComponent revisionDetail = new JScrollPane(revisionCommentArea);
-        JComponent revisionsUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(revisionsList), revisionDetail);
+        JComponent revisionsUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+            new JScrollPane(revisionsList),
+            new JScrollPane(revisionCommentArea,
+                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED)
+        );
         
         annotationView = new JList(new AnnotationModel());
         annotationView.setFont(FONT);
         annotationView.setVisibleRowCount(34);
-        JComponent detailUi = new JScrollPane(annotationView);
         
-        JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT, revisionsUi, detailUi);
+        JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+            revisionsUi,
+            new JScrollPane(annotationView));
 
         getContentPane().add(ui, BorderLayout.CENTER);
         getContentPane().add(statusLine, BorderLayout.SOUTH);
@@ -139,14 +144,16 @@ public class RevisionWindow extends JFrame {
             JList list = (JList) e.getSource();
             Object[] values = list.getSelectedValues();
             if (values.length == 1) {
+                // Show annotated revision.
                 Revision revision = (Revision) values[0];
                 revisionCommentArea.setText(revision.comment);
                 revisionCommentArea.setCaretPosition(0);
                 showAnnotationsForRevision(revision);
             } else if (values.length == 2) {
-                // show diff.
+                // Show differences between two revisions.
                 Revision newerRevision = (Revision) values[0];
                 Revision olderRevision = (Revision) values[1];
+                // FIXME: should we join all the revision comments and show that?
                 revisionCommentArea.setText("<differences between " + olderRevision.number + " and " + newerRevision.number + ">");
                 showDifferencesBetweenRevisions(olderRevision, newerRevision);
             }
