@@ -59,6 +59,10 @@ public class RevisionWindow extends JFrame {
             private void doubleClick(AnnotatedLine annotatedLine) {
                 Revision fromRevision = getSelectedRevision();
                 Revision toRevision = annotatedLine.revision;
+                if (toRevision == fromRevision) {
+                    return;
+                }
+                
                 Patch patch = new Patch(fromRevision, toRevision);
                 final int lineNumber = patch.translateLineNumberInFromRevision(1 + index);
 //                System.err.println("fromRevision == " + fromRevision + ", toRevision == " + toRevision + " to line number == " + lineNumber);
