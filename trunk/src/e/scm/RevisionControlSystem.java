@@ -98,4 +98,30 @@ public abstract class RevisionControlSystem {
             collection.add(file.getName());
         }
     }
+    
+    public static List justNewFiles(List/*<FileStatus>*/ fileStatuses) {
+        ArrayList result = new ArrayList();
+        for (int i = 0; i < fileStatuses.size(); ++i) {
+            FileStatus file = (FileStatus) fileStatuses.get(i);
+            if (file.getState() == FileStatus.NEW) {
+                result.add(file);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Used by CVS and Subversion.
+     */
+    public static void scheduleNewFiles(File repositoryRoot, String commandName, List/*<FileStatus>*/ fileStatuses) {
+        List newFiles = justNewFiles(fileStatuses);
+        if (newFiles.isEmpty()) {
+            return;
+        }
+        ArrayList command = new ArrayList();
+        command.add(commandName);
+        command.add("add");
+        addFilenames(command, newFiles);
+        execAndDump(repositoryRoot, command);
+    }
 }

@@ -128,6 +128,7 @@ public class Subversion extends RevisionControlSystem {
     }
     
     public void commit(File repositoryRoot, String comment, List fileStatuses) {
+        scheduleNewFiles(repositoryRoot, "svn", fileStatuses);
         ArrayList command = new ArrayList();
         command.add("svn");
         command.add("commit");

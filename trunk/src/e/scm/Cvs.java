@@ -140,6 +140,7 @@ public class Cvs extends RevisionControlSystem {
     }
     
     public void commit(File repositoryRoot, String comment, List fileStatuses) {
+        scheduleNewFiles(repositoryRoot, "cvs", fileStatuses);
         ArrayList command = new ArrayList();
         command.add("cvs");
         command.add("commit");
