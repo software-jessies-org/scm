@@ -22,9 +22,6 @@
 * Should we force an "svn update"? Or does saving/restoring the comment
   field cover the remote-changes scenario well enough?
 
-* "Refresh List" loses track of the included files. We could keep a list of
-  their names, and automatically re-include them.
-
 * The menu option to edit the selected file is okay, but what I really want
   is to be able to go straight to a patch hunk; even better, I'd like to be
   able to tell CheckInTool to revert a hunk (rather than a whole patch).

@@ -302,6 +302,7 @@ public class CheckInWindow extends JFrame {
         setStatus("Getting file statuses...");
         Thread worker = new Thread() {
             public void run() {
+                List oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : new ArrayList();
                 List statuses = null;
                 try {
                     WaitCursor.start(statusesTable);
@@ -312,6 +313,7 @@ public class CheckInWindow extends JFrame {
                 }
                 Collections.sort(statuses);
                 statusesTableModel = new StatusesTableModel(statuses);
+                statusesTableModel.includeFiles(oldIncludedFiles);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         statusesTable.setModel(statusesTableModel);

@@ -71,6 +71,19 @@ public class StatusesTableModel extends AbstractTableModel {
         fireTableCellUpdated(row, column);
     }
     
+    public void includeFiles(List/*<FileStatus>*/ files) {
+        ArrayList names = new ArrayList();
+        for (int i = 0; i < files.size(); ++i) {
+            names.add(((FileStatus) files.get(i)).getName());
+        }
+        for (int i = 0; i < getRowCount(); ++i) {
+            String name = getFileStatus(i).getName();
+            if (names.contains(name)) {
+                setValueAt(Boolean.TRUE, i, 0);
+            }
+        }
+    }
+    
     public List/*<FileStatus>*/ getIncludedFiles() {
         ArrayList result = new ArrayList();
         for (int i = 0; i < getRowCount(); ++i) {
