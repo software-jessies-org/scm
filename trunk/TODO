@@ -41,8 +41,13 @@
   version, it would be much more useful to show me the part of the
   latest version that the diff referred to.
 
-* With the pseudo-revision for the current file state, work out how to
-  fix the annotations view. The diffs are fine.
+* Fix the annotation view for the pseudo-revision corresponding to the
+  current file state. We can easily get annotations for the last checked-in
+  revision, and we have a patch between that revision and the local file, so
+  all we need to do is "apply" the patch to the annotations. So we remove
+  the red lines (based on number, not content, because we *know* the patch
+  is good, yet the line content will be different because of the annotations),
+  and insert the blue lines, possibly with made-up annotation.
 
 * Show decent progress feedback and keep processing events while talking
   to CVS.
