@@ -68,28 +68,23 @@ public class RevisionWindow extends JFrame {
     
     private final MouseListener annotationsDoubleClickListener =
         new MouseAdapter() {
+            private int index;
+            
             /**
              * Dispatches clicks and double-clicks on annotated lines.
              */
             public void mouseClicked(MouseEvent e) {
                 AnnotatedLine annotatedLine = lineForEvent(e);
-                if (annotatedLine == null) {
-                    return;
-                }
                 if (e.getClickCount() == 2) {
                     doubleClick(annotatedLine);
                 } else if (e.getClickCount() == 1) {
                     click(annotatedLine);
                 }
             }
-            private int index;
+            
             private AnnotatedLine lineForEvent(MouseEvent e) {
                 this.index = annotationView.locationToIndex(e.getPoint());
-                Object value = annotationView.getModel().getElementAt(index);
-                if (value instanceof AnnotatedLine) {
-                    return (AnnotatedLine) value;
-                }
-                return null;
+                return (AnnotatedLine) annotationView.getModel().getElementAt(index);
             }
 
             /**
