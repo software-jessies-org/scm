@@ -32,7 +32,7 @@ public class CheckInWindow extends JFrame {
     
     public CheckInWindow(final RevisionControlSystem backEnd) {
         this.backEnd = backEnd;
-        setTitle(backEnd.getRoot().toString());
+        setTitle(FileUtilities.getUserFriendlyName(backEnd.getRoot().toString()));
         makeUserInterface();
         updateFileStatuses();
         addWindowListener(new WindowAdapter() {
