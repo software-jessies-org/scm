@@ -96,6 +96,10 @@ public class CheckInWindow extends JFrame {
                 }
                 
                 final int selectedRow = statusesTable.getSelectedRow();
+                if (selectedRow == -1) {
+                    return;
+                }
+                
                 FileStatus status = statusesTableModel.getFileStatus(selectedRow);
                 if (status.getState() == FileStatus.NEW) {
                     DefaultListModel model = new DefaultListModel();
@@ -118,6 +122,7 @@ public class CheckInWindow extends JFrame {
         }
         List filenames = statusesTableModel.getIncludedFilenames();
         backEnd.commit(repositoryRoot, comment, filenames);
+        updateFileStatuses();
     }
     
     private void initCheckInCommentArea() {
