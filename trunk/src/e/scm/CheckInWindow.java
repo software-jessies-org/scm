@@ -53,7 +53,7 @@ public class CheckInWindow extends JFrame {
         // Give the statuses table a sensible amount of space.
         JScrollPane statusesScrollPane = new JScrollPane(statusesTable);
         Dimension preferredSize = statusesScrollPane.getPreferredSize();
-        preferredSize.height = getFontMetrics(FONT).getHeight() * 10;
+        preferredSize.height = getFontMetrics(statusesTable.getFont()).getHeight() * 10;
         statusesScrollPane.setPreferredSize(preferredSize);
         statusesScrollPane.getViewport().setBackground(statusesTable.getBackground());
         
