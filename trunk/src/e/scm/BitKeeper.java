@@ -134,6 +134,32 @@ public class BitKeeper implements RevisionControlSystem {
     }
     
     public void commit(File repositoryRoot, String comment, List filenames) {
-        throw new UnsupportedOperationException("Can't commit to a BitKeeper repository.");
+        ArrayList command = new ArrayList();
+        command.add("bk");
+        command.add("delta");
+        command.add("-a"); // Allow new files to be added without a separate 'bk new <file>'.
+        command.add("-y" + comment);
+        command.addAll(filenames);
+        doAndDump(repositoryRoot, command);
+        
+        command = new ArrayList();
+        command.add("bk");
+        command.add("commit");
+        command.add("-y" + comment);
+        command.addAll(filenames);
+        doAndDump(repositoryRoot, command);
+    }
+    
+    private void doAndDump(File repositoryRoot, List command) {
+        ArrayList lines = new ArrayList();
+        ArrayList errors = new ArrayList();
+        int status = ProcessUtilities.backQuote(repositoryRoot, (String[]) command.toArray(new String[command.size()]), lines, errors);
+        for (int i = 0; i < lines.size(); ++i) {
+            System.out.println(lines.get(i));
+        }
+        for (int i = 0; i < errors.size(); ++i) {
+            System.err.println(errors.get(i));
+        }
+        System.err.println(status);
     }
 }
