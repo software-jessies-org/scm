@@ -10,6 +10,8 @@
 
 * With BitKeeper, a pending change *will* be included in the next check-in.
   We need to have the 'included' boolean set to true, and non-editable.
+  (Martin claims this isn't true with "bk citool", so there must be some
+  way to work around it.)
 
 * Save the comment field contents in repositoryRoot/.checkintool-comment in
   case you want to quit and come back.
