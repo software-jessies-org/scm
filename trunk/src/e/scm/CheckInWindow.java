@@ -177,16 +177,37 @@ public class CheckInWindow extends JFrame {
                     public void run() {
                         statusesTable.setModel(statusesTableModel);
                         statusesTableModel.initColumnWidths(statusesTable);
-                        statusesTableModel.addTableModelListener(new TableModelListener() {
-                            public void tableChanged(TableModelEvent e) {
-                                commitButton.setEnabled(statusesTableModel.isAtLeastOneFileIncluded());
-                            }
-                        });
+                        statusesTableModel.addTableModelListener(new StatusesTableModelListener());
                     }
                 });
             }
         };
         worker.start();
+    }
+
+    private class StatusesTableModelListener implements TableModelListener {
+        public void tableChanged(TableModelEvent e) {
+            commitButton.setEnabled(statusesTableModel.isAtLeastOneFileIncluded());
+            if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 0) {
+                checkBoxUpdated(e);
+            }
+        }
+
+        /**
+         * Attempt to be helpful by inserting a file's name in the check-in
+         * comment when the file is marked for inclusion in this commit.
+         */
+        private void checkBoxUpdated(TableModelEvent e) {
+            FileStatus fileStatus = statusesTableModel.getFileStatus(e.getFirstRow());
+            String name = fileStatus.getName() + ": ";
+            String checkInComment = checkInCommentArea.getText();
+            if (checkInComment.indexOf(name) == -1) {
+                if (checkInComment.length() > 0 && !checkInComment.endsWith("\n")) {
+                    name = "\n" + name;
+                }
+                checkInCommentArea.append(name);
+            }
+        }
     }
     
     private void showToolError(JList list, ArrayList lines) {
