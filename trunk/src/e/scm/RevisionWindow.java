@@ -312,6 +312,10 @@ public class RevisionWindow extends JFrame {
             }
         }
         
+        if (clue == null) {
+            return null;
+        }
+        
         File root = directory;
         while (true) {
             File newRoot = new File(root.getParent());

@@ -32,8 +32,8 @@ public class CheckInWindow extends JFrame {
     private JLabel statusLine = new JLabel(" ");
     private JButton commitButton;
     
-    public CheckInWindow() {
-        this.repositoryRoot = RevisionWindow.getRepositoryRoot(System.getProperty("user.dir"));
+    public CheckInWindow(final File repositoryRoot) {
+        this.repositoryRoot = repositoryRoot;
         this.backEnd = RevisionWindow.guessWhichRevisionControlSystem(repositoryRoot);
         setTitle(repositoryRoot.toString());
         makeUserInterface();
