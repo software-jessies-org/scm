@@ -3,8 +3,11 @@ import java.util.regex.*;
 public class Revision {
     //date: 2002/11/25 14:41:42;  author: ericb;  state: Exp;  lines: +12 -1
     private static final Pattern CVS_PATTERN = Pattern.compile("^date: (\\d\\d\\d\\d)/(\\d\\d)/(\\d\\d)[^;]*;\\s+author: ([^;]+);\\s+.*");
+
     //D 1.2 04/02/15 13:02:22+00:00 elliotth@mercury.local 3 2 4/0/356
-    private static final Pattern BIT_KEEPER_PATTERN = Pattern.compile("^D ([0-9.]+) (\\d\\d)/(\\d\\d)/(\\d\\d) \\S+ ([^@]+)@.*");
+    //D 1.144 01/03/28 11:56:53-00:00 hughc 145 144 0/3/3528
+    private static final Pattern BIT_KEEPER_PATTERN = Pattern.compile("^D ([0-9.]+) (\\d\\d)/(\\d\\d)/(\\d\\d) \\S+ ([^@ ]+).*");
+
     public String number;
     public String date;
     public String author;
