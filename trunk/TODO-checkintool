@@ -12,3 +12,8 @@
 
 * With BitKeeper, a pending change *will* be included in the next check-in.
   We need to have the 'included' boolean set to true, and non-editable.
+
+* Save the comment field contents in repositoryRoot/.checkintool-comment in
+  case you want to quit and come back.
+
+* Sort the table entries alphabetically on filename.
