@@ -1,8 +1,10 @@
 SOURCE_FILES=$(wildcard *.java)
 TAR_FILE_OF_THE_DAY=`date +revtool-%Y-%m-%d.tar`
 
-BOOT_CLASS_PATH=/home/elliotth/download/j2sdk1.4.2/jre/lib/rt.jar
-BOOT_CLASS_PATH=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
+KNOWN_JRE_LOCATIONS+=/home/elliotth/download/j2sdk1.4.2/jre/lib/rt.jar
+KNOWN_JRE_LOCATIONS+=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
+
+BOOT_CLASS_PATH=$(wildcard $(KNOWN_JRE_LOCATIONS))
 
 revtool: $(SOURCE_FILES)
 	@echo Recompiling the world...
