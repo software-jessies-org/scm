@@ -2,7 +2,7 @@ import java.util.regex.*;
 
 public class Revision {
     /** A revision corresponding to changes not yet committed. */
-    public static final Revision LOCAL_REVISION = new Revision("local", "xxxx-xx-xx", "me", "Changes not yet committed."); 
+    public static final Revision LOCAL_REVISION = new Revision("local", "xxxx-xx-xx", "unknown", "Changes not yet committed."); 
 
     //date: 2002/11/25 14:41:42;  author: ericb;  state: Exp;  lines: +12 -1
     private static final Pattern CVS_PATTERN = Pattern.compile("^date: (\\d\\d\\d\\d)/(\\d\\d)/(\\d\\d)[^;]*;\\s+author: ([^;]+);\\s+.*");
