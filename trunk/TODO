@@ -74,11 +74,6 @@
 * Some way to move to the previous/next line in the selected
   revision (i.e. the blue lines).
 
-* When we can correctly go from a line in a patch to the corresponding
-  line in a revision, use that logic to fix the annotation view's
-  behavior when switching revisions; currently it just goes to the
-  same-numbered line in the target revision (there's a FIXME).
-
 * How about showing "+x -y" in the status line when showing a diff? I
   quite like that as an overview of the patch. Maybe the revision numbers
   involved too, because they're not necessarily visible elsewhere. (If
@@ -89,9 +84,6 @@
   I've been looking at a diff and I go back to looking at the latest
   version, it would be much more useful to show me the part of the
   latest version that the diff referred to.
-
-* Show decent progress feedback and keep processing events while talking
-  to CVS.
 
 * Implement some kind of cache of annotated revisions, so we don't have to
   keep going back to the server for them. Similarly diffs.
@@ -121,6 +113,3 @@
   when that line was removed. Search forward through revisions until we
   can't find the line. Relatedly: for a given line, make it easy to find
   out automatically when that line was introduced.
-
-* Subversion's move breaks Subversion's diff; we need to track name changes
-  back through time.
