@@ -103,6 +103,7 @@ public class RevisionWindow extends JFrame {
                 }
                 int fromLineNumber = 1 + index;
                 showAnnotationsForRevision(toRevision, fromRevision, fromLineNumber);
+                revisionsList.setSelectedValue(toRevision, true);
             }
 
             /**
