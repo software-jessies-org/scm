@@ -5,6 +5,8 @@ public class AnnotatedLineRenderer extends DefaultListCellRenderer {
     private static final float[] NEW_COLOR = Color.RGBtoHSB(0, 0, 255, null);
     private static final int DAYS_TO_BLACK = 31;
 
+    private static final Color ALTERNATE_BACKGROUND_COLOR = new Color(245, 240, 255);
+    
     private RevisionWindow revisionWindow;
 
     public AnnotatedLineRenderer(RevisionWindow parentRevisionWindow) {
@@ -18,6 +20,9 @@ public class AnnotatedLineRenderer extends DefaultListCellRenderer {
         setText(line.formattedLine);
         setToolTipText(toolTipForRevision(line.revision));
         setForeground((revisionWindow.getSelectedRevision() == line.revision) ? Color.blue : Color.black);
+        if (isSelected == false && line.useAlternateBackgroundColor) {
+            setBackground(ALTERNATE_BACKGROUND_COLOR);
+        }
 
         return this;
     }

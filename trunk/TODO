@@ -1,4 +1,10 @@
-* wHEN WE can correctly go from a line in a patch to the corresponding
+* The annotated view might be clearer if we didn't repeat duplicate
+  authors and revision numbers.
+
+* Some way to move to the previous/next line in the selected
+  revision (i.e. the blue lines).
+
+* When we can correctly go from a line in a patch to the corresponding
   line in a revision, use that logic to fix the annotation view's
   behavior when switching revisions; currently it just goes to the
   same-numbered line in the target revision (there's a FIXME).

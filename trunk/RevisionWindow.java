@@ -293,6 +293,7 @@ public class RevisionWindow extends JFrame {
         }
 
         history = backEnd.parseAnnotations(revisions, lines);
+        history.postProcess();
         switchAnnotationView(history, annotatedLineRenderer, annotationsDoubleClickListener);
         showSpecificLineInAnnotations(lineNumber);
     }

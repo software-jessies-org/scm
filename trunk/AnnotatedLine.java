@@ -24,6 +24,8 @@ public class AnnotatedLine {
     /** The number of days since this line was last changed. */
     public int age;
 
+    public boolean useAlternateBackgroundColor;
+
     private AnnotatedLine() {
     }
 
