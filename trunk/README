@@ -1,6 +1,7 @@
-This directory contains the RevisionTool revision history browser.
+This directory contains the scm package, currently comprising
+the RevisionTool revision history browser.
 
-RevisionTool is free software. See the file COPYING for copying permission.
+scm is free software. See the file COPYING for copying permission.
 All source files are copyright (C) 2004, Elliott Hughes where not
 otherwise attributed.
 

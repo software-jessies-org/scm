@@ -138,7 +138,7 @@ public class RevisionWindow extends JFrame {
     public RevisionWindow(String filename, int initialLineNumber) {
         super(filename);
         setFilename(filename);
-        this.backEnd = guessWhichRevisionControlSystem();
+        this.backEnd = guessWhichRevisionControlSystem(repositoryRoot);
         makeUserInterface(initialLineNumber);
 
         readListOfRevisions();
@@ -259,7 +259,7 @@ public class RevisionWindow extends JFrame {
         }
     }
     
-    private File getRepositoryRoot(String filename) {
+    public static File getRepositoryRoot(String filename) {
         String clue = null;
         
         File file = new File(new File(filename).getAbsolutePath());
@@ -295,7 +295,7 @@ public class RevisionWindow extends JFrame {
      * whether there's a CVS, SCCS or .svn directory in the same directory
      * as the file.
      */
-    private RevisionControlSystem guessWhichRevisionControlSystem() {
+    public static RevisionControlSystem guessWhichRevisionControlSystem(File repositoryRoot) {
         String[] siblings = repositoryRoot.list();
         for (int i = 0; i < siblings.length; ++i) {
             if (siblings[i].equals("CVS")) {
