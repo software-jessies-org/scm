@@ -105,7 +105,7 @@ public class Cvs implements RevisionControlSystem {
     }
     
     public List getStatuses(File repositoryRoot) {
-        String[] command = new String[] { "cvs", "update", "-dP" };
+        String[] command = new String[] { "cvs", "-q", "update", "-dP" };
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
