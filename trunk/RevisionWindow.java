@@ -131,20 +131,21 @@ public class RevisionWindow extends JFrame {
         setFilename(filename);
         this.backEnd = guessWhichRevisionControlSystem();
         makeUserInterface(initialLineNumber);
+
+        readListOfRevisions(filename);
+        if (initialLineNumber != 0) {
+            // revisions[0] is the local revision.
+            // revisions[1] is the latest revision in the repository.
+            showAnnotationsForRevision((Revision) revisions.getElementAt(1), initialLineNumber);
+        } else {
+            showSummaryOfAllRevisions();
+        }
     }
 
     private void makeUserInterface(int initialLineNumber) {
-        revisionsList = new JList();
-        revisionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        revisionsList.setFont(FONT);
-        revisionsList.addListSelectionListener(new RevisionListSelectionListener());
-
-        revisionCommentArea = new JTextArea(8, 80);
-        revisionCommentArea.setDragEnabled(false);
-        revisionCommentArea.setEditable(false);
-        revisionCommentArea.setFont(FONT);
-        revisionCommentArea.setWrapStyleWord(true);
-        revisionCommentArea.setLineWrap(true);
+        initRevisionsList();
+        initRevisionCommentArea();
+        initAnnotationView();
 
         JComponent revisionsUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
             new JScrollPane(revisionsList),
@@ -153,16 +154,6 @@ public class RevisionWindow extends JFrame {
                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED)
         );
         revisionsUi.setBorder(null);
-        
-        annotationView = new JList(new AnnotationModel());
-        annotationView.setFont(FONT);
-        annotationView.setVisibleRowCount(34);
-        ActionMap actionMap = annotationView.getActionMap();
-        actionMap.put("copy", new AbstractAction("copy") {
-            public void actionPerformed(ActionEvent e) {
-                copyAnnotationViewSelectionToClipboard();
-            }
-        });
         
         JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
             revisionsUi,
@@ -178,16 +169,34 @@ public class RevisionWindow extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
 
-        initRevisions(filename);
+    private void initRevisionsList() {
+        revisionsList = new JList();
+        revisionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        revisionsList.setFont(FONT);
+        revisionsList.addListSelectionListener(new RevisionListSelectionListener());
+    }
 
-        if (initialLineNumber != 0) {
-            // revisions[0] is the local revision.
-            // revisions[1] is the latest revision in the repository.
-            showAnnotationsForRevision((Revision) revisions.getElementAt(1), initialLineNumber);
-        } else {
-            showSummaryOfAllRevisions();
-        }
+    private void initAnnotationView() {
+        annotationView = new JList(new AnnotationModel());
+        annotationView.setFont(FONT);
+        annotationView.setVisibleRowCount(34);
+        ActionMap actionMap = annotationView.getActionMap();
+        actionMap.put("copy", new AbstractAction("copy") {
+            public void actionPerformed(ActionEvent e) {
+                copyAnnotationViewSelectionToClipboard();
+            }
+        });
+    }
+
+    private void initRevisionCommentArea() {
+        revisionCommentArea = new JTextArea(8, 80);
+        revisionCommentArea.setDragEnabled(false);
+        revisionCommentArea.setEditable(false);
+        revisionCommentArea.setFont(FONT);
+        revisionCommentArea.setWrapStyleWord(true);
+        revisionCommentArea.setLineWrap(true);
     }
 
     /**
@@ -284,10 +293,9 @@ public class RevisionWindow extends JFrame {
         annotationView.setModel(EMPTY_LIST_MODEL);
         annotationView.setCellRenderer(renderer);
         annotationView.setModel(listModel);
-        final MouseListener[] mouseListeners = annotationView.getMouseListeners();
-        for (int i = 0; i < mouseListeners.length; ++i) {
-            annotationView.removeMouseListener(mouseListeners[i]);
-        }
+        //FIXME: maybe we should have two JLists on a CardLayout?
+        annotationView.removeMouseListener(annotationsDoubleClickListener);
+        annotationView.removeMouseListener(differencesDoubleClickListener);
         annotationView.addMouseListener(doubleClickListener);
     }
 
@@ -305,7 +313,9 @@ public class RevisionWindow extends JFrame {
         // Set the clipboard (and X11's nasty hacky semi-duplicate).
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         toolkit.getSystemClipboard().setContents(selection, selection);
-        toolkit.getSystemSelection().setContents(selection, selection);
+        if (toolkit.getSystemSelection() != null) {
+            toolkit.getSystemSelection().setContents(selection, selection);
+        }
     }
     
     private void showDifferencesBetweenRevisions(Revision olderRevision, Revision newerRevision) {
@@ -360,7 +370,7 @@ public class RevisionWindow extends JFrame {
         return (Revision) revisionsList.getSelectedValue();
     }
 
-    private void initRevisions(String filename) {
+    private void readListOfRevisions(String filename) {
         setStatus("Getting list of revisions...");
         /* FIXME: do rest in separate thread. */
         ArrayList lines = new ArrayList();
