@@ -2,9 +2,6 @@
   bk sfiles. Also need to cope better with the fact that "cvs update" is
   capable of producing a bunch of irrelevant output.
 
-* Shouldn't ignore the status code returned from a commit; if it suggests
-  that the commit failed, we shouldn't throw away the check-in comment.
-
 * We need a way to remove files. ("rm x; cvsvn rm x".) Ed points out that
   there's "cvs rm -f x", which doesn't require the file to have been removed
   from the local file system first. Do we really need anything here? Can we
