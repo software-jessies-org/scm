@@ -369,12 +369,38 @@ public class RevisionWindow extends JFrame {
             return;
         }
 
-        updateAnnotationModel(lines);
+        updateAnnotationModel(revision, lines);
         showSpecificLineInAnnotations(lineNumber);
     }
     
-    private void updateAnnotationModel(List lines) {
+    private void updateAnnotationModel(Revision revision, List lines) {
         annotationModel = parseAnnotations(lines);
+        if (revision == Revision.LOCAL_REVISION) {
+            // The annotations are wrong. They're actually for the head
+            // revision, not the locally modified file. So we have to fake
+            // it by getting a patch and 'applying' it to the annotations.
+            
+            ArrayList patchLines = new ArrayList();
+            ArrayList errors = new ArrayList();
+            int status = 0;
+            /* FIXME: do this in separate thread. */
+            try {
+                WaitCursor.start(this);
+                String[] command = backEnd.getDifferencesCommand(null, Revision.LOCAL_REVISION, filePath);
+                status = ProcessUtilities.backQuote(repositoryRoot, command, patchLines, errors);
+            } finally {
+                WaitCursor.stop(this);
+                clearStatus();
+            }
+            
+            // CVS returns a non-zero exit status if there were any differences.
+            if (errors.size() > 0) {
+                showToolError(revisionsList, errors);
+                return;
+            }
+            
+            annotationModel.applyPatch(patchLines, revisions);
+        }
         switchAnnotationView(annotationModel, annotatedLineRenderer, annotationsDoubleClickListener);
     }
     

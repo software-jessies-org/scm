@@ -13,7 +13,7 @@ import e.util.*;
 public abstract class RevisionControlSystem {
     /**
      * Returns a command that gets the annotated form of the given revision
-     * of the given file.
+     * of the given file. You may be given Revision.LOCAL_REVISION as revision.
      */
     public abstract String[] getAnnotateCommand(Revision revision, String filename);
 
@@ -26,7 +26,7 @@ public abstract class RevisionControlSystem {
     /**
      * Returns a command that gets a patch for the given file from the older
      * revision to the newer revision. You may be given Revision.LOCAL_REVISION
-     * as newer revision. You may be given null for both revisions, which is
+     * as newerRevision. You may be given null for both revisions, which is
      * used by CheckInTool to ask for the differences between a locally-modified
      * file and the repository.
      */

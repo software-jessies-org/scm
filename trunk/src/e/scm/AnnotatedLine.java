@@ -33,6 +33,14 @@ public class AnnotatedLine {
         return result;
     }
     
+    public static AnnotatedLine fromLocalRevision(RevisionListModel revisions, String line) {
+        AnnotatedLine result = new AnnotatedLine();
+        result.revision = Revision.LOCAL_REVISION;
+        result.source = line;
+        result.prepareFormattedLine(revisions);
+        return result;
+    }
+    
     private void prepareFormattedLine(RevisionListModel revisions) {
         formattedLine = justify(revision.author, revisions.getMaxAuthorNameLength()) + " " +
                         justify(revision.number, revisions.getMaxRevisionNumberLength()) + ":" +

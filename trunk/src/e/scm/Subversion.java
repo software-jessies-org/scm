@@ -7,9 +7,15 @@ import e.util.*;
 
 public class Subversion extends RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
-        return new String[] {
-            "svn", "annotate", "-r", revision.number, filename
-        };
+        ArrayList command = new ArrayList();
+        command.add("svn");
+        command.add("annotate");
+        if (revision != Revision.LOCAL_REVISION) {
+            command.add("-r");
+            command.add(revision.number);
+        }
+        command.add(filename);
+        return (String[]) command.toArray(new String[command.size()]);
     }
 
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename) {
