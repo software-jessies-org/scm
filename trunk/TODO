@@ -1,3 +1,8 @@
+* BitKeeper and CVS both support arbitrary amounts of context with their "diff"
+  commands. Subversion doesn't, but we could use:
+
+    svn diff --diff-cmd "/usr/bin/diff" -x "-U12"
+
 * Notes on why I can't stand bk csettool:
 
     1. it's ugly enough to make me not want to have anything to do with it.
