@@ -13,15 +13,7 @@ import e.gui.*;
 import e.util.*;
 
 public class RevisionWindow extends JFrame {
-    private static final Font FONT;
-    static {
-        // FIXME: this is nasty. Why is there no Font.parse or Font.fromString?
-        if (System.getProperty("os.name").indexOf("Mac") != -1) {
-            FONT = new Font("Monaco", Font.PLAIN, 10);
-        } else {
-            FONT = new Font("Monospaced", Font.PLAIN, 12);
-        }
-    }
+    private static final Font FONT = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
 
     private final AnnotatedLineRenderer annotatedLineRenderer =
         new AnnotatedLineRenderer(this);

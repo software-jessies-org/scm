@@ -11,15 +11,7 @@ import e.gui.*;
 import e.util.*;
 
 public class CheckInWindow extends JFrame {
-    private static final Font FONT;
-    static {
-        // FIXME: this is nasty. Why is there no Font.parse or Font.fromString?
-        if (System.getProperty("os.name").indexOf("Mac") != -1) {
-            FONT = new Font("Monaco", Font.PLAIN, 10);
-        } else {
-            FONT = new Font("Monospaced", Font.PLAIN, 12);
-        }
-    }
+    private static final Font FONT = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
 
     private RevisionControlSystem backEnd;
     
@@ -123,7 +115,6 @@ public class CheckInWindow extends JFrame {
         statusesTable.setTableHeader(null);
         statusesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         statusesTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-        statusesTable.setFont(FONT);
         initStatusesTableContextMenu();
         statusesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
