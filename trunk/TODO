@@ -1,6 +1,4 @@
 
-* Start up at a decent size, and in a sensible position on the desktop.
-
 * Show decent progress feedback and keep processing events while talking
   to CVS.
 
