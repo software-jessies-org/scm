@@ -177,6 +177,24 @@ public abstract class RevisionControlSystem {
      */
     public abstract void commit(String comment, List/*<FileStatus>*/ fileStatuses);
     
+    private String quoteCommand(List command) {
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < command.size(); ++i) {
+            if (i > 0) {
+                result.append(' ');
+            }
+            String argument = (String) command.get(i);
+            if (argument.indexOf(' ') != -1) {
+                result.append('"');
+                result.append(argument);
+                result.append('"');
+            } else {
+                result.append(argument);
+            }
+        }
+        return result.toString();
+    }
+
     /**
      * Executes a command in the given directory, and dumps all the output from it.
      * Useful until we do something funkier.
@@ -184,7 +202,7 @@ public abstract class RevisionControlSystem {
     public void execAndDump(List command) {
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
-        System.err.println("Running " + StringUtilities.join(command, " "));
+        System.err.println("Running " + quoteCommand(command));
         int status = ProcessUtilities.backQuote(repositoryRoot, (String[]) command.toArray(new String[command.size()]), lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             System.out.println(lines.get(i));
