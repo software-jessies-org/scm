@@ -63,6 +63,15 @@ public class CheckInWindow extends JFrame {
         
         patchView = new PatchView();
         patchView.setFont(FONT);
+        patchView.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() != 2) {
+                    return;
+                }
+                int index = patchView.locationToIndex(e.getPoint());
+                editFile();
+            }
+        });
         
         JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
             topUi,
@@ -256,9 +265,15 @@ public class CheckInWindow extends JFrame {
     }
     
     private String getEditor() {
-        String result = System.getenv("SCM_EDITOR");
-        if (result == null) {
-            result = System.getenv("EDITOR");
+        String result = null;
+        try {
+            result = System.getenv("SCM_EDITOR");
+            if (result == null) {
+                result = System.getenv("EDITOR");
+            }
+        } catch (Error error) {
+            // Sun were really stupid there. Ignore them and wait for 1.5!
+            error = error;
         }
         if (result == null) {
             result = "vi";
