@@ -91,4 +91,36 @@ public class Subversion implements RevisionControlSystem {
     public void showChangeSet(File repositoryRoot, String filename, Revision revision) {
         throw new UnsupportedOperationException("Can't show a Subversion change set for " + filename + " revision " + revision.number);
     }
+    
+    public List getStatuses(File repositoryRoot) {
+        String[] command = new String[] { "svn", "status" };
+        ArrayList lines = new ArrayList();
+        ArrayList errors = new ArrayList();
+        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+        
+        ArrayList statuses = new ArrayList();
+        Pattern pattern = Pattern.compile("^(.)....\\s+(.+)$");
+        for (int i = 0; i < lines.size(); ++i) {
+            String line = (String) lines.get(i);
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find()) {
+                char state = matcher.group(1).charAt(0);
+                String name = matcher.group(2);
+                int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
+                switch (state) {
+                case 'A': canonicalState = FileStatus.ADDED; break;
+                case 'C': canonicalState = FileStatus.CONTAINS_CONFLICTS; break;
+                case 'D': canonicalState = FileStatus.REMOVED; break;
+                case 'M': canonicalState = FileStatus.MODIFIED; break;
+                case '?': canonicalState = FileStatus.NEW; break;
+                case '!': canonicalState = FileStatus.MISSING; break;
+                case '~': canonicalState = FileStatus.WRONG_KIND; break;
+                }
+                statuses.add(new FileStatus(canonicalState, name));
+            } else {
+                System.err.println("Subversion back end didn't understand '" + line + "'.");
+            }
+        }
+        return statuses;
+    }
 }

@@ -101,4 +101,8 @@ public class Cvs implements RevisionControlSystem {
     public void showChangeSet(File repositoryRoot, String filename, Revision revision) {
         throw new UnsupportedOperationException("Can't show a CVS change set for " + filename + " revision " + revision.number);
     }
+    
+    public List getStatuses(File repositoryRoot) {
+        throw new UnsupportedOperationException("Can't get status information for a CVS repository.");
+    }
 }

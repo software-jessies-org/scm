@@ -54,4 +54,14 @@ public interface RevisionControlSystem {
      * given revision of the given file.
      */
     public void showChangeSet(File repositoryRoot, String filename, Revision revision);
+    
+    //
+    // Methods relating to file status.
+    //
+    
+    /**
+     * Returns status information for all the added, deleted, modified or
+     * unmanaged files and directories in the repository.
+     */
+    public List getStatuses(File repositoryRoot);
 }

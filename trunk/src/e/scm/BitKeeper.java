@@ -90,4 +90,8 @@ public class BitKeeper implements RevisionControlSystem {
                          filename + "` -f" + filename + "@" + revision.number;
         ProcessUtilities.spawn(repositoryRoot, new String[] { "bash", "-c", command });
     }
+    
+    public List getStatuses(File repositoryRoot) {
+        throw new UnsupportedOperationException("Can't get status information for a BitKeeper repository.");
+    }
 }

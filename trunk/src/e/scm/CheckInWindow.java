@@ -34,6 +34,7 @@ public class CheckInWindow extends JFrame {
         this.backEnd = RevisionWindow.guessWhichRevisionControlSystem(repositoryRoot);
         setTitle(repositoryRoot.toString());
         makeUserInterface();
+        readFileStatuses();
     }
 
     private void makeUserInterface() {
@@ -118,34 +119,22 @@ public class CheckInWindow extends JFrame {
         return textArea;
     }
 
-    private void readListOfRevisions() {
+    private void readFileStatuses() {
         setStatus("Getting file statuses...");
-        // FIXME: i want to avoid this style, and have the back-end return a List<Status>.
-        /*
-        // FIXME: do rest in separate thread.
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
-        int status = 0;
+        List statuses = null;
         try {
             WaitCursor.start(this);
-            String[] command = backEnd.getStatusCommand(filePath);
-            status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+            statuses = backEnd.getStatuses(repositoryRoot);
         } finally {
             WaitCursor.stop(this);
             clearStatus();
         }
         
-        if (status != 0 || errors.size() > 0) {
-            showToolError(statusesList, errors);
-            return;
+        DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < statuses.size(); ++i) {
+            model.addElement(statuses.get(i));
         }
-
-        statuses = backEnd.parseLog(lines);
-        if (backEnd.isLocallyModified(repositoryRoot, filePath)) {
-            revisions.addLocalRevision(Revision.LOCAL_REVISION);
-        }
-        statusesList.setModel(statuses);
-        */
+        statusesList.setModel(model);
     }
 
     private void showToolError(JList list, ArrayList lines) {
