@@ -304,7 +304,7 @@ public class CheckInWindow extends JFrame {
     private void updateFileStatuses() {
         Thread worker = new Thread() {
             public void run() {
-                List oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : new ArrayList();
+                final List oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : new ArrayList();
                 List statuses = null;
                 try {
                     WaitCursor.start(statusesTable, "Getting file statuses...");
@@ -315,12 +315,12 @@ public class CheckInWindow extends JFrame {
                 }
                 Collections.sort(statuses);
                 statusesTableModel = new StatusesTableModel(statuses);
-                statusesTableModel.includeFiles(oldIncludedFiles);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         statusesTable.setModel(statusesTableModel);
                         statusesTableModel.initColumnWidths(statusesTable);
                         statusesTableModel.addTableModelListener(new StatusesTableModelListener());
+                        statusesTableModel.includeFiles(oldIncludedFiles);
                         
                         /* Give some feedback to demonstrate we're not broken if there's nothing to show. */
                         boolean nothingModified = (statusesTableModel.getRowCount() == 0);
