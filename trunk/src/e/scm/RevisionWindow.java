@@ -188,6 +188,23 @@ public class RevisionWindow extends JFrame {
         buttonsPanel.add(showLogButton, BorderLayout.WEST);
         
         final JTextField searchField = new JTextField(10);
+        searchField.addFocusListener(new FocusListener() {
+            private String previousText = "";
+            private Color previousColor;
+            {
+                focusLost(null);
+            }
+            public void focusGained(FocusEvent e) {
+                searchField.setForeground(previousColor);
+                searchField.setText(previousText);
+            }
+            public void focusLost(FocusEvent e) {
+                previousText = searchField.getText();
+                previousColor = searchField.getForeground();
+                searchField.setForeground(Color.GRAY);
+                searchField.setText(" Search");
+            }
+        });
         searchField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String searchTerm = searchField.getText();
