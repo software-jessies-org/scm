@@ -17,6 +17,65 @@ public class RevisionWindow extends JFrame {
         }
     }
 
+    private static final AnnotatedLineRenderer ANNOTATED_LINE_RENDERER =
+        new AnnotatedLineRenderer();
+    private static final DifferencesRenderer DIFFERENCES_RENDERER =
+        new DifferencesRenderer();
+
+    private final MouseListener annotationsDoubleClickListener =
+        new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    final int i = annotationView.locationToIndex(e.getPoint());
+                    Object value = annotationView.getModel().getElementAt(i);
+                    if (value instanceof AnnotatedLine) {
+                        AnnotatedLine annotatedLine = (AnnotatedLine) value;
+                        revisionsList.setSelectedValue(annotatedLine.revision, true);
+                        showAnnotationsForRevision(annotatedLine.revision, i);
+                    }
+                }
+            }
+        };
+
+    private final MouseListener differencesDoubleClickListener =
+        new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    Object[] values = revisionsList.getSelectedValues();
+                    Revision newerRevision = (Revision) values[0];
+                    Revision olderRevision = (Revision) values[values.length - 1];
+
+                    ListModel model = annotationView.getModel();
+                    final int index = annotationView.locationToIndex(e.getPoint());
+                    String lineOfInterest = (String) model.getElementAt(index);
+
+                    // Search backwards for the previous @@ line to help find out where we are.
+                    String atAtLine = null;
+                    int linesIntoHunk = 0;
+                    for (int i = index; i >= 0; --i) {
+                        String line = (String) model.getElementAt(i);
+                        if (line.startsWith("@@ -")) {
+                            atAtLine = line;
+                            break;
+                        }
+                        ++linesIntoHunk;
+                    }
+
+                    int olderRevisionOffset = Integer.parseInt(atAtLine.substring(4, atAtLine.indexOf(',', 4)));
+                    --olderRevisionOffset; // The line number in the @@ line actually refers to the line after.
+                    int desiredLineNumber = olderRevisionOffset + linesIntoHunk;
+
+                    Revision desiredRevision = olderRevision;
+                    if (lineOfInterest.startsWith("+")) {
+                        desiredRevision = newerRevision;
+                    }
+
+                    revisionsList.setSelectedValue(desiredRevision, true);
+                    showAnnotationsForRevision(desiredRevision, desiredLineNumber);
+                }
+            }
+        };
+
     private String filename;
 
     private RevisionControlSystem backEnd;
@@ -28,8 +87,6 @@ public class RevisionWindow extends JFrame {
     private JTextArea revisionCommentArea;
     private JList annotationView;
     private JLabel statusLine = new JLabel(" ");
-    
-    private MouseListener doubleClickListener;
     
     public RevisionWindow(String filename, int initialLineNumber) {
         super(filename);
@@ -69,21 +126,6 @@ public class RevisionWindow extends JFrame {
             }
         });
         
-        doubleClickListener = new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    final int i = annotationView.locationToIndex(e.getPoint());
-                    Object value = annotationView.getModel().getElementAt(i);
-                    if (value instanceof AnnotatedLine) {
-                        AnnotatedLine annotatedLine = (AnnotatedLine) value;
-                        revisionsList.setSelectedValue(annotatedLine.revision, true);
-                        showAnnotationsForRevision(annotatedLine.revision);
-                    }
-                }
-            }
-        };
-        annotationView.addMouseListener(doubleClickListener);
-        
         JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
             revisionsUi,
             new JScrollPane(annotationView));
@@ -101,21 +143,10 @@ public class RevisionWindow extends JFrame {
 
         initRevisions(filename);
 
-        // FIXME: this only works while the implementation is synchronous.
         if (initialLineNumber != 0) {
             // revisions[0] is the local revision.
             // revisions[1] is the latest revision in the repository.
-            showAnnotationsForRevision((Revision) revisions.getElementAt(1));
-            final int index = initialLineNumber - 1;
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    annotationView.setSelectedIndex(index);
-                    int desiredBottomIndex = index +
-                        (annotationView.getLastVisibleIndex() -
-                         annotationView.getFirstVisibleIndex()) / 2;
-                    annotationView.ensureIndexIsVisible(desiredBottomIndex);
-                }
-            });
+            showAnnotationsForRevision((Revision) revisions.getElementAt(1), initialLineNumber);
         } else {
             showSummaryOfAllRevisions();
         }
@@ -162,7 +193,7 @@ public class RevisionWindow extends JFrame {
         return new Cvs();
     }
     
-    private void showAnnotationsForRevision(Revision revision) {
+    private void showAnnotationsForRevision(Revision revision, int lineNumber) {
         setStatus("Getting annotations for revision...");
         /* FIXME: do rest in separate thread. */
         String[] command = backEnd.getAnnotateCommand(revision, filename);
@@ -176,7 +207,22 @@ public class RevisionWindow extends JFrame {
         }
 
         history = backEnd.parseAnnotations(revisions, lines);
-        switchAnnotationView(history, new AnnotatedLineRenderer());
+        switchAnnotationView(history, ANNOTATED_LINE_RENDERER, annotationsDoubleClickListener);
+        showSpecificLineInAnnotations(lineNumber);
+    }
+
+    private void showSpecificLineInAnnotations(int lineNumber) {
+        // FIXME: this only works while the implementation is synchronous.
+        final int index = lineNumber - 1;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                annotationView.setSelectedIndex(index);
+                int desiredBottomIndex = index +
+                    (annotationView.getLastVisibleIndex() -
+                     annotationView.getFirstVisibleIndex()) / 2;
+                annotationView.ensureIndexIsVisible(desiredBottomIndex);
+            }
+        });
     }
 
     private static final ListModel EMPTY_LIST_MODEL = new DefaultListModel();
@@ -188,10 +234,15 @@ public class RevisionWindow extends JFrame {
      * an empty list model, switch to a renderer suitable for the incoming
      * list model, and only then set the new model.
      */
-    private void switchAnnotationView(ListModel listModel, ListCellRenderer renderer) {
+    private void switchAnnotationView(ListModel listModel, ListCellRenderer renderer, MouseListener doubleClickListener) {
         annotationView.setModel(EMPTY_LIST_MODEL);
         annotationView.setCellRenderer(renderer);
         annotationView.setModel(listModel);
+        final MouseListener[] mouseListeners = annotationView.getMouseListeners();
+        for (int i = 0; i < mouseListeners.length; ++i) {
+            annotationView.removeMouseListener(mouseListeners[i]);
+        }
+        annotationView.addMouseListener(doubleClickListener);
     }
 
     private void copyAnnotationViewSelectionToClipboard() {
@@ -228,7 +279,7 @@ public class RevisionWindow extends JFrame {
         for (int i = 0; i < lines.length; ++i) {
             differences.addElement(lines[i]);
         }
-        switchAnnotationView(differences, new DifferencesRenderer());
+        switchAnnotationView(differences, DIFFERENCES_RENDERER, differencesDoubleClickListener);
 
         // We can't easily retain the context when switching to differences.
         // As an extension, though, we could do this.
@@ -296,7 +347,7 @@ public class RevisionWindow extends JFrame {
                 Revision revision = (Revision) values[0];
                 revisionCommentArea.setText(revision.comment);
                 revisionCommentArea.setCaretPosition(0);
-                showAnnotationsForRevision(revision);
+                showAnnotationsForRevision(revision, 0);
             } else {
                 // Show differences between two revisions.
                 Revision newerRevision = (Revision) values[0];
