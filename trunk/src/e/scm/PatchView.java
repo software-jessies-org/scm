@@ -82,7 +82,7 @@ public class PatchView extends JList {
         File file = new File(backEnd.getRoot(), status.getName());
         if (file.isDirectory()) {
             model.addElement("(" + status.getName() + " is a directory.)");
-        } else if (FileUtilities.isAsciiFile(file) == false) {
+        } else if (FileUtilities.isTextFile(file) == false) {
             model.addElement("(" + status.getName() + " is a binary file.)");
         } else {
             String[] lines = StringUtilities.readLinesFromFile(file.getAbsolutePath());
