@@ -250,9 +250,10 @@ public class CheckInWindow extends JFrame {
     private void updateSavedComment() {
         String comment = checkInCommentArea.getText();
         File savedCommentFile = getSavedCommentFile();
-        if (comment.length() == 0 && savedCommentFile.exists()) {
+        if (savedCommentFile.exists()) {
             savedCommentFile.delete();
-        } else {
+        }
+        if (comment.length() != 0) {
             StringUtilities.writeFile(savedCommentFile, comment);
         }
     }
