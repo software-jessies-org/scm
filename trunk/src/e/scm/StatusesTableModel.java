@@ -68,6 +68,7 @@ public class StatusesTableModel extends AbstractTableModel {
     public void setValueAt(Object value, int row, int column) {
         assert(column == 0);
         isIncluded[row] = (Boolean) value;
+        fireTableCellUpdated(row, column);
     }
     
     public List getIncludedFilenames() {
@@ -78,6 +79,19 @@ public class StatusesTableModel extends AbstractTableModel {
             }
         }
         return result;
+    }
+    
+    /**
+     * Tests whether the check-in from the currently included files would
+     * be non-empty. Used to enable and disable the commit button.
+     */
+    public boolean isAtLeastOneFileIncluded() {
+        for (int i = 0; i < getRowCount(); ++i) {
+            if (isIncluded[i].booleanValue()) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public void initColumnWidths(JTable table) {

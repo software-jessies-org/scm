@@ -30,6 +30,7 @@ public class CheckInWindow extends JFrame {
     private JTextArea checkInCommentArea;
     private PatchView patchView;
     private JLabel statusLine = new JLabel(" ");
+    private JButton commitButton;
     
     public CheckInWindow() {
         this.repositoryRoot = RevisionWindow.getRepositoryRoot(System.getProperty("user.dir"));
@@ -59,12 +60,13 @@ public class CheckInWindow extends JFrame {
             new JScrollPane(patchView));
         ui.setBorder(null);
         
-        JButton commitButton = new JButton("Commit");
+        commitButton = new JButton("Commit");
         commitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 commit();
             }
         });
+        commitButton.setEnabled(false);
 
         JPanel statusPanel = new JPanel(new BorderLayout());
         statusPanel.add(statusLine, BorderLayout.CENTER);
@@ -147,6 +149,11 @@ public class CheckInWindow extends JFrame {
         statusesTableModel = new StatusesTableModel(statuses);
         statusesTable.setModel(statusesTableModel);
         statusesTableModel.initColumnWidths(statusesTable);
+        statusesTableModel.addTableModelListener(new TableModelListener() {
+            public void tableChanged(TableModelEvent e) {
+                commitButton.setEnabled(statusesTableModel.isAtLeastOneFileIncluded());
+            }
+        });
     }
     
     private void showToolError(JList list, ArrayList lines) {
