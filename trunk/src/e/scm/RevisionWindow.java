@@ -117,10 +117,6 @@ public class RevisionWindow extends JFrame {
             }
         };
 
-    /** Matches the "@@ -111,41 +113,41 @@" lines at the start of a hunk. */
-    private static final Pattern AT_AT_PATTERN =
-        Pattern.compile("^@@ -(\\d+),\\d+ \\+(\\d+),\\d+ @@$");
-
     private final MouseListener differencesDoubleClickListener =
         new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -151,7 +147,7 @@ public class RevisionWindow extends JFrame {
                     int linesIntoHunk = 0;
                     for (int i = index; i >= 0; --i) {
                         String line = (String) model.getElementAt(i);
-                        Matcher matcher = AT_AT_PATTERN.matcher(line);
+                        Matcher matcher = Patch.AT_AT_PATTERN.matcher(line);
                         if (matcher.matches()) {
                             olderStartLine = Integer.parseInt(matcher.group(1));
                             newerStartLine = Integer.parseInt(matcher.group(2));

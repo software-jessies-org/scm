@@ -5,8 +5,6 @@ import java.util.regex.*;
 import javax.swing.*;
 
 public class AnnotationModel extends AbstractListModel {
-    private static final Pattern HUNK_PATTERN = Pattern.compile("^@@ -\\d+,\\d+ \\+(\\d+),\\d+ @@$");
-
     private ArrayList data = new ArrayList();
 
     public int getSize() {
@@ -36,7 +34,7 @@ public class AnnotationModel extends AbstractListModel {
         int lineNumber = -1;
         for (int i = 0; i < patchLines.size(); ++i) {
             String line = (String) patchLines.get(i);
-            Matcher matcher = HUNK_PATTERN.matcher(line);
+            Matcher matcher = Patch.AT_AT_PATTERN.matcher(line);
             if (matcher.find()) {
                 String location = matcher.group(1);
                 lineNumber = Integer.parseInt(location);

@@ -18,10 +18,9 @@ public class Patch {
     }
 
     /** Matches the "@@ -111,41 +113,41 @@" lines at the start of a hunk. */
-    private static final Pattern AT_AT_PATTERN =
-        Pattern.compile("^@@ -(\\d+),(\\d+) \\+(\\d+),(\\d+) @@$");
+    public static final Pattern AT_AT_PATTERN = Pattern.compile("^@@ -(\\d+),(\\d+) \\+(\\d+),(\\d+) @@$");
     
-    public void parsePatch(boolean isPatchReversed, List lines, PatchLineParser patchLineParser) {
+    private void parsePatch(boolean isPatchReversed, List lines, PatchLineParser patchLineParser) {
         String fromPrefix = isPatchReversed ? "+" : "-";
         String toPrefix = isPatchReversed ? "-" : "+";
         for (int lineNumberWithinPatch = 0; lineNumberWithinPatch < lines.size(); ++lineNumberWithinPatch) {
