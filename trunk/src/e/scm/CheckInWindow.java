@@ -37,7 +37,7 @@ public class CheckInWindow extends JFrame {
         updateFileStatuses();
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                updateSavedComment();
+                updateSavedState();
             }
         });
     }
@@ -227,7 +227,7 @@ public class CheckInWindow extends JFrame {
     
     private void clearCheckInCommentArea() {
         checkInCommentArea.setText("");
-        updateSavedComment();
+        updateSavedState();
     }
     
     /**
@@ -291,26 +291,41 @@ public class CheckInWindow extends JFrame {
     }
     
     private void readSavedComment() {
-        File savedCommentFile = getSavedCommentFile();
-        if (savedCommentFile.exists()) {
-            String savedComment = StringUtilities.readFile(savedCommentFile);
-            checkInCommentArea.setText(savedComment);
+        checkInCommentArea.setText(readSavedStateFile(getSavedCommentFile()));
+    }
+    
+    private void readSavedFilenames() {
+        String[] filenames = readSavedStateFile(getSavedFilenamesFile()).split("\n");
+        statusesTableModel.includeFilenames(Arrays.asList(filenames));
+    }
+    
+    private String readSavedStateFile(File file) {
+        if (file.exists() == false) {
+            return "";
+        }
+        return StringUtilities.readFile(file);
+    }
+    
+    private void updateSavedState() {
+        updateSavedStateFile(getSavedCommentFile(), checkInCommentArea.getText());
+        updateSavedStateFile(getSavedFilenamesFile(), StringUtilities.join(statusesTableModel.getIncludedFilenames(), "\n"));
+    }
+
+    private void updateSavedStateFile(File file, String newContent) {
+        if (file.exists()) {
+            file.delete();
+        }
+        if (newContent.length() != 0) {
+            StringUtilities.writeFile(file, newContent);
         }
     }
     
-    private void updateSavedComment() {
-        String comment = checkInCommentArea.getText();
-        File savedCommentFile = getSavedCommentFile();
-        if (savedCommentFile.exists()) {
-            savedCommentFile.delete();
-        }
-        if (comment.length() != 0) {
-            StringUtilities.writeFile(savedCommentFile, comment);
-        }
-    }
-
     private File getSavedCommentFile() {
         return FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), ".e.scm.CheckInWindow.savedComment");
+    }
+    
+    private File getSavedFilenamesFile() {
+        return FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), ".e.scm.CheckInWindow.savedFilenames");
     }
     
     private JTextArea makeTextArea(final int rowCount) {
@@ -330,7 +345,7 @@ public class CheckInWindow extends JFrame {
             List statuses;
             
             public void work() {
-                oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : new ArrayList();
+                oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : null;
                 commitButton.setEnabled(false);
                 statuses = backEnd.getStatuses(getWaitCursor());
                 Collections.sort(statuses);
@@ -341,7 +356,11 @@ public class CheckInWindow extends JFrame {
                 statusesTable.setModel(statusesTableModel);
                 statusesTableModel.initColumnWidths(statusesTable);
                 statusesTableModel.addTableModelListener(new StatusesTableModelListener());
-                statusesTableModel.includeFiles(oldIncludedFiles);
+                if (oldIncludedFiles != null) {
+                    statusesTableModel.includeFiles(oldIncludedFiles);
+                } else {
+                    readSavedFilenames();
+                }
                 
                 /* Give some feedback to demonstrate we're not broken if there's nothing to show. */
                 boolean nothingModified = (statusesTableModel.getRowCount() == 0);

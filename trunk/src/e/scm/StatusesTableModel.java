@@ -71,11 +71,11 @@ public class StatusesTableModel extends AbstractTableModel {
         fireTableCellUpdated(row, column);
     }
     
-    public void includeFiles(List/*<FileStatus>*/ files) {
-        ArrayList names = new ArrayList();
-        for (int i = 0; i < files.size(); ++i) {
-            names.add(((FileStatus) files.get(i)).getName());
-        }
+    public void includeFiles(List/*<FileStatus>*/ fileStatuses) {
+        includeFilenames(fileStatusListToFilenameList(fileStatuses));
+    }
+    
+    public void includeFilenames(List/*<String>*/ names) {
         for (int i = 0; i < getRowCount(); ++i) {
             String name = getFileStatus(i).getName();
             if (names.contains(name)) {
@@ -92,6 +92,23 @@ public class StatusesTableModel extends AbstractTableModel {
             }
         }
         return result;
+    }
+    
+    public List/*<String>*/ getIncludedFilenames() {
+        return fileStatusListToFilenameList(getIncludedFiles());
+    }
+    
+    /**
+     * Converts a list of FileStatus instances to a list of String instances
+     * by invoking getName on each FileStatus.
+     */
+    private List/*<String>*/ fileStatusListToFilenameList(List/*<FileStatus>*/ files) {
+        ArrayList names = new ArrayList();
+        for (int i = 0; i < files.size(); ++i) {
+            FileStatus fileStatus = (FileStatus) files.get(i);
+            names.add(fileStatus.getName());
+        }
+        return names;
     }
     
     /**
