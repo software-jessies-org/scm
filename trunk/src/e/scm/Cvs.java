@@ -166,8 +166,8 @@ public class Cvs extends RevisionControlSystem {
         ArrayList command = new ArrayList();
         command.add("cvs");
         command.add("commit");
-        command.add("-m");
-        command.add(comment);
+        command.add("-F");
+        command.add(createCommentFile(comment));
         addFilenames(command, fileStatuses);
         execAndDump(command);
     }

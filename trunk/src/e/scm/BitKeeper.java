@@ -194,19 +194,22 @@ public class BitKeeper extends RevisionControlSystem {
     }
     
     public void commit(String comment, List fileStatuses) {
-        ArrayList command = new ArrayList();
-        command.add("bk");
-        command.add("delta");
-        command.add("-a"); // Allow new files to be added without a separate 'bk new <file>'.
-        command.add("-y" + comment);
-        addFilenames(command, fileStatuses);
-        execAndDump(command);
+        // We run "bk delta" once per file, to avoid OS command-line limits.
+        for (int i = 0; i < fileStatuses.size(); ++i) {
+            FileStatus file = (FileStatus) fileStatuses.get(i);
+            ArrayList command = new ArrayList();
+            command.add("bk");
+            command.add("delta");
+            command.add("-a"); // Allow new files to be added without a separate 'bk new <file>'.
+            command.add("-y" + comment);
+            command.add(file.getName());
+            execAndDump(command);
+        }
         
-        command = new ArrayList();
+        ArrayList command = new ArrayList();
         command.add("bk");
         command.add("commit");
         command.add("-y" + comment);
-        addFilenames(command, fileStatuses);
         execAndDump(command);
     }
 }

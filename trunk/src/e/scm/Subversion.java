@@ -158,9 +158,10 @@ public class Subversion extends RevisionControlSystem {
         command.add("svn");
         command.add("commit");
         command.add("--non-interactive");
-        command.add("-m");
-        command.add(comment);
-        addFilenames(command, fileStatuses);
+        command.add("-F");
+        command.add(createCommentFile(comment));
+        command.add("--targets");
+        command.add(createFileListFile(fileStatuses));
         execAndDump(command);
     }
 }

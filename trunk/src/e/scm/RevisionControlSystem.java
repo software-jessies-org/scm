@@ -233,6 +233,34 @@ public abstract class RevisionControlSystem {
         }
     }
     
+    public static String createCommentFile(String comment) {
+        try {
+            File file = File.createTempFile("e.scm.RevisionControlSystem-file-list-", null);
+            file.deleteOnExit();
+            PrintWriter out = new PrintWriter(new FileOutputStream(file));
+            out.println(comment);
+            out.close();
+            return file.toString();
+        } catch (IOException ex) {
+            throw new RuntimeException("Couldn't create comment file: " + ex.getMessage());
+        }
+    }
+    
+    public static String createFileListFile(List/*<FileStatus>*/ fileStatuses) {
+        try {
+            File file = File.createTempFile("e.scm.RevisionControlSystem-file-list-", null);
+            file.deleteOnExit();
+            PrintWriter out = new PrintWriter(new FileOutputStream(file));
+            for (int i = 0; i < fileStatuses.size(); ++i) {
+                out.println(((FileStatus) fileStatuses.get(i)).getName());
+            }
+            out.close();
+            return file.toString();
+        } catch (IOException ex) {
+            throw new RuntimeException("Couldn't create list of files: " + ex.getMessage());
+        }
+    }
+    
     public static List justNewFiles(List/*<FileStatus>*/ fileStatuses) {
         ArrayList result = new ArrayList();
         for (int i = 0; i < fileStatuses.size(); ++i) {
