@@ -2,6 +2,13 @@
   the current line. And a catchy enough name that we can put it on a
   sensibly-sized menu item or button!
 
+* Tracing the history of a line: how much quicker would this be if we
+  could see an annotated clickable list of all the versions of the line?
+  (But how do we get that list?)
+
+* Ability to export either a whole patch or just selected hunks to
+  a valid patch file; possibly also with the ability to apply the patch.
+
 * The annotated view might be clearer if we didn't repeat duplicate
   authors and revision numbers. It also might not.
 
