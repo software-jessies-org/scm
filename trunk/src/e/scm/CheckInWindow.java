@@ -120,10 +120,11 @@ public class CheckInWindow extends JFrame {
     private JTextArea makeTextArea(final int rowCount) {
         JTextArea textArea = new JTextArea(rowCount, 80);
         textArea.setDragEnabled(false);
-        textArea.setEditable(false);
         textArea.setFont(FONT);
         textArea.setWrapStyleWord(true);
         textArea.setLineWrap(true);
+        e.gui.JTextComponentSpellingChecker spellingChecker = new e.gui.JTextComponentSpellingChecker(textArea);
+        spellingChecker.setDocument(textArea.getDocument());
         return textArea;
     }
 
