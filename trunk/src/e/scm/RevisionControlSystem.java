@@ -233,32 +233,30 @@ public abstract class RevisionControlSystem {
         }
     }
     
-    public static String createCommentFile(String comment) {
+    private static String createFile(String prefix, String humanReadableName, String content) {
         try {
-            File file = File.createTempFile("e.scm.RevisionControlSystem-file-list-", null);
+            File file = File.createTempFile("e.scm.RevisionControlSystem-" + prefix + "-", null);
             file.deleteOnExit();
             PrintWriter out = new PrintWriter(new FileOutputStream(file));
-            out.println(comment);
+            out.print(content);
             out.close();
             return file.toString();
         } catch (IOException ex) {
-            throw new RuntimeException("Couldn't create comment file: " + ex.getMessage());
+            throw new RuntimeException("Couldn't create " + humanReadableName + ": " + ex.getMessage());
         }
     }
     
+    public static String createCommentFile(String comment) {
+        return createFile("comment", "comment file", comment);
+    }
+    
     public static String createFileListFile(List/*<FileStatus>*/ fileStatuses) {
-        try {
-            File file = File.createTempFile("e.scm.RevisionControlSystem-file-list-", null);
-            file.deleteOnExit();
-            PrintWriter out = new PrintWriter(new FileOutputStream(file));
-            for (int i = 0; i < fileStatuses.size(); ++i) {
-                out.println(((FileStatus) fileStatuses.get(i)).getName());
-            }
-            out.close();
-            return file.toString();
-        } catch (IOException ex) {
-            throw new RuntimeException("Couldn't create list of files: " + ex.getMessage());
+        StringBuffer content = new StringBuffer();
+        for (int i = 0; i < fileStatuses.size(); ++i) {
+            content.append(((FileStatus) fileStatuses.get(i)).getName());
+            content.append("\n");
         }
+        return createFile("file-list", "list of files", content.toString());
     }
     
     public static List justNewFiles(List/*<FileStatus>*/ fileStatuses) {

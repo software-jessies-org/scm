@@ -194,6 +194,9 @@ public class BitKeeper extends RevisionControlSystem {
     }
     
     public void commit(String comment, List fileStatuses) {
+        // We write the comment to a file once, because it doesn't change.
+        String commentFilename = createCommentFile(comment);
+        
         // We run "bk delta" once per file, to avoid OS command-line limits.
         for (int i = 0; i < fileStatuses.size(); ++i) {
             FileStatus file = (FileStatus) fileStatuses.get(i);
@@ -201,7 +204,7 @@ public class BitKeeper extends RevisionControlSystem {
             command.add("bk");
             command.add("delta");
             command.add("-a"); // Allow new files to be added without a separate 'bk new <file>'.
-            command.add("-y" + comment);
+            command.add("-Y" + commentFilename);
             command.add(file.getName());
             execAndDump(command);
         }
@@ -209,7 +212,7 @@ public class BitKeeper extends RevisionControlSystem {
         ArrayList command = new ArrayList();
         command.add("bk");
         command.add("commit");
-        command.add("-y" + comment);
+        command.add("-Y" + commentFilename);
         execAndDump(command);
     }
 }
