@@ -98,9 +98,7 @@ public class RevisionWindow extends JFrame {
                     return;
                 }
                 int fromLineNumber = 1 + index;
-                int toLineNumber = translateLineNumberStepByStep(fromRevision, toRevision, fromLineNumber);
-                selectRevision(toRevision);
-                showAnnotationsForRevision(toRevision, toLineNumber);
+                showAnnotationsForRevision(toRevision, fromRevision, fromLineNumber);
             }
 
             /**
@@ -358,7 +356,7 @@ public class RevisionWindow extends JFrame {
     }
 
     private void showAnnotationsForRevision(final Revision revision, final int lineNumber) {
-        new BackEndWorker("Getting annotations for revision...") {
+        new BackEndWorker("Getting annotations for revision" + revision.number + "...") {
             public void work() {
                 command = backEnd.getAnnotateCommand(revision, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
@@ -377,6 +375,24 @@ public class RevisionWindow extends JFrame {
         };
     }
     
+    /**
+     * Here, the line number corresponds to a line number in fromRevision.
+     */
+    private void showAnnotationsForRevision(final Revision toRevision, final Revision fromRevision, final int fromLineNumber) {
+        new BlockingWorker(this, "Tracing line back to revision " + toRevision.number + "...") {
+            private int toLineNumber;
+            
+            public void work() {
+                toLineNumber = translateLineNumberStepByStep(fromRevision, toRevision, fromLineNumber);
+            }
+            
+            public void finish() {
+                //selectRevision(toRevision);
+                showAnnotationsForRevision(toRevision, toLineNumber);
+            }
+        };
+    }
+
     private void updateAnnotationModel(Revision revision, List lines) {
         annotationModel = parseAnnotations(lines);
         if (revision == Revision.LOCAL_REVISION) {
