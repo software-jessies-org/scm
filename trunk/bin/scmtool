@@ -23,4 +23,4 @@ Darwin)
     ;;
 esac
 
-exec java $os_specific_options -cp $class_path e.scm.$tool_name "$@"
+exec java $os_specific_options -Xmx1g -cp $class_path e.scm.$tool_name "$@"
