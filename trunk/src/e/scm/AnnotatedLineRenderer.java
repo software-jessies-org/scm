@@ -3,7 +3,7 @@ package e.scm;
 import java.awt.*;
 import javax.swing.*;
 
-public class AnnotatedLineRenderer extends DefaultListCellRenderer {
+public class AnnotatedLineRenderer extends e.gui.EListCellRenderer {
     /** Used to draw the dashed line between adjacent lines from different revisions. */
     private static final Stroke DASHED_STROKE = new BasicStroke(1.0f,
             BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
@@ -16,6 +16,7 @@ public class AnnotatedLineRenderer extends DefaultListCellRenderer {
     private boolean shouldDrawLine;
 
     public AnnotatedLineRenderer(RevisionWindow parentRevisionWindow) {
+        super(false);
         this.revisionWindow = parentRevisionWindow;
     }
 
@@ -36,8 +37,9 @@ public class AnnotatedLineRenderer extends DefaultListCellRenderer {
         }
 
         setText(line.formattedLine);
-        setForeground((revisionWindow.getAnnotatedRevision() == line.revision) ? Color.blue : Color.black);
-
+        if (isSelected == false) {
+            setForeground((revisionWindow.getAnnotatedRevision() == line.revision) ? Color.BLUE : Color.BLACK);
+        }
         return this;
     }
 
