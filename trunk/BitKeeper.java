@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.regex.*;
 
 public class BitKeeper implements RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
@@ -24,12 +25,10 @@ public class BitKeeper implements RevisionControlSystem {
         return new String[] { "bk", "prs", filename };
     }
 
-    public AnnotationModel parseAnnotations(RevisionListModel revisions, List lines) {
-        AnnotationModel result = new AnnotationModel();
-        for (int i = 0; i < lines.size(); ++i) {
-            result.add(AnnotatedLine.fromBitKeeperAnnotatedLine(revisions, (String) lines.get(i)));
-        }
-        return result;
+    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^([^\t]+)\t([^\t]+)\t(.*)$");
+
+    public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
+        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 2, 3);
     }
 
     public RevisionListModel parseLog(List linesList) {

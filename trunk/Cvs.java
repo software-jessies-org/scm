@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.regex.*;
 
 public class Cvs implements RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
@@ -27,14 +28,12 @@ public class Cvs implements RevisionControlSystem {
         return new String[] { "cvs", "log", filename };
     }
 
-    public AnnotationModel parseAnnotations(RevisionListModel revisions, List lines) {
-        AnnotationModel result = new AnnotationModel();
-        for (int i = 0; i < lines.size(); ++i) {
-            result.add(AnnotatedLine.fromCvsAnnotatedLine(revisions, (String) lines.get(i)));
-        }
-        return result;
-    }
+    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^([0-9.]+)\\s+\\((\\S+)\\s+(\\d\\d-\\S\\S\\S-\\d\\d)\\): (.*)$");
 
+    public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
+        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 4);
+    }
+    
     public RevisionListModel parseLog(List linesList) {
         String[] lines = (String[]) linesList.toArray(new String[linesList.size()]);
 

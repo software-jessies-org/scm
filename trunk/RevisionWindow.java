@@ -3,6 +3,7 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -123,7 +124,7 @@ public class RevisionWindow extends JFrame {
 
     private RevisionControlSystem backEnd;
     
-    private AnnotationModel history;
+    private AnnotationModel annotationModel;
     private RevisionListModel revisions;
     
     private JList revisionsList;
@@ -292,10 +293,22 @@ public class RevisionWindow extends JFrame {
             return;
         }
 
-        history = backEnd.parseAnnotations(revisions, lines);
-        history.postProcess();
-        switchAnnotationView(history, annotatedLineRenderer, annotationsDoubleClickListener);
+        updateAnnotationModel(lines);
         showSpecificLineInAnnotations(lineNumber);
+    }
+    
+    private void updateAnnotationModel(List lines) {
+        annotationModel = parseAnnotations(lines);
+        switchAnnotationView(annotationModel, annotatedLineRenderer, annotationsDoubleClickListener);
+    }
+    
+    public AnnotationModel parseAnnotations(List lines) {
+        AnnotationModel result = new AnnotationModel();
+        for (int i = 0; i < lines.size(); ++i) {
+            result.add(backEnd.parseAnnotatedLine(revisions, (String) lines.get(i)));
+        }
+        result.postProcess();
+        return result;
     }
 
     private void showSpecificLineInAnnotations(int lineNumber) {

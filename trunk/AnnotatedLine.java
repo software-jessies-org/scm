@@ -2,8 +2,6 @@ import java.text.*;
 import java.util.regex.*;
 
 public class AnnotatedLine {
-    private static final Pattern CVS_PATTERN = Pattern.compile("^([0-9.]+)\\s+\\((\\S+)\\s+(\\d\\d-\\S\\S\\S-\\d\\d)\\): (.*)$");
-    private static final Pattern BK_PATTERN = Pattern.compile("^([^\t]+)\t([^\t]+)\t(.*)$");
     private static final SimpleDateFormat INPUT_DATE_FORMAT = new SimpleDateFormat("dd-MMM-yy");
     private static final SimpleDateFormat OUTPUT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final long NOW = System.currentTimeMillis();
@@ -23,32 +21,19 @@ public class AnnotatedLine {
     private AnnotatedLine() {
     }
 
-    public static AnnotatedLine fromCvsAnnotatedLine(RevisionListModel revisions, String line) {
-        Matcher matcher = CVS_PATTERN.matcher(line);
+    public static AnnotatedLine fromLine(RevisionListModel revisions, String line, Pattern pattern, int revisionGroup, int sourceGroup) {
+        Matcher matcher = pattern.matcher(line);
         if (matcher.matches() == false) {
             return null;
         }
-
+        
         AnnotatedLine result = new AnnotatedLine();
-        result.revision = revisions.fromNumber(matcher.group(1));
-        result.source = matcher.group(4);
+        result.revision = revisions.fromNumber(matcher.group(revisionGroup));
+        result.source = matcher.group(sourceGroup);
         result.prepareFormattedLine(revisions);
         return result;
     }
-
-    public static AnnotatedLine fromBitKeeperAnnotatedLine(RevisionListModel revisions, String line) {
-        Matcher matcher = BK_PATTERN.matcher(line);
-        if (matcher.matches() == false) {
-            return null;
-        }
-
-        AnnotatedLine result = new AnnotatedLine();
-        result.revision = revisions.fromNumber(matcher.group(2));
-        result.source = matcher.group(3);
-        result.prepareFormattedLine(revisions);
-        return result;
-    }
-
+    
     private void prepareFormattedLine(RevisionListModel revisions) {
         formattedLine = justify(revision.author, revisions.getMaxAuthorNameLength()) + " " +
                         justify(revision.number, revisions.getMaxRevisionNumberLength()) + ":" +

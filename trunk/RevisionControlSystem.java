@@ -8,10 +8,10 @@ public interface RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename);
 
     /**
-     * Parses the lines returned on standard output by the command from
-     * getAnnotateCommand, building an AnnotationModel.
+     * Parses one of the lines returned on standard output by the command from
+     * getAnnotateCommand, building an AnnotatedLine.
      */
-    public AnnotationModel parseAnnotations(RevisionListModel revisions, List lines);
+    public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line);
 
     /**
      * Returns a command that gets a patch for the given file from the older
