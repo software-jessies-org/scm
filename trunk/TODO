@@ -1,5 +1,9 @@
+* Some way of asking for the patch containing the most recent change to
+  the current line. And a catchy enough name that we can put it on a
+  sensibly-sized menu item or button!
+
 * The annotated view might be clearer if we didn't repeat duplicate
-  authors and revision numbers.
+  authors and revision numbers. It also might not.
 
 * Some way to move to the previous/next line in the selected
   revision (i.e. the blue lines).
