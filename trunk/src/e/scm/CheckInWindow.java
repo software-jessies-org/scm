@@ -282,7 +282,7 @@ public class CheckInWindow extends JFrame {
      */
     private void editFileAtLine(int lineNumber) {
         FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
-        String command = getEditor() + " " + fileStatus.getName() + ":" + lineNumber;
+        String command = getEditor() + " " + ("+" + lineNumber) + " " + fileStatus.getName();
         ProcessUtilities.spawn(backEnd.getRoot(), new String[] { "bash", "-c", command });
     }
     
