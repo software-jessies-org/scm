@@ -169,7 +169,7 @@ public class RevisionWindow extends JFrame {
         if (backEnd.supportsChangeSets()) {
             changeSetButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    backEnd.showChangeSet(filePath, getSelectedRevision());
+                    backEnd.showChangeSet(repositoryRoot, filePath, getSelectedRevision());
                 }
             });
         } else {

@@ -74,10 +74,10 @@ public class BitKeeper implements RevisionControlSystem {
         return true;
     }
 
-    public void showChangeSet(String filename, Revision revision) {
+    public void showChangeSet(File repositoryRoot, String filename, Revision revision) {
         // bk csettool -r`bk r2c -r1.3 file.cpp` -ffile.cpp@1.3
         String command = "bk csettool -r`bk r2c -r" + revision.number + " " +
                          filename + "` -f" + filename + "@" + revision.number;
-        ProcessUtilities.spawn(new String[] { "bash", "-c", command });
+        ProcessUtilities.spawn(repositoryRoot, new String[] { "bash", "-c", command });
     }
 }

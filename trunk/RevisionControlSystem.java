@@ -51,5 +51,5 @@ public interface RevisionControlSystem {
      * Opens some kind of viewer for the change set corresponding to the
      * given revision of the given file.
      */
-    public void showChangeSet(String filename, Revision revision);
+    public void showChangeSet(File repositoryRoot, String filename, Revision revision);
 }

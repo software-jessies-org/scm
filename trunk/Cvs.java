@@ -89,7 +89,7 @@ public class Cvs implements RevisionControlSystem {
         return false;
     }
 
-    public void showChangeSet(String filename, Revision revision) {
+    public void showChangeSet(File repositoryRoot, String filename, Revision revision) {
         throw new UnsupportedOperationException("Can't show a CVS change set for " + filename + " revision " + revision.number);
     }
 }

@@ -25,11 +25,11 @@ public class ProcessUtilities {
         }
     }
 
-    public static void spawn(final String[] command) {
+    public static void spawn(final File directory, final String[] command) {
         new Thread() {
             public void run() {
                 try {
-                    Process p = Runtime.getRuntime().exec(command);
+                    Process p = Runtime.getRuntime().exec(command, null, directory);
                     p.getOutputStream().close();
                     p.waitFor();
                 } catch (Exception ex) {
