@@ -17,7 +17,7 @@ public class RevisionWindow extends JFrame {
     private JList annotationView;
     private JLabel statusLine = new JLabel(" ");
     
-    public RevisionWindow(String filename, final int initialLineNumber) {
+    public RevisionWindow(String filename, int initialLineNumber) {
         super(filename);
         this.filename = filename;
         
@@ -51,9 +51,11 @@ public class RevisionWindow extends JFrame {
         if (initialLineNumber != 0) {
             // FIXME: this only works while the implementation is synchronous.
             showAnnotationsForRevision((Revision) revisions.getElementAt(0));
+            final int index = initialLineNumber - 1;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    annotationView.setSelectedIndex(initialLineNumber - 1);
+                    annotationView.setSelectedIndex(index);
+                    annotationView.ensureIndexIsVisible(index);
                 }
             });
         }
