@@ -185,10 +185,36 @@ public class RevisionWindow extends JFrame {
             }
         });
 
+        JPanel buttonsPanel = new JPanel(new BorderLayout());
+        buttonsPanel.add(changeSetButton, BorderLayout.EAST);
+        buttonsPanel.add(showLogButton, BorderLayout.WEST);
+        
+        final JTextField searchField = new JTextField(10);
+        searchField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String searchTerm = searchField.getText();
+                if (searchTerm.matches("^:\\d+$")) {
+                    goToLine(searchTerm.substring(1));
+                } else {
+                    findText(searchTerm);
+                }
+            }
+            
+            public void goToLine(String number) {
+                int lineNumber = Integer.parseInt(number);
+                showSpecificLineInAnnotations(lineNumber);
+            }
+            
+            public void findText(String searchTerm) {
+                // FIXME
+            }
+        });
+        
         JPanel statusPanel = new JPanel(new BorderLayout());
+        statusPanel.setBorder(new javax.swing.border.EmptyBorder(10, 0, 10, 0));
         statusPanel.add(statusLine, BorderLayout.CENTER);
-        statusPanel.add(changeSetButton, BorderLayout.EAST);
-        statusPanel.add(showLogButton, BorderLayout.WEST);
+        statusPanel.add(buttonsPanel, BorderLayout.WEST);
+        statusPanel.add(searchField, BorderLayout.EAST);
 
         JPanel contentPane = new JPanel(new BorderLayout());
         contentPane.setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
@@ -354,13 +380,27 @@ public class RevisionWindow extends JFrame {
         final int index = lineNumber - 1;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+                // Select the appropriate index.
                 annotationView.setSelectedIndex(index);
-                int desiredBottomIndex = index +
-                    (annotationView.getLastVisibleIndex() -
-                     annotationView.getFirstVisibleIndex()) / 2;
+                
+                // Center the newly selected item by making an item
+                // near the bottom of the area we want visible and
+                // then an item near the top visible in turn. We can't
+                // just make the item itself visible, because Swing will
+                // move the least distance necessary, and the item will
+                // tend to be at the very top or very bottom of the visible
+                // area, which isn't as useful as being in the middle.
+                int visibleLineCount = annotationView.getLastVisibleIndex() -
+                     annotationView.getFirstVisibleIndex();
+                
+                int desiredBottomIndex = index + (visibleLineCount / 2);
                 desiredBottomIndex = Math.min(desiredBottomIndex,
                     annotationView.getModel().getSize() - 1);
                 annotationView.ensureIndexIsVisible(desiredBottomIndex);
+                
+                int desiredTopIndex = index - (visibleLineCount / 2);
+                desiredTopIndex = Math.max(0, desiredTopIndex);
+                annotationView.ensureIndexIsVisible(desiredTopIndex);
             }
         });
     }
