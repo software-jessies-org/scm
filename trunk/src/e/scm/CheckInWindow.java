@@ -437,6 +437,16 @@ public class CheckInWindow extends JFrame {
                     message += "\n";
                     SimpleDialog.showAlert(CheckInWindow.this, "Back-end problem", message);
                 }
+                
+                /*
+                 * If a user's working from the keyboard, they probably want
+                 * to see the first patch and have the focus in the statuses
+                 * table, so they can start reviewing changes.
+                 */
+                if (statusesTable.getRowCount() != 0) {
+                    statusesTable.getSelectionModel().setSelectionInterval(0, 0);
+                    statusesTable.requestFocus();
+                }
             }
         };
     }
