@@ -70,8 +70,7 @@ public class RevisionWindow extends JFrame {
              * the line's revision.
              */
             private void click(AnnotatedLine annotatedLine) {
-                revisionCommentArea.setText(annotatedLine.revision.comment);
-                revisionCommentArea.setCaretPosition(0);
+                showComment(annotatedLine.revision.comment);
             }
         };
 
@@ -501,8 +500,7 @@ public class RevisionWindow extends JFrame {
     }
 
     private void showSummaryOfAllRevisions() {
-        revisionCommentArea.setText(summaryOfAllRevisions());
-        revisionCommentArea.setCaretPosition(0);
+        showComment(summaryOfAllRevisions());
         annotationView.setModel(EMPTY_LIST_MODEL);
     }
 
@@ -574,6 +572,14 @@ public class RevisionWindow extends JFrame {
         statusLine.setText(message);
     }
 
+    /**
+     * Shows the given text in the revision comment area.
+     */
+    private void showComment(String comment) {
+        revisionCommentArea.setText(comment);
+        revisionCommentArea.setCaretPosition(0);
+    }
+
     private class RevisionListSelectionListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
             if (e.getValueIsAdjusting()) {
@@ -590,8 +596,7 @@ public class RevisionWindow extends JFrame {
             } else if (values.length == 1) {
                 // Show annotated revision.
                 Revision revision = (Revision) values[0];
-                revisionCommentArea.setText(revision.comment);
-                revisionCommentArea.setCaretPosition(0);
+                showComment(revision.comment);
                 showAnnotationsForRevision(revision, 0);
             } else {
                 // Show differences between two revisions.
@@ -612,7 +617,7 @@ public class RevisionWindow extends JFrame {
                     comment.append(revision.comment);
                 }
 
-                revisionCommentArea.setText(comment.toString());
+                showComment(comment.toString());
                 showDifferencesBetweenRevisions(olderRevision, newerRevision);
             }
         }
