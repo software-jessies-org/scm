@@ -36,6 +36,11 @@ public class WaitCursor {
      */
     private static Timer sheetTimer;
     
+    /**
+     * To work around a Sun bug in Java 1.4.2, it's useful to keep a progress bar.
+     */
+    private static JProgressBar progressBar = new JProgressBar();
+    
     public static void start(Object component, String message) {
         Component glassPane = getGlassPane(component);
         glassPane.setCursor(WAIT_CURSOR);
@@ -46,8 +51,10 @@ public class WaitCursor {
     }
     
     public static void stop(Object component) {
-        sheetTimer.stop();
-        sheetTimer = null;
+        if (sheetTimer != null) {
+            sheetTimer.stop();
+            sheetTimer = null;
+        }
         
         Component glassPane = getGlassPane(component);
         glassPane.setCursor(DEFAULT_CURSOR);
@@ -58,6 +65,9 @@ public class WaitCursor {
     }
 
     private static synchronized void hideSheet() {
+        // Work around Sun bug 4995929 for Java 1.4.2 users.
+        progressBar.setIndeterminate(false);
+        
         if (sheet != null) {
             sheet.getOwner().removeComponentListener(SHEET_PARENT_LISTENER);
             sheet.setVisible(false);
@@ -87,9 +97,8 @@ public class WaitCursor {
         sheet.setVisible(true);
     }
     
-    private static void createSheet(final Component glassPane, final String message) {
+    private static synchronized void createSheet(final Component glassPane, final String message) {
         // Create the content.
-        JProgressBar progressBar = new JProgressBar();
         progressBar.setIndeterminate(true);
         JComponent content = new JPanel(new BorderLayout(20, 20));
         content.add(makeCenteredPanel(progressBar), BorderLayout.CENTER);
