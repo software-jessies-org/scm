@@ -1,3 +1,7 @@
+* When we can correctly go from a line in a patch to the corresponding
+  line in a revision, use that logic to fix the annotation view's
+  behavior when switching revisions; currently it just goes to the
+  same-numbered line in the target revision (there's a FIXME).
 
 * It would be better than translating tabs to spaces if we could actually
   render tabs properly in our JList's cell renderer. At least, what I'm
