@@ -10,8 +10,14 @@
 
 * With BitKeeper, a pending change *will* be included in the next check-in.
   We need to have the 'included' boolean set to true, and non-editable.
-  (Martin claims this isn't true with "bk citool", so there must be some
-  way to work around it.)
+  Martin explains how "bk citool" works: it always uses an undocumented -f
+  parameter which takes a filename. The file contains lines of the form
+  "SCCS/s.index.html|1.5\n". Each line specifies a checked-in revision which
+  should be committed to the ChangeSet. I'm not sure that bk commit does the
+  right thing if you really want to distinguish between multiple, checked-in
+  revisions of the same file --- I did bk "rm file; bk unrm file; bk citool"
+  and told it to commit the rm revision but not the unrm revision, but it
+  committed both anyway. Telling it not to commit either revision worked.
 
 * When you create a new directory, some revision control systems don't seem
   to consider the files below that point until you add the directory.
