@@ -8,7 +8,12 @@ public class DifferencesRenderer extends e.gui.EListCellRenderer {
      * The sole instance of this class.
      */
     public static final DifferencesRenderer INSTANCE = new DifferencesRenderer();
-
+    
+    /**
+     * Background color for the @@ lines.
+     */
+    private static final Color VERY_LIGHT_GRAY = new Color(230, 230, 230);
+    
     /**
      * Prevents the creation of useless instances.
      */
@@ -27,6 +32,7 @@ public class DifferencesRenderer extends e.gui.EListCellRenderer {
         } else if (line.startsWith("-")) {
             setForeground(Color.RED);
         } else if (line.startsWith("@@ ")) {
+            setBackground(VERY_LIGHT_GRAY);
             setForeground(Color.GRAY);
         }
         return this;
