@@ -38,6 +38,11 @@ public class CheckInWindow extends JFrame {
         setTitle(repositoryRoot.toString());
         makeUserInterface();
         updateFileStatuses();
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                writeSavedComment();
+            }
+        });
     }
 
     private void makeUserInterface() {
@@ -226,8 +231,31 @@ public class CheckInWindow extends JFrame {
     
     private void initCheckInCommentArea() {
         checkInCommentArea = makeTextArea(8);
+        readSavedComment();
+    }
+    
+    private void readSavedComment() {
+        File savedCommentFile = getSavedCommentFile();
+        if (savedCommentFile.exists()) {
+            String savedComment = StringUtilities.readFile(savedCommentFile);
+            checkInCommentArea.setText(savedComment);
+        }
+    }
+    
+    private void writeSavedComment() {
+        String comment = checkInCommentArea.getText();
+        File savedCommentFile = getSavedCommentFile();
+        if (comment.length() == 0 && savedCommentFile.exists()) {
+            savedCommentFile.delete();
+        } else {
+            StringUtilities.writeFile(savedCommentFile, comment);
+        }
     }
 
+    private File getSavedCommentFile() {
+        return FileUtilities.fileFromParentAndString(repositoryRoot.toString(), ".e.scm.CheckInWindow.savedComment");
+    }
+    
     private JTextArea makeTextArea(final int rowCount) {
         JTextArea textArea = new JTextArea(rowCount, 80);
         textArea.setDragEnabled(false);

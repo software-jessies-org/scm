@@ -13,9 +13,6 @@
   (Martin claims this isn't true with "bk citool", so there must be some
   way to work around it.)
 
-* Save the comment field contents in repositoryRoot/.checkintool-comment in
-  case you want to quit and come back.
-
 * When we "cvs update" to find out what local changes we've got, we should
   (a) ignore successfully merged remote changes and (b) warn about merge
   conflicts.
