@@ -125,6 +125,19 @@ public class StatusesTableModel extends AbstractTableModel {
     }
     
     /**
+     * Returns the index of the first row whose file is included, 0 if no
+     * files are currently included.
+     */
+    public int chooseDefaultSelectedRow() {
+        for (int i = 0; i < getRowCount(); ++i) {
+            if (isIncluded(i)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+    
+    /**
      * Tests whether the file represented by the given row is to be included
      * in the check-in.
      */

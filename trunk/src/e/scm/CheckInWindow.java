@@ -440,7 +440,8 @@ public class CheckInWindow extends JFrame {
                  * table, so they can start reviewing changes.
                  */
                 if (statusesTable.getRowCount() != 0) {
-                    statusesTable.getSelectionModel().setSelectionInterval(0, 0);
+                    int chosenRow = statusesTableModel.chooseDefaultSelectedRow();
+                    statusesTable.getSelectionModel().setSelectionInterval(chosenRow, chosenRow);
                     statusesTable.requestFocus();
                 }
             }
