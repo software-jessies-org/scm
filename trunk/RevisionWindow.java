@@ -6,7 +6,15 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 public class RevisionWindow extends JFrame {
-    private static final Font FONT = new Font(System.getProperty("os.name").indexOf("Mac") != -1 ? "Monaco" : "Monospaced", Font.PLAIN, 10);
+    private static final Font FONT;
+    static {
+        // FIXME: this is nasty. Why is there no Font.parse or Font.fromString?
+        if (System.getProperty("os.name").indexOf("Mac") != -1) {
+            FONT = new Font("Monaco", Font.PLAIN, 10);
+        } else {
+            FONT = new Font("Monospaced", Font.PLAIN, 12);
+        }
+    }
 
     private String filename;
 
@@ -43,6 +51,7 @@ public class RevisionWindow extends JFrame {
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED)
         );
+        revisionsUi.setBorder(null);
         
         annotationView = new JList(new AnnotationModel());
         annotationView.setFont(FONT);
@@ -51,9 +60,13 @@ public class RevisionWindow extends JFrame {
         JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
             revisionsUi,
             new JScrollPane(annotationView));
+        ui.setBorder(null);
 
-        getContentPane().add(ui, BorderLayout.CENTER);
-        getContentPane().add(statusLine, BorderLayout.SOUTH);
+        JPanel contentPane = new JPanel(new BorderLayout());
+        contentPane.setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
+        contentPane.add(ui, BorderLayout.CENTER);
+        contentPane.add(statusLine, BorderLayout.SOUTH);
+        setContentPane(contentPane);
         pack();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
