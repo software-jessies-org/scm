@@ -203,9 +203,13 @@ public class CheckInWindow extends JFrame {
             comment += "\n";
         }
         List/*<FileStatus>*/ filenames = statusesTableModel.getIncludedFiles();
-        backEnd.commit(comment, filenames);
-        updateFileStatuses();
-        clearCheckInCommentArea();
+        try {
+            backEnd.commit(comment, filenames);
+            updateFileStatuses();
+            clearCheckInCommentArea();
+        } catch (Exception ex) {
+            System.err.println("couldn't check in.");
+        }
     }
     
     private void clearCheckInCommentArea() {

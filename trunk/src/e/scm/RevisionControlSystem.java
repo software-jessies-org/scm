@@ -191,7 +191,9 @@ public abstract class RevisionControlSystem {
         for (int i = 0; i < errors.size(); ++i) {
             System.err.println(errors.get(i));
         }
-        System.err.println(status);
+        if (status != 0) {
+            throw new RuntimeException("[Command '" + StringUtilities.join(command, " ") + "' returned status " + status + ".]");
+        }
     }
     
     public static void addFilenames(Collection collection, List/*<FileStatus>*/ fileStatuses) {
