@@ -41,3 +41,6 @@
 * We could use the CVS/Entries files to avoid having to run "cvs update";
   we could hack together our own equivalent of "svn status" or "bk sfiles".
   Why isn't there a CVS command to do this already?
+
+* Saving and restoring the comment has been broken roughly since the
+  gray help text went in on startup.
