@@ -1,5 +1,7 @@
 SOURCE_FILES=$(wildcard *.java)
 TAR_FILE_OF_THE_DAY=`date +revtool-%Y-%m-%d.tar`
+
+BOOT_CLASS_PATH=/home/elliotth/download/j2sdk1.4.2/jre/lib/rt.jar
 BOOT_CLASS_PATH=/System/Library/Frameworks/JavaVM.framework/Classes/classes.jar
 
 revtool: $(SOURCE_FILES)
