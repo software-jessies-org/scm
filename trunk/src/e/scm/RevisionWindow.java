@@ -23,8 +23,6 @@ public class RevisionWindow extends JFrame {
 
     private final AnnotatedLineRenderer annotatedLineRenderer =
         new AnnotatedLineRenderer(this);
-    private static final DifferencesRenderer DIFFERENCES_RENDERER =
-        new DifferencesRenderer();
 
     private final MouseListener annotationsDoubleClickListener =
         new MouseAdapter() {
@@ -478,7 +476,7 @@ public class RevisionWindow extends JFrame {
         for (int i = 0; i < lines.size(); ++i) {
             differences.addElement((String) lines.get(i));
         }
-        switchAnnotationView(differences, DIFFERENCES_RENDERER, differencesDoubleClickListener);
+        switchAnnotationView(differences, DifferencesRenderer.INSTANCE, differencesDoubleClickListener);
 
         // We can't easily retain the context when switching to differences.
         // As an extension, though, we could do this.
@@ -575,6 +573,13 @@ public class RevisionWindow extends JFrame {
 
     private class RevisionListSelectionListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) {
+            if (e.getValueIsAdjusting()) {
+                // We're not interested in transitional states, particularly
+                // given how expensive they are if you're talking to a CVS
+                // repository that's hundreds of milliseconds away.
+                return;
+            }
+            
             JList list = (JList) e.getSource();
             Object[] values = list.getSelectedValues();
             if (values.length == 0) {

@@ -17,11 +17,13 @@ public class Cvs implements RevisionControlSystem {
         result.add("diff");
         result.add("-u");
         result.add("-kk");
-        result.add("-r");
-        result.add(olderRevision.number);
-        if (newerRevision != Revision.LOCAL_REVISION) {
+        if (olderRevision != null) {
             result.add("-r");
-            result.add(newerRevision.number);
+            result.add(olderRevision.number);
+            if (newerRevision != Revision.LOCAL_REVISION) {
+                result.add("-r");
+                result.add(newerRevision.number);
+            }
         }
         result.add(filename);
         return (String[]) result.toArray(new String[result.size()]);

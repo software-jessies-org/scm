@@ -16,9 +16,11 @@ public class BitKeeper implements RevisionControlSystem {
         result.add("bk");
         result.add("diffs");
         result.add("-u");
-        result.add("-r" + olderRevision.number);
-        if (newerRevision != Revision.LOCAL_REVISION) {
-            result.add("-r" + newerRevision.number);
+        if (olderRevision != null) {
+            result.add("-r" + olderRevision.number);
+            if (newerRevision != Revision.LOCAL_REVISION) {
+                result.add("-r" + newerRevision.number);
+            }
         }
         result.add(filename);
         return (String[]) result.toArray(new String[result.size()]);

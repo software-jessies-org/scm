@@ -24,7 +24,10 @@ public interface RevisionControlSystem {
 
     /**
      * Returns a command that gets a patch for the given file from the older
-     * revision to the newer revision.
+     * revision to the newer revision. You may be given Revision.LOCAL_REVISION
+     * as newer revision. You may be given null for both revisions, which is
+     * used by CheckInTool to ask for the differences between a locally-modified
+     * file and the repository.
      */
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename);
 

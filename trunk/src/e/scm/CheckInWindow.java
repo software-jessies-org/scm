@@ -1,7 +1,6 @@
 package e.scm;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
@@ -27,6 +26,7 @@ public class CheckInWindow extends JFrame {
     
     private JList statusesList;
     private JTextArea checkInCommentArea;
+    private PatchView patchView;
     private JLabel statusLine = new JLabel(" ");
     
     public CheckInWindow() {
@@ -40,7 +40,6 @@ public class CheckInWindow extends JFrame {
     private void makeUserInterface() {
         initStatusesList();
         initCheckInCommentArea();
-        initAnnotationView();
 
         JComponent topUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
             new JScrollPane(statusesList),
@@ -50,13 +49,13 @@ public class CheckInWindow extends JFrame {
         );
         topUi.setBorder(null);
         
-        /*
+        patchView = new PatchView();
+        patchView.setFont(FONT);
+        
         JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
             topUi,
-            new JScrollPane(annotationView));
+            new JScrollPane(patchView));
         ui.setBorder(null);
-        */
-        JComponent ui = topUi;
         
         JButton commitButton = new JButton("Commit");
         commitButton.addActionListener(new ActionListener() {
@@ -84,21 +83,16 @@ public class CheckInWindow extends JFrame {
         statusesList = new JList();
         statusesList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         statusesList.setFont(FONT);
-        //statusesList.addListSelectionListener(new RevisionListSelectionListener());
-    }
-
-    private void initAnnotationView() {
-        /*
-        annotationView = new JList(new AnnotationModel());
-        annotationView.setFont(FONT);
-        annotationView.setVisibleRowCount(34);
-        ActionMap actionMap = annotationView.getActionMap();
-        actionMap.put("copy", new AbstractAction("copy") {
-            public void actionPerformed(ActionEvent e) {
-                copyAnnotationViewSelectionToClipboard();
+        statusesList.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) {
+                    return;
+                }
+                
+                FileStatus status = (FileStatus) statusesList.getSelectedValue();
+                patchView.showPatch(backEnd, repositoryRoot, null, null, status.getName());
             }
         });
-        */
     }
 
     private void commit() {

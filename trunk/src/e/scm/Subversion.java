@@ -15,12 +15,14 @@ public class Subversion implements RevisionControlSystem {
         ArrayList result = new ArrayList();
         result.add("svn");
         result.add("diff");
-        result.add("-r");
-        String revisionArgument = olderRevision.number;
-        if (newerRevision != Revision.LOCAL_REVISION) {
-            revisionArgument += ":" + newerRevision.number;
+        if (olderRevision != null) {
+            result.add("-r");
+            String revisionArgument = olderRevision.number;
+            if (newerRevision != Revision.LOCAL_REVISION) {
+                revisionArgument += ":" + newerRevision.number;
+            }
+            result.add(revisionArgument);
         }
-        result.add(revisionArgument);
         result.add(filename);
         return (String[]) result.toArray(new String[result.size()]);
     }
