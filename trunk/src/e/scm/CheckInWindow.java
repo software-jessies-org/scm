@@ -69,7 +69,8 @@ public class CheckInWindow extends JFrame {
                     return;
                 }
                 int index = patchView.locationToIndex(e.getPoint());
-                editFile();
+                int lineNumber = patchView.lineNumberInNewerRevisionAtIndex(index);
+                editFileAtLine(lineNumber);
             }
         });
         
@@ -150,7 +151,7 @@ public class CheckInWindow extends JFrame {
             super("Edit File");
         }
         public void actionPerformed(ActionEvent e) {
-            editFile();
+            editFileAtLine(1);
         }
     }
     
@@ -258,9 +259,12 @@ public class CheckInWindow extends JFrame {
         }
     }
     
-    private void editFile() {
+    /**
+     * Edits the currently selected file, at the given line number.
+     */
+    private void editFileAtLine(int lineNumber) {
         FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
-        String command = getEditor() + " " + fileStatus.getName();
+        String command = getEditor() + " " + fileStatus.getName() + ":" + lineNumber;
         ProcessUtilities.spawn(backEnd.getRoot(), new String[] { "bash", "-c", command });
     }
     

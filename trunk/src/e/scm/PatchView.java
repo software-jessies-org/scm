@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.regex.*;
 import javax.swing.*;
 import e.util.*;
 
@@ -68,5 +69,25 @@ public class PatchView extends JList {
         // We can't easily retain the context when switching to differences.
         // As an extension, though, we could do this.
         ensureIndexIsVisible(0);
+    }
+    
+    /**
+     * Given an index (that is, a line number in the patch), returns the
+     * line number in the newer revision. Used to implement double-clicking
+     * on a patch in CheckInWindow, which shows you that line in your
+     * editor.
+     */
+    public int lineNumberInNewerRevisionAtIndex(int index) {
+        int lineNumber = 0;
+        for (int i = 0; i <= index; ++i) {
+            String line = (String) getModel().getElementAt(i);
+            Matcher matcher = Patch.AT_AT_PATTERN.matcher(line);
+            if (matcher.matches()) {
+                lineNumber = Integer.parseInt(matcher.group(3)) - 1;
+            } else if (line.startsWith("-") == false) {
+                ++lineNumber;
+            }
+        }
+        return lineNumber;
     }
 }
