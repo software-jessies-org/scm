@@ -1,2 +1,2 @@
 #!/bin/bash
-exec java -cp `dirname $0`/classes e.scm.RevisionTool $*
+exec java -cp `dirname $0`/classes e.scm.RevisionTool "$@"
