@@ -94,7 +94,42 @@ public class BitKeeper implements RevisionControlSystem {
     }
     
     public List getStatuses(File repositoryRoot) {
-        throw new UnsupportedOperationException("Can't get status information for a BitKeeper repository.");
+        String[] command = new String[] { "bk", "sfiles", "-ct", "-g", "-x", "-v", "-p" };
+        ArrayList lines = new ArrayList();
+        ArrayList errors = new ArrayList();
+        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+        
+        ArrayList statuses = new ArrayList();
+        Pattern pattern = Pattern.compile("^(.{4})\\s+(.+)(@[0-9.]+)?$");
+        for (int i = 0; i < lines.size(); ++i) {
+            String line = (String) lines.get(i);
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find()) {
+                String state = matcher.group(1);
+                String name = matcher.group(2);
+                int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
+                if (state.equals("jjjj")) {
+                    // Junk. Ignore.
+                } else if (state.equals("xxxx")) {
+                    canonicalState = FileStatus.NEW;
+                } else if (state.matches(".c..")) {
+                    canonicalState = FileStatus.MODIFIED;
+                } else if (state.matches("..p.")) {
+                    if (name.startsWith("BitKeeper/deleted/.del-")) {
+                        canonicalState = FileStatus.REMOVED;
+                    } else {
+                        canonicalState = FileStatus.ADDED;
+                    }
+                }
+                statuses.add(new FileStatus(canonicalState, name));
+                //case 'C': canonicalState = FileStatus.CONTAINS_CONFLICTS; break;
+                //case '!': canonicalState = FileStatus.MISSING; break;
+                //case '~': canonicalState = FileStatus.WRONG_KIND; break;
+            } else {
+                System.err.println("BitKeeper back end didn't understand '" + line + "'.");
+            }
+        }
+        return statuses;
     }
     
     public void commit(File repositoryRoot, String comment, List filenames) {
