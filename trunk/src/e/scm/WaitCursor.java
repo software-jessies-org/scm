@@ -14,6 +14,19 @@ public class WaitCursor {
     };
     
     /**
+     * Makes sure that the sheet follows its parent around.
+     */
+    private static final ComponentListener SHEET_PARENT_LISTENER = new ComponentAdapter() {
+        public void componentMoved(ComponentEvent e) {
+            repositionSheet();
+        }
+        
+        public void componentResized(ComponentEvent e) {
+            repositionSheet();
+        }
+    };
+    
+    /**
      * If we're waiting long enough, we provide more feedback, via this window.
      */
     private static JDialog sheet;
@@ -46,6 +59,7 @@ public class WaitCursor {
 
     private static synchronized void hideSheet() {
         if (sheet != null) {
+            sheet.getOwner().removeComponentListener(SHEET_PARENT_LISTENER);
             sheet.setVisible(false);
             sheet.dispose();
             sheet = null;
@@ -88,9 +102,15 @@ public class WaitCursor {
         sheet.setSize(new Dimension(400, 120));
         sheet.setUndecorated(true);
         
-        // Line it up with the middle of the top of the window.
-        Point location = glassPane.getLocationOnScreen();
-        location.x += (glassPane.getWidth() - sheet.getWidth()) / 2;
+        sheet.getOwner().addComponentListener(SHEET_PARENT_LISTENER);
+        repositionSheet();
+    }
+    
+    /** Lines the sheet up with the middle of the top of the parent window. */
+    private static void repositionSheet() {
+        Point location = sheet.getOwner().getLocationOnScreen();
+        location.y += sheet.getOwner().getInsets().top;
+        location.x += (sheet.getOwner().getWidth() - sheet.getWidth()) / 2;
         sheet.setLocation(location);
     }
 
