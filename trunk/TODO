@@ -1,0 +1,54 @@
+
+* Start up at a decent size, and in a sensible position on the desktop.
+
+* Show decent progress feedback and keep processing events while talking
+  to CVS.
+
+* Show CVS errors. (If we try to look at a non-existant file, say, there's
+  no useful feedback at the moment.)
+
+* Sort the revisions properly (cvs lists revisions with lots of dots in them
+  out of order).
+
+* Support the following styles of addressing on the command line:
+
+   grep-style  "<filename>:<line>"
+   vim-style   "<filename> +<line>"
+   bk-style    "<filename> +@<line>" [check this]
+
+* Use some kind of two-element selection model for the revisions list. Color
+  the selected items so that if there's only one, it's red, and the second
+  one is blue. (To correspond to the diff colors. The 'one item selected'
+  case is less obviously right.)
+
+* Use a JTextPane for the checkin comments, and allow some kind of filter
+  to be specified by the user to rewrite references to bugs as links to
+  bug database entries or whatever; be able to launch a browser when these
+  are clicked on.
+
+* Add search functionality. Usual C-D, C-F, C-G trio. I don't know how we
+  can do Edit-like alpha highlighting, which is a shame.
+
+* Add go to line functionality (not usually useful because you'd do it on the
+  command line, or have your editor do it for you).
+
+* Add C-A and C-C to the JList, so we can copy text out of it. (We can already
+  copy checkin comments from the JTextArea.) Do we need an explicit patch
+  export facility if we can just copy/paste?
+
+* Show checkin comments for other revisions when you hover, so you don't
+  *have* to look at another revision when you're looking at an annotated
+  file to get some idea of whether you're interested in that revision.
+  Here's an example of bonsai doing something similar:
+  http://bonsai.mozilla.org/cvsblame.cgi?file=mozilla/camino/src/browser/CocoaPromptService.mm&root=/cvsroot
+
+* Auto-detect whether we're in a CVS or BitKeeper repository; for now, if
+  we're in a BitKeeper repository, we can just invoke "bk revtool" and quit.
+
+* Support a BitKeeper back-end as well as CVS. (If you don't do this sooner
+  rather than later, you'll only make it more difficult!)
+
+* Follow symlinks.
+
+* For a given line, make it possible (and easy) to find out automatically
+  when that line was removed.
