@@ -292,7 +292,6 @@ public class RevisionWindow extends JFrame {
             this.filePath = filename.substring(repositoryRoot.toString().length() + File.separator.length());
         } catch (IOException ex) {
             ex.printStackTrace();
-            System.exit(1);
         }
     }
     
