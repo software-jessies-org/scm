@@ -25,6 +25,20 @@ public class ProcessUtilities {
         }
     }
 
+    public static void spawn(final String[] command) {
+        new Thread() {
+            public void run() {
+                try {
+                    Process p = Runtime.getRuntime().exec(command);
+                    p.getOutputStream().close();
+                    p.waitFor();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
     private static void readLinesFromStream(ArrayList result, InputStream stream) {
         BufferedReader in = null;
         try {

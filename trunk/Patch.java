@@ -1,4 +1,4 @@
-import java.util.regex.*;
+//import java.util.regex.*;
 
 public class Patch {
     public Patch(Revision fromRevision, Revision toRevision) {

@@ -163,10 +163,25 @@ public class RevisionWindow extends JFrame {
             new JScrollPane(annotationView));
         ui.setBorder(null);
 
+        JButton changeSetButton = new JButton("Show Change Set");
+        if (backEnd.supportsChangeSets()) {
+            changeSetButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    backEnd.showChangeSet(filename, getSelectedRevision());
+                }
+            });
+        } else {
+            changeSetButton.setEnabled(false);
+        }
+
+        JPanel statusPanel = new JPanel(new BorderLayout());
+        statusPanel.add(statusLine, BorderLayout.CENTER);
+        statusPanel.add(changeSetButton, BorderLayout.EAST);
+
         JPanel contentPane = new JPanel(new BorderLayout());
         contentPane.setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
         contentPane.add(ui, BorderLayout.CENTER);
-        contentPane.add(statusLine, BorderLayout.SOUTH);
+        contentPane.add(statusPanel, BorderLayout.SOUTH);
         setContentPane(contentPane);
         pack();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

@@ -32,4 +32,17 @@ public interface RevisionControlSystem {
      * Tests whether a given file has been locally modified.
      */
     public boolean isLocallyModified(String filename);
+
+    /**
+     * Tests whether this revision control system supports the notion of
+     * change sets, where a number of files are grouped together as a single
+     * change.
+     */
+    public boolean supportsChangeSets();
+
+    /**
+     * Opens some kind of viewer for the change set corresponding to the
+     * given revision of the given file.
+     */
+    public void showChangeSet(String filename, Revision revision);
 }

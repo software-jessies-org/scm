@@ -77,4 +77,19 @@ public class Cvs implements RevisionControlSystem {
         }
         return false;
     }
+
+    /**
+     * CVS has no notion of a change set.
+     * FIXME: we could try to read filenames out of the revision comment,
+     * which in many cases will include all the other changed files. I don't
+     * know how we'd work out the appropriate revisions, though I guess the
+     * time stamps would be enough.
+     */
+    public boolean supportsChangeSets() {
+        return false;
+    }
+
+    public void showChangeSet(String filename, Revision revision) {
+        throw new UnsupportedOperationException("Can't show a CVS change set for " + filename + " revision " + revision.number);
+    }
 }
