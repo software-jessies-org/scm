@@ -167,12 +167,7 @@ public class RevisionWindow extends JFrame {
         setFilename(filename);
         makeUserInterface(initialLineNumber);
 
-        readListOfRevisions();
-        if (initialLineNumber != 0) {
-            showAnnotationsForRevision(revisions.getLatestInRepository(), initialLineNumber);
-        } else {
-            showSummaryOfAllRevisions();
-        }
+        readListOfRevisions(initialLineNumber);
     }
 
     private void makeUserInterface(int initialLineNumber) {
@@ -314,27 +309,38 @@ public class RevisionWindow extends JFrame {
         }
     }
     
-    private void showAnnotationsForRevision(Revision revision, int lineNumber) {
+    /**
+     * Factors out the data common to all BlockingWorker subclasses in this RevisionWindow.
+     */
+    public abstract class BackEndWorker extends BlockingWorker {
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
+        String[] command;
         int status = 0;
-        String[] command = backEnd.getAnnotateCommand(revision, filePath);
-        try {
-            WaitCursor.start(this, "Getting annotations for revision...");
-            /* FIXME: do this in separate thread. */
-            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
-        } finally {
-            WaitCursor.stop(this);
+        
+        public BackEndWorker(final String message) {
+            super(RevisionWindow.this, message);
         }
+    }
 
-        // CVS writes junk to standard error even on success.
-        if (status != 0) {
-            showToolError(annotationView, errors, command, status);
-            return;
-        }
-
-        updateAnnotationModel(revision, lines);
-        showSpecificLineInAnnotations(lineNumber);
+    private void showAnnotationsForRevision(final Revision revision, final int lineNumber) {
+        new BackEndWorker("Getting annotations for revision...") {
+            public void work() {
+                command = backEnd.getAnnotateCommand(revision, filePath);
+                status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
+            }
+            
+            public void finish() {
+                // CVS writes junk to standard error even on success.
+                if (status != 0) {
+                    showToolError(annotationView, errors, command, status);
+                    return;
+                }
+                
+                updateAnnotationModel(revision, lines);
+                showSpecificLineInAnnotations(lineNumber);
+            }
+        };
     }
     
     private void updateAnnotationModel(Revision revision, List lines) {
@@ -443,34 +449,31 @@ public class RevisionWindow extends JFrame {
         }
     }
     
-    private void showDifferencesBetweenRevisions(Revision olderRevision, Revision newerRevision) {
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
-        int status = 0;
-        /* FIXME: do this in separate thread. */
-        try {
-            WaitCursor.start(this, "Getting differences between revisions...");
-            String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
-            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
-        } finally {
-            WaitCursor.stop(this);
-        }
-
-        // CVS returns a non-zero exit status if there were any differences.
-        if (errors.size() > 0) {
-            showToolError(revisionsList, errors);
-            return;
-        }
-
-        DefaultListModel differences = new DefaultListModel();
-        for (int i = 0; i < lines.size(); ++i) {
-            differences.addElement((String) lines.get(i));
-        }
-        switchAnnotationView(differences, DifferencesRenderer.INSTANCE, differencesDoubleClickListener);
-
-        // We can't easily retain the context when switching to differences.
-        // As an extension, though, we could do this.
-        annotationView.ensureIndexIsVisible(0);
+    private void showDifferencesBetweenRevisions(final Revision olderRevision, final Revision newerRevision) {
+        new BackEndWorker("Getting differences between revisions...") {
+            public void work() {
+                command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
+                status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
+            }
+            
+            public void finish() {
+                // CVS returns a non-zero exit status if there were any differences.
+                if (errors.size() > 0) {
+                    showToolError(revisionsList, errors);
+                    return;
+                }
+                
+                DefaultListModel differences = new DefaultListModel();
+                for (int i = 0; i < lines.size(); ++i) {
+                    differences.addElement((String) lines.get(i));
+                }
+                switchAnnotationView(differences, DifferencesRenderer.INSTANCE, differencesDoubleClickListener);
+                
+                // We can't easily retain the context when switching to differences.
+                // As an extension, though, we could do this.
+                annotationView.ensureIndexIsVisible(0);
+            }
+        };
     }
 
     private String summaryOfAllRevisions() {
@@ -511,31 +514,34 @@ public class RevisionWindow extends JFrame {
     public Revision getSelectedRevision() {
         return (Revision) revisionsList.getSelectedValue();
     }
-
-    private void readListOfRevisions() {
-        /* FIXME: do rest in separate thread. */
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
-        int status = 0;
-        String[] command = backEnd.getLogCommand(filePath);
-        try {
-            WaitCursor.start(this, "Getting list of revisions...");
-            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
-            // When there's an error, it's useful to dump out the directory, command and environment.
-        } finally {
-            WaitCursor.stop(this);
-        }
-        
-        if (status != 0 || errors.size() > 0) {
-            showToolError(revisionsList, errors, command, status);
-            return;
-        }
-
-        revisions = backEnd.parseLog(lines);
-        if (backEnd.isLocallyModified(filePath)) {
-            revisions.addLocalRevision(Revision.LOCAL_REVISION);
-        }
-        revisionsList.setModel(revisions);
+    
+    private void readListOfRevisions(final int initialLineNumber) {
+        new BackEndWorker("Getting list of revisions...") {
+            public void work() {
+                command = backEnd.getLogCommand(filePath);
+                status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
+            }
+            
+            public void finish() {
+                if (status != 0 || errors.size() > 0) {
+                    showToolError(revisionsList, errors, command, status);
+                    return;
+                }
+                
+                revisions = backEnd.parseLog(lines);
+                if (backEnd.isLocallyModified(filePath)) {
+                    revisions.addLocalRevision(Revision.LOCAL_REVISION);
+                }
+                revisionsList.setModel(revisions);
+                
+                // This doesn't really belong in here, but it can only be invoked after the code above has finished.
+                if (initialLineNumber != 0) {
+                    showAnnotationsForRevision(revisions.getLatestInRepository(), initialLineNumber);
+                } else {
+                    showSummaryOfAllRevisions();
+                }
+            }
+        };
     }
 
     public void selectRevision(Revision revision) {
