@@ -101,9 +101,11 @@ public class RevisionWindow extends JFrame {
 
         initRevisions(filename);
 
+        // FIXME: this only works while the implementation is synchronous.
         if (initialLineNumber != 0) {
-            // FIXME: this only works while the implementation is synchronous.
-            showAnnotationsForRevision((Revision) revisions.getElementAt(0));
+            // revisions[0] is the local revision.
+            // revisions[1] is the latest revision in the repository.
+            showAnnotationsForRevision((Revision) revisions.getElementAt(1));
             final int index = initialLineNumber - 1;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
