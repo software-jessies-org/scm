@@ -1,3 +1,33 @@
+* Martin explains how we can work with change sets:
+
+   Given the ChangeSet number from bk r2c, we can find the range of
+   revisions it compromises it each of its files:
+
+    doozer:~/xray/libs/genmgmtserver$ bk rset -r1.2887.110.4
+    ChangeSet|1.2887.110.3..1.2887.110.4
+    tcp/http/socket.cpp|1.78..1.79
+    libs/genmgmtserver/GenericManagementServer.h|1.29..1.30
+    libs/management/ftp/session.cpp|1.16..1.17
+    fsb/resolve/resolve.cpp|1.27..1.28
+    libs/telnet/telnet.cpp|1.75..1.76
+    libs/management/sictrlserver/MgmntServer.cpp|1.55..1.56
+    libs/genmgmtserver/connections.cpp|1.12..1.13
+    doozer:~/xray/libs/genmgmtserver$
+
+   We could grok this output and fork off new RevisionWindows for each
+   file, in patch view across the specified range of revisions. Revisiontool
+   didn't seem too happy about being asked to look at ChangeSet but, 'part
+   from that, sounds easy enough, dunnit?
+
+  I added:
+
+   We could make it work for CVS by pulling the other filenames out of
+   the revision comment for the first file you thought of.
+
+   If we pulled the content pane out of RevisionWindow (as we should), we
+   could even have a ChangeSetWindow with a JTabbedPane with a tab per
+   file from the change set.
+
 * Some way of asking for the patch containing the most recent change to
   the current line. And a catchy enough name that we can put it on a
   sensibly-sized menu item or button!
