@@ -323,6 +323,14 @@ public class CheckInWindow extends JFrame {
                         statusesTable.setModel(statusesTableModel);
                         statusesTableModel.initColumnWidths(statusesTable);
                         statusesTableModel.addTableModelListener(new StatusesTableModelListener());
+                        
+                        /* Give some feedback to demonstrate we're not broken if there's nothing to show. */
+                        boolean nothingModified = (statusesTableModel.getRowCount() == 0);
+                        if (nothingModified) {
+                            DefaultListModel model = new DefaultListModel();
+                            model.addElement("(Nothing to check in.)");
+                            patchView.setModel(model);
+                        }
                     }
                 });
             }
