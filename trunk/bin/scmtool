@@ -1,6 +1,13 @@
 #!/bin/bash
 real_script=`readlink $0 || echo $0`
 tools_dir=`dirname $real_script`/..
+
+if [ $# == 0 ];
+then
+    echo "Use the 'checkintool' or 'revisiontool' scripts instead."
+    exit 1
+fi
+
 tool_name=$1
 
 class_path=$tools_dir/classes:$tools_dir/../salma-hayek/classes
