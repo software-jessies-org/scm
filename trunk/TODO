@@ -45,6 +45,9 @@
    We could make it work for CVS by pulling the other filenames out of
    the revision comment for the first file you thought of.
 
+   We could make it work for Subversion by using this command to list the
+   files changed in a given revision: "svnlook changed -r <number>".
+
    If we pulled the content pane out of RevisionWindow (as we should), we
    could even have a ChangeSetWindow with a JTabbedPane with a tab per
    file from the change set.
