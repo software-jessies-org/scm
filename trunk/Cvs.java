@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class Cvs implements RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
         return new String[] {
@@ -6,14 +8,19 @@ public class Cvs implements RevisionControlSystem {
     }
 
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename) {
-        return new String[] {
-            "cvs", "diff",
-                "-u",
-                "-kk",
-                "-r", olderRevision.number,
-                "-r", newerRevision.number,
-                filename
-        };
+        ArrayList result = new ArrayList();
+        result.add("cvs");
+        result.add("diff");
+        result.add("-u");
+        result.add("-kk");
+        result.add("-r");
+        result.add(olderRevision.number);
+        if (newerRevision != Revision.LOCAL_REVISION) {
+            result.add("-r");
+            result.add(newerRevision.number);
+        }
+        result.add(filename);
+        return (String[]) result.toArray(new String[result.size()]);
     }
 
     public String[] getLogCommand(String filename) {

@@ -1,6 +1,9 @@
 import java.util.regex.*;
 
 public class Revision {
+    /** A revision corresponding to changes not yet committed. */
+    public static final Revision LOCAL_REVISION = new Revision("local", "xxxx-xx-xx", "me", "Changes not yet committed."); 
+
     //date: 2002/11/25 14:41:42;  author: ericb;  state: Exp;  lines: +12 -1
     private static final Pattern CVS_PATTERN = Pattern.compile("^date: (\\d\\d\\d\\d)/(\\d\\d)/(\\d\\d)[^;]*;\\s+author: ([^;]+);\\s+.*");
 
@@ -12,6 +15,13 @@ public class Revision {
     public String date;
     public String author;
     public String comment;
+
+    public Revision(String number, String date, String author, String comment) {
+        this.number = number;
+        this.date = date;
+        this.author = author;
+        this.comment = comment;
+    }
 
     public Revision(String number, String info, String comment) {
         this.number = number;

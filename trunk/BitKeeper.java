@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class BitKeeper implements RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
         return new String[] {
@@ -6,13 +8,16 @@ public class BitKeeper implements RevisionControlSystem {
     }
 
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename) {
-        return new String[] {
-            "bk", "diffs",
-                "-u",
-                "-r" + olderRevision.number,
-                "-r" + newerRevision.number,
-                filename
-        };
+        ArrayList result = new ArrayList();
+        result.add("bk");
+        result.add("diffs");
+        result.add("-u");
+        result.add("-r" + olderRevision.number);
+        if (newerRevision != Revision.LOCAL_REVISION) {
+            result.add("-r" + newerRevision.number);
+        }
+        result.add(filename);
+        return (String[]) result.toArray(new String[result.size()]);
     }
 
     public String[] getLogCommand(String filename) {

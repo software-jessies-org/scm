@@ -259,6 +259,7 @@ public class RevisionWindow extends JFrame {
         }
 
         revisions = backEnd.parseLog(lines);
+        revisions.addLocalRevision(Revision.LOCAL_REVISION);
         revisionsList.setModel(revisions);
     }
 

@@ -22,9 +22,22 @@ public class RevisionListModel extends AbstractListModel {
         return data.get(row);
     }
     
+    /**
+     * Adds the unique local revision, corresponding to changes not yet
+     * committed.
+     */
+    public void addLocalRevision(Revision localRevision) {
+        data.add(0, localRevision);
+        updateCaches(localRevision);
+    }
+
     /** Adds a revision. */
     public void add(Revision revision) {
         data.add(revision);
+        updateCaches(revision);
+    }
+
+    private void updateCaches(Revision revision) {
         numberToRevisionMap.put(revision.number, revision);
         maxAuthorNameLength = Math.max(maxAuthorNameLength, revision.author.length());
         maxRevisionNumberLength = Math.max(maxRevisionNumberLength, revision.number.length());
