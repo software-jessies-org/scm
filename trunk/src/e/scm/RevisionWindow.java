@@ -206,7 +206,17 @@ public class RevisionWindow extends JFrame {
             }
             
             public void findText(String searchTerm) {
-                // FIXME
+                Pattern pattern = Pattern.compile(searchTerm);
+                int currentLine = annotationView.getSelectedIndex();
+                ListModel model = annotationView.getModel();
+                for (int i = currentLine + 1; i < model.getSize(); ++i) {
+                    String line = model.getElementAt(i).toString();
+                    if (pattern.matcher(line).find()) {
+                        int lineNumber = i + 1; // Indexes are zero-based.
+                        showSpecificLineInAnnotations(lineNumber);
+                        return;
+                    }
+                }
             }
         });
         
