@@ -565,7 +565,8 @@ public class RevisionWindow extends JFrame {
         JTextArea summary = makeTextArea(20);
         summary.setText(summaryOfAllRevisions());
         summary.setCaretPosition(0);
-
+        JTextComponentFind.addFindFunctionalityTo(summary);
+        
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(new JScrollPane(summary), BorderLayout.CENTER);
 
