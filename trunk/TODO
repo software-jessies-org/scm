@@ -1,4 +1,15 @@
 
+* It would be better than translating tabs to spaces if we could actually
+  render tabs properly in our JList's cell renderer. At least, what I'm
+  trying to say is that it will suck if copying and pasting from our
+  annotations or differences will mangle your tabs.
+
+* How about showing "+x -y" in the status line when showing a diff? I
+  quite like that as an overview of the patch. Maybe the revision numbers
+  involved too, because they're not necessarily visible elsewhere. (If
+  we're going to waste screen space on a status line, we may as well try
+  to use it.)
+
 * martind: Double-clicking on a line in the annotated view should take
   you to the revision corresponding to that line (and keep that line
   visible).
