@@ -111,8 +111,10 @@ public class Cvs extends RevisionControlSystem {
         ArrayList command = new ArrayList();
         command.add("cvs");
         command.add("update");
-        command.add("-r");
-        command.add("BASE");
+        // Although this might seem like the right thing to do, CVS will then
+        // refuse to update the file until you "update -A".
+        //command.add("-r");
+        //command.add("BASE");
         command.add(filename);
         execAndDump(repositoryRoot, command);
     }
