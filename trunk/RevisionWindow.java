@@ -69,7 +69,7 @@ public class RevisionWindow extends JFrame {
         String[] lines = ProcessUtilities.backQuote(command);
         history = new AnnotationModel();
         for (int i = 0; i < lines.length; ++i) {
-            history.add(new AnnotatedLine(lines[i]));
+            history.add(new AnnotatedLine(revisions, lines[i]));
         }
         annotationView.setModel(history);
         annotationView.setCellRenderer(new AnnotatedLineRenderer());

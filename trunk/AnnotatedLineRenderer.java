@@ -10,7 +10,8 @@ public class AnnotatedLineRenderer extends DefaultListCellRenderer {
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean isFocused) {
         super.getListCellRendererComponent(list, value, index, isSelected, isFocused);
         AnnotatedLine line = (AnnotatedLine) value;
-        setText(line.date + " " + line.source);
+        setText(line.formattedLine);
+        setToolTipText(toolTipForRevision(line.revision));
         setForeground(colorForAge(line.age));
         return this;
     }
@@ -26,11 +27,21 @@ public class AnnotatedLineRenderer extends DefaultListCellRenderer {
      * "yesterday", "this week", "this month", et cetera. This could
      * possibly even use a collection of very different colors, rather than
      * a range.
+     *
+     * Another alternative suggested to me by looking at the RevisionTool
+     * repository itself is that we don't (necessarily) want to measure
+     * age in days, but in revisions.
      */
     private Color colorForAge(int ageInDays) {
         float b = 1.0f - Math.min((float) ageInDays / DAYS_TO_BLACK, 1.0f);
         // FIXME: stop creating all these Color instances at render-time!
         // FIXME: especially because there are so few unique ones!
         return new Color(Color.HSBtoRGB(NEW_COLOR[0], NEW_COLOR[1], b));
+    }
+
+    private String toolTipForRevision(Revision revision) {
+        return "<html>" +
+               revision.comment.replaceAll(" ", "&nbsp;").replaceAll("\n", "<p>") +
+               "</html>";
     }
 }
