@@ -339,6 +339,22 @@ public class CheckInWindow extends JFrame {
         return textArea;
     }
 
+    /**
+     * Returns a copy of the given list with any entries corresponding to
+     * SCM's own dot files removed. This saves the user from having to teach
+     * their back-end to ignore our files.
+     */
+    private List/*<FileStatuses>*/ removeScmDotFiles(List/*<FileStatus>*/ list) {
+        ArrayList result = new ArrayList();
+        for (int i = 0; i < list.size(); ++i) {
+            FileStatus fileStatus = (FileStatus) list.get(i);
+            if (fileStatus.getName().startsWith(".e.scm.") == false) {
+                result.add(fileStatus);
+            }
+        }
+        return result;
+    }
+    
     private void updateFileStatuses() {
         new BlockingWorker(statusesTable, "Getting file statuses...") {
             List oldIncludedFiles;
@@ -348,6 +364,7 @@ public class CheckInWindow extends JFrame {
                 oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : null;
                 commitButton.setEnabled(false);
                 statuses = backEnd.getStatuses(getWaitCursor());
+                statuses = removeScmDotFiles(statuses);
                 Collections.sort(statuses);
                 statusesTableModel = new StatusesTableModel(statuses);
             }
