@@ -160,6 +160,7 @@ public class CheckInWindow extends JFrame {
     }
     
     private void commit() {
+        patchView.setModel(new DefaultListModel());
         String comment = checkInCommentArea.getText();
         if (comment.endsWith("\n") == false) {
             comment += "\n";
@@ -168,10 +169,10 @@ public class CheckInWindow extends JFrame {
         backEnd.commit(repositoryRoot, comment, filenames);
         updateFileStatuses();
         checkInCommentArea.setText("");
-        patchView.setModel(new DefaultListModel());
     }
 
     private void revert() {
+        patchView.setModel(new DefaultListModel());
         FileStatus file = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
         backEnd.revert(repositoryRoot, file.getName());
         updateFileStatuses();
