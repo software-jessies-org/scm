@@ -103,9 +103,17 @@ public class CheckInWindow extends JFrame {
                 FileStatus status = statusesTableModel.getFileStatus(selectedRow);
                 if (status.getState() == FileStatus.NEW) {
                     DefaultListModel model = new DefaultListModel();
-                    String[] lines = StringUtilities.readLinesFromFile(new File(repositoryRoot, status.getName()).getAbsolutePath());
-                    for (int i = 0; i < lines.length; ++i) {
-                        model.addElement(lines[i]);
+                    File file = new File(repositoryRoot, status.getName());
+                    if (file.isDirectory()) {
+                        model.addElement("(" + status.getName() + " is a directory.)");
+                    } else {
+                        String[] lines = StringUtilities.readLinesFromFile(file.getAbsolutePath());
+                        for (int i = 0; i < lines.length; ++i) {
+                            model.addElement(lines[i]);
+                        }
+                        if (model.getSize() == 0) {
+                            model.addElement("(" + status.getName() + " is empty.)");
+                        }
                     }
                     patchView.setModel(model);
                 } else {
