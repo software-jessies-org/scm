@@ -1,3 +1,6 @@
+* Emulate Mail's "Paste as Quotation" (C-S V). Indent each pasted line two
+  spaces?
+
 * Shouldn't ignore the status code returned from cvs update/svn status/
   bk sfiles. Also need to cope better with the fact that "cvs update" is
   capable of producing a bunch of irrelevant output.
