@@ -271,15 +271,27 @@ public class CheckInWindow extends JFrame {
      */
     private void discardChanges() {
         patchView.setModel(new DefaultListModel());
+        
+        // Which file?
         FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
+        String filename = fileStatus.getName();
+        File file = FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), filename);
+        
+        // Keep a backup.
+        String oldContent = StringUtilities.readFile(file);
+        File backupFile = FileUtilities.fileFromParentAndString(System.getProperty("java.io.tmpdir"), StringUtilities.urlEncode(filename));
+        StringUtilities.writeFile(backupFile, oldContent);
+        // FIXME: offer an "Undo Discard Changes" menu option?
+        
+        // Revert.
         if (fileStatus.getState() == FileStatus.NEW) {
             // If the file isn't under version control, we'll have to remove
             // it ourselves...
-            File file = FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), fileStatus.getName());
             boolean deleted = file.delete();
+            // FIXME: report errors properly. (We still need a general mechanism for this!)
             System.err.println(deleted);
         } else {
-            backEnd.revert(fileStatus.getName());
+            backEnd.revert(filename);
         }
         updateFileStatuses();
     }
