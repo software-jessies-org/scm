@@ -1,0 +1,6 @@
+
+* We need a way to remove files. ("rm x; cvsvn rm x".)
+
+* We need a way to revert files. ("svn revert x".)
+
+* We need a way to add new files. ("cvsvn add x", "bk new x".)
