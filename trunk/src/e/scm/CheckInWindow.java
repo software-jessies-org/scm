@@ -216,6 +216,35 @@ public class CheckInWindow extends JFrame {
         updateSavedComment();
     }
 
+    public abstract class BlockingWorker extends Thread {
+        private Component component;
+        private String message;
+        
+        public BlockingWorker(Component component, String message) {
+            this.component = component;
+            this.message = message;
+            start();
+        }
+        
+        public final void run() {
+            try {
+                WaitCursor.start(component, message);
+                work();
+            } finally {
+                WaitCursor.stop(component);
+            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    finish();
+                }
+            });
+        }
+        
+        public abstract void work();
+        
+        public abstract void finish();
+    }
+    
     /**
      * Invoked when the user chooses "Revert" from the pop-up menu.
      */
@@ -302,38 +331,33 @@ public class CheckInWindow extends JFrame {
     }
 
     private void updateFileStatuses() {
-        Thread worker = new Thread() {
-            public void run() {
-                final List oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : new ArrayList();
-                List statuses = null;
-                try {
-                    WaitCursor.start(statusesTable, "Getting file statuses...");
-                    commitButton.setEnabled(false);
-                    statuses = backEnd.getStatuses();
-                } finally {
-                    WaitCursor.stop(statusesTable);
-                }
+        new BlockingWorker(statusesTable, "Getting file statuses...") {
+            List oldIncludedFiles;
+            List statuses;
+            
+            public void work() {
+                oldIncludedFiles = (statusesTableModel != null) ? statusesTableModel.getIncludedFiles() : new ArrayList();
+                commitButton.setEnabled(false);
+                statuses = backEnd.getStatuses();
                 Collections.sort(statuses);
                 statusesTableModel = new StatusesTableModel(statuses);
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        statusesTable.setModel(statusesTableModel);
-                        statusesTableModel.initColumnWidths(statusesTable);
-                        statusesTableModel.addTableModelListener(new StatusesTableModelListener());
-                        statusesTableModel.includeFiles(oldIncludedFiles);
-                        
-                        /* Give some feedback to demonstrate we're not broken if there's nothing to show. */
-                        boolean nothingModified = (statusesTableModel.getRowCount() == 0);
-                        if (nothingModified) {
-                            DefaultListModel model = new DefaultListModel();
-                            model.addElement("(Nothing to check in.)");
-                            patchView.setModel(model);
-                        }
-                    }
-                });
+            }
+            
+            public void finish() {
+                statusesTable.setModel(statusesTableModel);
+                statusesTableModel.initColumnWidths(statusesTable);
+                statusesTableModel.addTableModelListener(new StatusesTableModelListener());
+                statusesTableModel.includeFiles(oldIncludedFiles);
+                
+                /* Give some feedback to demonstrate we're not broken if there's nothing to show. */
+                boolean nothingModified = (statusesTableModel.getRowCount() == 0);
+                if (nothingModified) {
+                    DefaultListModel model = new DefaultListModel();
+                    model.addElement("(Nothing to check in.)");
+                    patchView.setModel(model);
+                }
             }
         };
-        worker.start();
     }
 
     private class StatusesTableModelListener implements TableModelListener {
