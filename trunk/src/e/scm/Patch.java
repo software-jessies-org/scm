@@ -17,8 +17,12 @@ public class Patch {
         public abstract void parseContextLine(String sourceLine);        
     }
 
-    /** Matches the "@@ -111,41 +113,41 @@" lines at the start of a hunk. */
-    public static final Pattern AT_AT_PATTERN = Pattern.compile("^@@ -(\\d+),(\\d+) \\+(\\d+),(\\d+) @@$");
+    /**
+     * Matches the "@@ -111,41 +113,41 @@" lines at the start of a hunk.
+     * We allow anything after the trailing "@@" because that gap is used
+     * for annotations, both by our annotate-patch.rb script and by "diff -p".
+     */
+    public static final Pattern AT_AT_PATTERN = Pattern.compile("^@@ -(\\d+),(\\d+) \\+(\\d+),(\\d+) @@(.*)$");
     
     private void parsePatch(boolean isPatchReversed, List lines, PatchLineParser patchLineParser) {
         String fromPrefix = isPatchReversed ? "+" : "-";
