@@ -95,14 +95,11 @@ public class BitKeeper extends RevisionControlSystem {
     }
 
     public void revert(File repositoryRoot, String filename) {
-        throw new UnsupportedOperationException("BitKeeper back-end can't revert");
-/*
         ArrayList command = new ArrayList();
-        command.add("svn");
-        command.add("revert");
+        command.add("bk");
+        command.add("unedit");
         command.add(filename);
         execAndDump(repositoryRoot, command);
-*/
     }
     
     public List getStatuses(File repositoryRoot) {
