@@ -41,7 +41,7 @@ public class WaitCursor {
      */
     private static JProgressBar progressBar = new JProgressBar();
     
-    public static void start(Object component, String message) {
+    public static synchronized void start(Object component, String message) {
         Component glassPane = getGlassPane(component);
         glassPane.setCursor(WAIT_CURSOR);
         glassPane.addMouseListener(MOUSE_EVENT_SWALLOWER);
@@ -50,7 +50,7 @@ public class WaitCursor {
         scheduleSheetAppearance(glassPane, message);
     }
     
-    public static void stop(Object component) {
+    public static synchronized void stop(Object component) {
         if (sheetTimer != null) {
             sheetTimer.stop();
             sheetTimer = null;
