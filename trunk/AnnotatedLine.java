@@ -15,9 +15,6 @@ public class AnnotatedLine {
     /** The formatted form suitable for direct presentation to the user. */
     public String formattedLine;
 
-    /** Whether this line should use the alternate background color to distinguish it from the previous line, which was in a different revision. */
-    public boolean useAlternateBackgroundColor;
-
     private AnnotatedLine() {
     }
 

@@ -307,7 +307,6 @@ public class RevisionWindow extends JFrame {
         for (int i = 0; i < lines.size(); ++i) {
             result.add(backEnd.parseAnnotatedLine(revisions, (String) lines.get(i)));
         }
-        result.postProcess();
         return result;
     }
 
