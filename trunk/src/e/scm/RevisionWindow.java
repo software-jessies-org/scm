@@ -299,7 +299,7 @@ public class RevisionWindow extends JFrame {
         String clue = null;
         
         File file = new File(new File(filename).getAbsolutePath());
-        File directory = new File(file.getParent());
+        File directory = file.isDirectory() ? file : new File(file.getParent());
         String[] siblings = directory.list();
         for (int i = 0; i < siblings.length; ++i) {
             if (siblings[i].equals("CVS")) {
