@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import e.gui.*;
 import e.util.*;
 
 public class RevisionWindow extends JFrame {
@@ -188,24 +189,7 @@ public class RevisionWindow extends JFrame {
         buttonsPanel.add(changeSetButton, BorderLayout.EAST);
         buttonsPanel.add(showLogButton, BorderLayout.WEST);
         
-        final JTextField searchField = new JTextField(10);
-        searchField.addFocusListener(new FocusListener() {
-            private String previousText = "";
-            private Color previousColor;
-            {
-                focusLost(null);
-            }
-            public void focusGained(FocusEvent e) {
-                searchField.setForeground(previousColor);
-                searchField.setText(previousText);
-            }
-            public void focusLost(FocusEvent e) {
-                previousText = searchField.getText();
-                previousColor = searchField.getForeground();
-                searchField.setForeground(Color.GRAY);
-                searchField.setText(" Search");
-            }
-        });
+        final JTextField searchField = new SearchField();
         searchField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String searchTerm = searchField.getText();
