@@ -387,7 +387,6 @@ public class RevisionWindow extends JFrame {
             }
             
             public void finish() {
-                //selectRevision(toRevision);
                 showAnnotationsForRevision(toRevision, toLineNumber);
             }
         };
