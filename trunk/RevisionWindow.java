@@ -34,6 +34,8 @@ public class RevisionWindow extends JFrame {
         revisionCommentArea.setDragEnabled(false);
         revisionCommentArea.setEditable(false);
         revisionCommentArea.setFont(FONT);
+        revisionCommentArea.setWrapStyleWord(true);
+        revisionCommentArea.setLineWrap(true);
 
         JComponent revisionsUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
             new JScrollPane(revisionsList),

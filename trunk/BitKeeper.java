@@ -36,7 +36,7 @@ public class BitKeeper implements RevisionControlSystem {
             if (lines[i].startsWith("D ")) {
                 description = lines[i];
             } else if (lines[i].startsWith("C ")) {
-                comment += lines[i].substring(2);
+                comment += lines[i].substring(2) + '\n';
             }
             if (lines[i].equals(separator)) {
                 result.add(new Revision(description, comment));
