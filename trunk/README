@@ -1,5 +1,14 @@
 This directory contains the scm package, currently comprising
-the RevisionTool revision history browser.
+these front-ends:
+
+ RevisionTool - revision history browser
+ CheckInTool  - check-in tool
+
+And these back-ends:
+
+ BitKeeper
+ CVS
+ Subversion
 
 scm is free software. See the file COPYING for copying permission.
 All source files are copyright (C) 2004, Elliott Hughes where not
