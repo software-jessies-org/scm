@@ -356,7 +356,7 @@ public class RevisionWindow extends JFrame {
     }
 
     private void showAnnotationsForRevision(final Revision revision, final int lineNumber) {
-        new BackEndWorker("Getting annotations for revision" + revision.number + "...") {
+        new BackEndWorker("Getting annotations for revision " + revision.number + "...") {
             public void work() {
                 command = backEnd.getAnnotateCommand(revision, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
