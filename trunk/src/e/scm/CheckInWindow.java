@@ -110,33 +110,8 @@ public class CheckInWindow extends JFrame {
         initStatusesTableContextMenu();
         statusesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting()) {
-                    return;
-                }
-                
-                final int selectedRow = statusesTable.getSelectedRow();
-                if (selectedRow == -1) {
-                    return;
-                }
-                
-                FileStatus status = statusesTableModel.getFileStatus(selectedRow);
-                if (status.getState() == FileStatus.NEW) {
-                    DefaultListModel model = new DefaultListModel();
-                    File file = new File(backEnd.getRoot(), status.getName());
-                    if (file.isDirectory()) {
-                        model.addElement("(" + status.getName() + " is a directory.)");
-                    } else {
-                        String[] lines = StringUtilities.readLinesFromFile(file.getAbsolutePath());
-                        for (int i = 0; i < lines.length; ++i) {
-                            model.addElement(lines[i]);
-                        }
-                        if (model.getSize() == 0) {
-                            model.addElement("(" + status.getName() + " is empty.)");
-                        }
-                    }
-                    patchView.setModel(model);
-                } else {
-                    patchView.showPatch(backEnd, null, null, status.getName());
+                if (e.getValueIsAdjusting() == false) {
+                    updatePatchView();
                 }
             }
         });
@@ -144,6 +119,33 @@ public class CheckInWindow extends JFrame {
         // Try to make JTable look a little less weird.
         statusesTable.setIntercellSpacing(new Dimension());
         statusesTable.setShowGrid(false);
+    }
+    
+    private void updatePatchView() {
+        final int selectedRow = statusesTable.getSelectedRow();
+        if (selectedRow == -1) {
+            return;
+        }
+        
+        FileStatus status = statusesTableModel.getFileStatus(selectedRow);
+        if (status.getState() == FileStatus.NEW) {
+            DefaultListModel model = new DefaultListModel();
+            File file = new File(backEnd.getRoot(), status.getName());
+            if (file.isDirectory()) {
+                model.addElement("(" + status.getName() + " is a directory.)");
+            } else {
+                String[] lines = StringUtilities.readLinesFromFile(file.getAbsolutePath());
+                for (int i = 0; i < lines.length; ++i) {
+                    model.addElement(lines[i]);
+                }
+                if (model.getSize() == 0) {
+                    model.addElement("(" + status.getName() + " is empty.)");
+                }
+            }
+            patchView.setModel(model);
+        } else {
+            patchView.showPatch(backEnd, null, null, status.getName());
+        }
     }
     
     private class EditFileAction extends AbstractAction {
