@@ -268,6 +268,8 @@ public class RevisionWindow extends JFrame {
                 clue = "CVS";
             } else if (siblings[i].equals("SCCS")) {
                 clue = "SCCS";
+            } else if (siblings[i].equals(".svn")) {
+                clue = ".svn";
             }
         }
         
@@ -288,7 +290,7 @@ public class RevisionWindow extends JFrame {
     /**
      * Attempts to guess which revision control system the file we're
      * interested in is managed by. We do this simply on the basis of
-     * whether there's a CVS or an SCCS directory in the same directory
+     * whether there's a CVS, SCCS or .svn directory in the same directory
      * as the file.
      */
     private RevisionControlSystem guessWhichRevisionControlSystem() {
@@ -298,6 +300,8 @@ public class RevisionWindow extends JFrame {
                 return new Cvs();
             } else if (siblings[i].equals("SCCS")) {
                 return new BitKeeper();
+            } else if (siblings[i].equals(".svn")) {
+                return new Subversion();
             }
         }
         // We know this is wrong, but CVS is likely to be installed,
