@@ -245,6 +245,7 @@ public class CheckInWindow extends JFrame {
     
     private void clearCheckInCommentArea() {
         checkInCommentArea.setText("");
+        checkInCommentArea.setEnabled(false);
         updateSavedState();
     }
     
@@ -305,6 +306,7 @@ public class CheckInWindow extends JFrame {
     
     private void initCheckInCommentArea() {
         checkInCommentArea = makeTextArea(8);
+        checkInCommentArea.setEnabled(false);
         readSavedComment();
     }
     
@@ -325,7 +327,8 @@ public class CheckInWindow extends JFrame {
     }
     
     private void updateSavedState() {
-        updateSavedStateFile(getSavedCommentFile(), checkInCommentArea.getText());
+        String comment = checkInCommentArea.isEnabled() ? checkInCommentArea.getText() : "";
+        updateSavedStateFile(getSavedCommentFile(), comment);
         if (statusesTableModel != null) {
             updateSavedStateFile(getSavedFilenamesFile(), StringUtilities.join(statusesTableModel.getIncludedFilenames(), "\n"));
         }
@@ -399,6 +402,7 @@ public class CheckInWindow extends JFrame {
                 statusesTable.setModel(statusesTableModel);
                 statusesTableModel.initColumnWidths(statusesTable);
                 statusesTableModel.addTableModelListener(new StatusesTableModelListener());
+                statusesTableModel.fireTableDataChanged();
                 if (oldIncludedFiles != null) {
                     statusesTableModel.includeFiles(oldIncludedFiles);
                 } else {
@@ -421,10 +425,21 @@ public class CheckInWindow extends JFrame {
             }
         };
     }
-
+    
+    private static final String INSTRUCTIONS = "\n 1. Check all those files in the list to the left that you wish to commit.\n\n 2. Edit the resulting comment in this area.\n\n 3. Click the \"Commit\" button when done.";
+    
     private class StatusesTableModelListener implements TableModelListener {
         public void tableChanged(TableModelEvent e) {
-            commitButton.setEnabled(statusesTableModel.isAtLeastOneFileIncluded());
+            boolean haveFiles = statusesTableModel.isAtLeastOneFileIncluded();
+            commitButton.setEnabled(haveFiles);
+            if (checkInCommentArea.isEnabled() == false && haveFiles) {
+                checkInCommentArea.setText("");
+            }
+            checkInCommentArea.setEnabled(haveFiles);
+            if (haveFiles == false) {
+                checkInCommentArea.setText(INSTRUCTIONS);
+            }
+            
             if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 0) {
                 checkBoxUpdated(e);
             }
