@@ -309,6 +309,7 @@ public class CheckInWindow extends JFrame {
                 List statuses = null;
                 try {
                     WaitCursor.start(statusesTable);
+                    commitButton.setEnabled(false);
                     statuses = backEnd.getStatuses();
                 } finally {
                     WaitCursor.stop(statusesTable);
@@ -319,7 +320,6 @@ public class CheckInWindow extends JFrame {
                 statusesTableModel.includeFiles(oldIncludedFiles);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        commitButton.setEnabled(false);
                         statusesTable.setModel(statusesTableModel);
                         statusesTableModel.initColumnWidths(statusesTable);
                         statusesTableModel.addTableModelListener(new StatusesTableModelListener());
