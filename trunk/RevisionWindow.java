@@ -31,7 +31,7 @@ public class RevisionWindow extends JFrame {
                     Object value = annotationView.getModel().getElementAt(i);
                     if (value instanceof AnnotatedLine) {
                         AnnotatedLine annotatedLine = (AnnotatedLine) value;
-                        revisionsList.setSelectedValue(annotatedLine.revision, true);
+                        selectRevision(annotatedLine.revision);
                         final int lineNumber = 1 + i; // FIXME: this needs to take the patch between the current and the target revisions into account; the line may have a different line number in the target revision.
                         showAnnotationsForRevision(annotatedLine.revision, lineNumber);
                     }
@@ -108,7 +108,7 @@ public class RevisionWindow extends JFrame {
                         System.err.println("startLine=" + startLine + "  desiredLineNumber=" + desiredLineNumber);
                     }
 
-                    revisionsList.setSelectedValue(desiredRevision, true);
+                    selectRevision(desiredRevision);
                     showAnnotationsForRevision(desiredRevision, desiredLineNumber);
                 }
             }
@@ -361,6 +361,11 @@ public class RevisionWindow extends JFrame {
         revisions = backEnd.parseLog(lines);
         revisions.addLocalRevision(Revision.LOCAL_REVISION);
         revisionsList.setModel(revisions);
+    }
+
+    public void selectRevision(Revision revision) {
+        revisionsList.clearSelection();
+        revisionsList.setSelectedValue(revision, true);
     }
 
     private void showToolError(JList list, ArrayList lines) {
