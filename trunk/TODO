@@ -20,9 +20,7 @@
   latest version that the diff referred to.
 
 * With the pseudo-revision for the current file state, work out how to
-  fix the annotations view. The diffs are fine. Would it be good not to
-  have a the pseudo-revision if the file is unchanged? How can we tell
-  in BitKeeper and CVS?
+  fix the annotations view. The diffs are fine.
 
 * Show decent progress feedback and keep processing events while talking
   to CVS.
@@ -32,6 +30,10 @@
 
 * Sort the revisions properly (cvs lists revisions with lots of dots in them
   out of order).
+
+* When displaying all the checkin comments between two selected revisions,
+  we shouldn't display comments which aren't on the same branch. How do
+  we decide whether they are or not?
 
 * Use a JTextPane for the checkin comments, and allow some kind of filter
   to be specified by the user to rewrite references to bugs as links to
