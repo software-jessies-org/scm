@@ -7,9 +7,15 @@ class_path=$tools_dir/classes:$tools_dir/../salma-hayek/classes
 class_path=$class_path:$tools_dir/scm.jar
 
 shift
-if [ "`uname`" == "Darwin" ]
-then
+case "`uname`" in
+Linux)
+    class_path=$class_path:$tools_dir/../salma-hayek/MRJ141Stubs.jar
+    ;;
+Darwin)
     os_specific_options=-Xdock:name=$tool_name
-fi
+    ;;
+*)
+    ;;
+esac
 
 exec java $os_specific_options -cp $class_path e.scm.$tool_name "$@"
