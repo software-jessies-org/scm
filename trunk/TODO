@@ -43,10 +43,6 @@
   (Store the line number in a field from the constructor, and blank it out
   when we've done the setting later?)
 
-* Should we color the selected revisions so that if there's an interval
-  selected, the earliest revision is shown in red, and the latest is shown
-  in blue to correspond to the diff colors.
-
 * Use a JTextPane for the checkin comments, and allow some kind of filter
   to be specified by the user to rewrite references to bugs as links to
   bug database entries or whatever; be able to launch a browser when these
