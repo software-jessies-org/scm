@@ -59,7 +59,7 @@ public interface RevisionControlSystem {
     public void showChangeSet(File repositoryRoot, String filename, Revision revision);
     
     //
-    // Methods relating to file status.
+    // Methods relating to checking in.
     //
     
     /**
@@ -67,4 +67,10 @@ public interface RevisionControlSystem {
      * unmanaged files and directories in the repository.
      */
     public List getStatuses(File repositoryRoot);
+    
+    /**
+     * Commits the files from the given list of filenames using the comment
+     * supplied.
+     */
+    public void commit(File repositoryRoot, String comment, List filenames);
 }

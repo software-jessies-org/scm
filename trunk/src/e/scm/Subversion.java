@@ -125,4 +125,24 @@ public class Subversion implements RevisionControlSystem {
         }
         return statuses;
     }
+    
+    public void commit(File repositoryRoot, String comment, List filenames) {
+        ArrayList command = new ArrayList();
+        command.add("svn");
+        command.add("commit");
+        command.add("--non-interactive");
+        command.add("-m");
+        command.add(comment);
+        command.addAll(filenames);
+        ArrayList lines = new ArrayList();
+        ArrayList errors = new ArrayList();
+        int status = ProcessUtilities.backQuote(repositoryRoot, (String[]) command.toArray(new String[command.size()]), lines, errors);
+        for (int i = 0; i < lines.size(); ++i) {
+            System.out.println(lines.get(i));
+        }
+        for (int i = 0; i < errors.size(); ++i) {
+            System.err.println(errors.get(i));
+        }
+        System.err.println(status);
+    }
 }

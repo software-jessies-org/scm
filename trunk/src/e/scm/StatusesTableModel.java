@@ -70,6 +70,16 @@ public class StatusesTableModel extends AbstractTableModel {
         isIncluded[row] = (Boolean) value;
     }
     
+    public List getIncludedFilenames() {
+        ArrayList result = new ArrayList();
+        for (int i = 0; i < getRowCount(); ++i) {
+            if (isIncluded[i].booleanValue()) {
+                result.add(getFileStatus(i).getName());
+            }
+        }
+        return result;
+    }
+    
     public void initColumnWidths(JTable table) {
         TableColumnModel columns = table.getColumnModel();
         for (int i = 0; i < columns.getColumnCount() - 1; ++i) {

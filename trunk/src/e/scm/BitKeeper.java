@@ -96,4 +96,8 @@ public class BitKeeper implements RevisionControlSystem {
     public List getStatuses(File repositoryRoot) {
         throw new UnsupportedOperationException("Can't get status information for a BitKeeper repository.");
     }
+    
+    public void commit(File repositoryRoot, String comment, List filenames) {
+        throw new UnsupportedOperationException("Can't commit to a BitKeeper repository.");
+    }
 }

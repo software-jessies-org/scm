@@ -110,7 +110,12 @@ public class CheckInWindow extends JFrame {
     }
     
     private void commit() {
-        // FIXME!
+        String comment = checkInCommentArea.getText();
+        if (comment.endsWith("\n") == false) {
+            comment += "\n";
+        }
+        List filenames = statusesTableModel.getIncludedFilenames();
+        backEnd.commit(repositoryRoot, comment, filenames);
     }
     
     private void initCheckInCommentArea() {
