@@ -5,73 +5,71 @@ import java.util.regex.*;
 public class Subversion implements RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
         return new String[] {
-            "cvs", "annotate", "-r", revision.number, filename
+            "svn", "annotate", "-r", revision.number, filename
         };
     }
 
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename) {
         ArrayList result = new ArrayList();
-        result.add("cvs");
+        result.add("svn");
         result.add("diff");
-        result.add("-u");
-        result.add("-kk");
         result.add("-r");
-        result.add(olderRevision.number);
+        String revisionArgument = olderRevision.number;
         if (newerRevision != Revision.LOCAL_REVISION) {
-            result.add("-r");
-            result.add(newerRevision.number);
+            revisionArgument += ":" + newerRevision.number;
         }
+        result.add(revisionArgument);
         result.add(filename);
         return (String[]) result.toArray(new String[result.size()]);
     }
 
     public String[] getLogCommand(String filename) {
-        return new String[] { "cvs", "log", filename };
+        return new String[] { "svn", "log", filename };
     }
 
-    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^([0-9.]+)\\s+\\((\\S+)\\s+(\\d\\d-\\S\\S\\S-\\d\\d)\\): (.*)$");
+    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s+(\\d+)\\s+(?:\\S+) (.*)$");
 
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
-        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 4);
+        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2);
     }
     
+    private static final Pattern LOG_PATTERN = Pattern.compile("^r(\\d+) \\| (\\S+) \\| (\\d{4}-\\d{2}-\\d{2}) .* lines$");
+
     public RevisionListModel parseLog(List linesList) {
         String[] lines = (String[]) linesList.toArray(new String[linesList.size()]);
 
-        String separator = "----------------------------";
-        String endMarker = "=============================================================================";
-        int i = 0;
-        for (; i < lines.length && lines[i].equals(separator) == false; ++i) {
-            // Skip header.
-        }
+        String separator = "------------------------------------------------------------------------";
         
         RevisionListModel result = new RevisionListModel();
-        while (i < lines.length && lines[i].equals(endMarker) == false) {
+        for (int i = 0; i < lines.length; ++i) {
             if (lines[i].equals(separator)) {
-                i++;
                 continue;
             }
-            String number = lines[i++];
-            number = number.substring("revision ".length());
-            String info = lines[i++];
-            StringBuffer comment = new StringBuffer();
-            while (i < lines.length && lines[i].equals(endMarker) == false && lines[i].equals(separator) == false) {
-                comment.append(lines[i++]);
-                comment.append("\n");
+            
+            Matcher matcher = LOG_PATTERN.matcher(lines[i]);
+            if (matcher.matches()) {
+                String number = matcher.group(1);
+                String author = matcher.group(2);
+                String date = matcher.group(3);
+                StringBuffer comment = new StringBuffer();
+                while (i < lines.length && lines[i].equals(separator) == false) {
+                    comment.append(lines[i++]);
+                    comment.append("\n");
+                }
+                result.add(new Revision(number, date, author, comment.toString()));
             }
-            result.add(new Revision(number, info, comment.toString()));
         }
         return result;
     }
 
     public boolean isLocallyModified(File repositoryRoot, String filename) {
-        String[] command = new String[] { "cvs", "status", filename };
+        String[] command = new String[] { "svn", "status", filename };
         ArrayList lines = new ArrayList();
         ArrayList errors = new ArrayList();
         int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             String line = (String) lines.get(i);
-            if (line.indexOf("Status: Locally Modified") != -1) {
+            if (line.startsWith("M")) {
                 return true;
             }
         }
@@ -79,17 +77,15 @@ public class Subversion implements RevisionControlSystem {
     }
 
     /**
-     * CVS has no notion of a change set.
-     * FIXME: we could try to read filenames out of the revision comment,
-     * which in many cases will include all the other changed files. I don't
-     * know how we'd work out the appropriate revisions, though I guess the
-     * time stamps would be enough.
+     * Subversion has some notion of a change set, but it's a bit odd.
+     * Global revision numbers ought to give us all we need, if we can
+     * get a list of files modified in that revision.
      */
     public boolean supportsChangeSets() {
-        return false;
+        return false; // FIXME: learn about svn global revisions.
     }
 
     public void showChangeSet(File repositoryRoot, String filename, Revision revision) {
-        throw new UnsupportedOperationException("Can't show a CVS change set for " + filename + " revision " + revision.number);
+        throw new UnsupportedOperationException("Can't show a Subversion change set for " + filename + " revision " + revision.number);
     }
 }
