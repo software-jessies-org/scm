@@ -124,8 +124,7 @@ public class BitKeeper extends RevisionControlSystem {
     
     public List getStatuses(final WaitCursor waitCursor) {
         // Switch to a determinate progress bar as soon as possible...
-        int fileCount = getRepositoryFileCount();
-        waitCursor.setProgressMaximum(fileCount);
+        final int fileCount = getRepositoryFileCount();
         
         // Create a temporary file for the interesting output; we'll get progress information on standard out.
         File temporaryFile = null;
@@ -141,7 +140,7 @@ public class BitKeeper extends RevisionControlSystem {
             public void processLine(String line) {
                 // Update the progress bar based on BitKeeper's progress feedback.
                 int value = Integer.parseInt(line.substring(0, line.indexOf(' ')));
-                waitCursor.setProgressValue(value);
+                waitCursor.setProgressValue(value, fileCount);
             }
         };
         ProcessUtilities.LineListener errorListener = new ProcessUtilities.LineListener() {

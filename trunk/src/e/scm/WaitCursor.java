@@ -37,10 +37,7 @@ public class WaitCursor {
      */
     private Timer sheetTimer;
     
-    /**
-     * To work around a Sun bug in Java 1.4.2, it's useful to keep a progress bar.
-     */
-    private JProgressBar progressBar = new JProgressBar();
+    private JProgressBar progressBar;
     
     private Object component;
     private String message;
@@ -50,6 +47,7 @@ public class WaitCursor {
         this.component = component;
         this.message = message;
         this.glassPane = getGlassPane();
+        this.progressBar = new JProgressBar();
     }
     
     public synchronized void start() {
@@ -73,12 +71,9 @@ public class WaitCursor {
         hideSheet();
     }
     
-    public void setProgressValue(final int value) {
+    public void setProgressValue(final int value, final int maximum) {
         progressBar.setValue(value);
-    }
-    
-    public void setProgressMaximum(final int value) {
-        progressBar.setMaximum(value);
+        progressBar.setMaximum(maximum);
         progressBar.setIndeterminate(false);
     }
     
