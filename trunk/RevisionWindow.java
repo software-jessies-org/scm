@@ -28,6 +28,8 @@ public class RevisionWindow extends JFrame {
     private JList annotationView;
     private JLabel statusLine = new JLabel(" ");
     
+    private MouseListener doubleClickListener;
+    
     public RevisionWindow(String filename, int initialLineNumber) {
         super(filename);
         this.filename = filename;
@@ -56,6 +58,21 @@ public class RevisionWindow extends JFrame {
         annotationView = new JList(new AnnotationModel());
         annotationView.setFont(FONT);
         annotationView.setVisibleRowCount(34);
+        
+        doubleClickListener = new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    final int i = annotationView.locationToIndex(e.getPoint());
+                    Object value = annotationView.getModel().getElementAt(i);
+                    if (value instanceof AnnotatedLine) {
+                        AnnotatedLine annotatedLine = (AnnotatedLine) value;
+                        revisionsList.setSelectedValue(annotatedLine.revision, true);
+                        showAnnotationsForRevision(annotatedLine.revision);
+                    }
+                }
+            }
+        };
+        annotationView.addMouseListener(doubleClickListener);
         
         JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
             revisionsUi,

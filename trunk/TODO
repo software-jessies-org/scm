@@ -10,10 +10,6 @@
   we're going to waste screen space on a status line, we may as well try
   to use it.)
 
-* martind: Double-clicking on a line in the annotated view should take
-  you to the revision corresponding to that line (and keep that line
-  visible).
-
 * martind: The revisions aren't sorted numerically - which I don't care
   about in itself - but finding 1.34 in the list is then a job for the
   computer.
