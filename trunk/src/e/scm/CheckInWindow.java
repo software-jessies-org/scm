@@ -138,6 +138,7 @@ public class CheckInWindow extends JFrame {
     private void initStatusesTableContextMenu() {
         // FIXME: with Java 1.5, we can simplify this, I think.
         final PopupMenu contextMenu = new PopupMenu();
+        
         MenuItem revertItem = new MenuItem("Revert");
         revertItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -145,6 +146,15 @@ public class CheckInWindow extends JFrame {
             }
         });
         contextMenu.add(revertItem);
+        
+        MenuItem historyItem = new MenuItem("Show History...");
+        historyItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showHistory();
+            }
+        });
+        contextMenu.add(historyItem);
+        
         statusesTable.add(contextMenu);
         statusesTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -173,6 +183,9 @@ public class CheckInWindow extends JFrame {
         checkInCommentArea.setText("");
     }
 
+    /**
+     * Invoked when the user chooses "Revert" from the pop-up menu.
+     */
     private void revert() {
         patchView.setModel(new DefaultListModel());
         FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
@@ -186,6 +199,17 @@ public class CheckInWindow extends JFrame {
             backEnd.revert(repositoryRoot, fileStatus.getName());
         }
         updateFileStatuses();
+    }
+    
+    /**
+     * Invoked when the user chooses "Show History..." from the pop-up menu.
+     */
+    private void showHistory() {
+        FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
+        if (fileStatus.getState() != FileStatus.NEW) {
+            File file = FileUtilities.fileFromParentAndString(repositoryRoot.toString(), fileStatus.getName());
+            new RevisionWindow(file.toString(), 1);
+        }
     }
     
     private void initCheckInCommentArea() {
