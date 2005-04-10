@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
 import e.gui.*;
+import e.ptextarea.*;
 import e.util.*;
 
 public class CheckInWindow extends JFrame {
@@ -17,7 +18,7 @@ public class CheckInWindow extends JFrame {
     
     private JTable statusesTable;
     private StatusesTableModel statusesTableModel;
-    private JTextArea checkInCommentArea;
+    private PTextArea checkInCommentArea;
     private PatchView patchView;
     private JLabel statusLine = new JLabel(" ");
     private JButton commitButton;
@@ -377,14 +378,9 @@ public class CheckInWindow extends JFrame {
         return FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), ".e.scm.CheckInWindow.savedFilenames");
     }
     
-    private JTextArea makeTextArea(final int rowCount) {
-        JTextArea textArea = new JTextArea(rowCount, 80);
-        textArea.setDragEnabled(false);
+    private PTextArea makeTextArea(final int rowCount) {
+        PTextArea textArea = new PTextArea(rowCount, 80);
         textArea.setFont(FONT);
-        textArea.setWrapStyleWord(true);
-        textArea.setLineWrap(true);
-        e.gui.JTextComponentSpellingChecker spellingChecker = new e.gui.JTextComponentSpellingChecker(textArea);
-        spellingChecker.setDocument(textArea.getDocument());
         return textArea;
     }
 
