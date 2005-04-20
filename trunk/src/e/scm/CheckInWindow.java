@@ -278,10 +278,14 @@ public class CheckInWindow extends JFrame {
         String filename = fileStatus.getName();
         File file = FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), filename);
         
-        // Keep a backup.
-        String oldContent = StringUtilities.readFile(file);
-        File backupFile = FileUtilities.fileFromParentAndString(System.getProperty("java.io.tmpdir"), StringUtilities.urlEncode(filename));
-        StringUtilities.writeFile(backupFile, oldContent);
+        // Keep a backup. The file may not exist if the change we're discarding
+        // is a local "rm". FIXME: Recognize that case ('!' status in svn), and
+        // change the UI to something like "restore"?
+        if (file.exists()) {
+            String oldContent = StringUtilities.readFile(file);
+            File backupFile = FileUtilities.fileFromParentAndString(System.getProperty("java.io.tmpdir"), StringUtilities.urlEncode(filename));
+            StringUtilities.writeFile(backupFile, oldContent);
+        }
         // FIXME: offer an "Undo Discard Changes" menu option?
         
         // Revert.
