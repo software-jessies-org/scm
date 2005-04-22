@@ -219,12 +219,15 @@ public abstract class RevisionControlSystem {
         }
     }
     
+    /**
+     * Reports an error in a dialog, and then throws a RuntimeException.
+     */
     public static void throwError(int status, String[] command, List errors) {
         String message = "Command '" + quoteCommand(Arrays.asList(command)) + "' returned status " + status + ".";
         if (errors.size() > 0) {
-            message += "\nErrors were:\n\n" + StringUtilities.join(errors, "\n");
+            message += " Errors were:\n\n" + StringUtilities.join(errors, "\n");
         }
-        SimpleDialog.showAlert(null, "Back-end Error", message);
+        SimpleDialog.showDetails(null, "Back-end Error", message);
         throw new RuntimeException(message);
     }
     
