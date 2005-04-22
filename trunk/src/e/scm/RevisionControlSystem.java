@@ -3,6 +3,7 @@ package e.scm;
 import java.io.File;
 import java.io.*;
 import java.util.*;
+import e.gui.*;
 import e.util.*;
 
 /**
@@ -221,8 +222,9 @@ public abstract class RevisionControlSystem {
     public static void throwError(int status, String[] command, List errors) {
         String message = "Command '" + quoteCommand(Arrays.asList(command)) + "' returned status " + status + ".";
         if (errors.size() > 0) {
-            message += " Errors were:\n\n" + StringUtilities.join(errors, "\n");
+            message += "\nErrors were:\n\n" + StringUtilities.join(errors, "\n");
         }
+        SimpleDialog.showAlert(null, "Back-end Error", message);
         throw new RuntimeException(message);
     }
     
