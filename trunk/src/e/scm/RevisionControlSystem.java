@@ -215,17 +215,20 @@ public abstract class RevisionControlSystem {
             System.err.println(errors.get(i));
         }
         if (status != 0 || errors.size() > 0) {
-            throwError(status, command, errors);
+            throwError(status, command, lines, errors);
         }
     }
     
     /**
      * Reports an error in a dialog, and then throws a RuntimeException.
      */
-    public static void throwError(int status, String[] command, List errors) {
+    public static void throwError(int status, String[] command, List output, List errors) {
         String message = "Command '" + quoteCommand(Arrays.asList(command)) + "' returned status " + status + ".";
         if (errors.size() > 0) {
-            message += " Errors were:\n\n" + StringUtilities.join(errors, "\n");
+            message += "\n\nErrors were:\n\n" + StringUtilities.join(errors, "\n");
+        }
+        if (output.size() > 0) {
+            message += "\n\nOutput was:\n\n" + StringUtilities.join(output, "\n");
         }
         SimpleDialog.showDetails(null, "Back-end Error", message);
         throw new RuntimeException(message);

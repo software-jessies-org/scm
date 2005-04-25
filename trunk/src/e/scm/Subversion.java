@@ -123,7 +123,7 @@ public class Subversion extends RevisionControlSystem {
         ArrayList errors = new ArrayList();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
-            throwError(status, command, errors);
+            throwError(status, command, lines, errors);
         }
         
         ArrayList statuses = new ArrayList();

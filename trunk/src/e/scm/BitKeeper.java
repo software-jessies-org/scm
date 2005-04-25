@@ -143,11 +143,12 @@ public class BitKeeper extends RevisionControlSystem {
                 waitCursor.setProgressValue(value, fileCount);
             }
         };
+        ArrayList notReallyTheOutput = new ArrayList();
         ArrayList errors = new ArrayList();
         ProcessUtilities.LineListener errorsListener = new ProcessUtilities.ArrayListLineListener(errors);
         int status = ProcessUtilities.backQuote(getRoot(), command, outputListener, errorsListener);
         if (status != 0) {
-            throwError(status, command, errors);
+            throwError(status, command, notReallyTheOutput, errors);
         }
         
         // Read in BitKeeper's real output.
