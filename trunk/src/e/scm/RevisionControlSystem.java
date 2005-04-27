@@ -214,7 +214,7 @@ public abstract class RevisionControlSystem {
         for (int i = 0; i < errors.size(); ++i) {
             System.err.println(errors.get(i));
         }
-        if (status != 0 || errors.size() > 0) {
+        if (status != 0) {
             throwError(status, command, lines, errors);
         }
     }
