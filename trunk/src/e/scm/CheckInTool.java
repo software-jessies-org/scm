@@ -5,6 +5,7 @@ import e.util.*;
 public class CheckInTool {
     public static void main(String[] arguments) {
         Log.setApplicationName("CheckInTool");
+        GuiUtilities.initLookAndFeel();
 
         final RevisionControlSystem backEnd = RevisionControlSystem.forPath(System.getProperty("user.dir"));
         if (backEnd == null) {

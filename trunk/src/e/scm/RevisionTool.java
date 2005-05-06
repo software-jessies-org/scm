@@ -8,6 +8,7 @@ public class RevisionTool {
 
     public static void main(String[] args) {
         Log.setApplicationName("RevisionTool");
+        GuiUtilities.initLookAndFeel();
 
         if (args.length == 0) {
             System.err.println("No file specified.");
