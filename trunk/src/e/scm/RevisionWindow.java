@@ -10,6 +10,7 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import e.gui.*;
+import e.ptextarea.*;
 import e.util.*;
 
 public class RevisionWindow extends JFrame {
@@ -198,7 +199,7 @@ public class RevisionWindow extends JFrame {
     private RevisionListModel revisions;
     
     private JList revisionsList;
-    private JTextArea revisionCommentArea;
+    private PTextArea revisionCommentArea;
     private JList annotationView;
     private JLabel statusLine = new JLabel(" ");
     private JButton changeSetButton;
@@ -320,13 +321,11 @@ public class RevisionWindow extends JFrame {
         revisionCommentArea = makeTextArea(8);
     }
 
-    private JTextArea makeTextArea(final int rowCount) {
-        JTextArea textArea = new JTextArea(rowCount, 80);
-        textArea.setDragEnabled(false);
+    private PTextArea makeTextArea(final int rowCount) {
+        PTextArea textArea = new PTextArea(rowCount, 80);
         textArea.setEditable(false);
         textArea.setFont(FONT);
         textArea.setWrapStyleWord(true);
-        textArea.setLineWrap(true);
         return textArea;
     }
 
@@ -555,10 +554,9 @@ public class RevisionWindow extends JFrame {
     }
 
     private void showLog() {
-        JTextArea summary = makeTextArea(20);
+        PTextArea summary = makeTextArea(20);
         summary.setText(summaryOfAllRevisions());
         summary.setCaretPosition(0);
-        JTextComponentFind.addFindFunctionalityTo(summary);
         
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(new JScrollPane(summary), BorderLayout.CENTER);
