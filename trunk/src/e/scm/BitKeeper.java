@@ -197,7 +197,7 @@ public class BitKeeper extends RevisionControlSystem {
     public void commit(String comment, List fileStatuses) {
         File resync = new File(getRoot(), "RESYNC");
         if (resync.isDirectory()) {
-            throw new RuntimeException("the BitKeeper back-end doesn't support committing of bk resolve merges");
+            throw new RuntimeException("the BitKeeper back-end doesn't support committing of bk resolve merges - sorry, it's back to bk citool for you");
         }
         
         // We write the comment to a file once, because it doesn't change.
