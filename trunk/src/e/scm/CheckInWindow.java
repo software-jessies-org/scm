@@ -343,8 +343,15 @@ public class CheckInWindow extends JFrame {
         checkInCommentArea.setEnabled(false);
     }
     
-    private void readSavedComment() {
-        checkInCommentArea.setText(readSavedStateFile(getSavedCommentFile()));
+    private void fillCheckInCommentArea() {
+        boolean haveFiles = statusesTableModel.isAtLeastOneFileIncluded();
+        if (haveFiles) {
+            checkInCommentArea.setText(readSavedStateFile(getSavedCommentFile()));
+            checkInCommentArea.setEnabled(true);
+        } else {
+            checkInCommentArea.setEnabled(false);
+            checkInCommentArea.setText(INSTRUCTIONS);
+        }
     }
     
     private void readSavedFilenames() {
@@ -432,6 +439,7 @@ public class CheckInWindow extends JFrame {
                 statusesTableModel.addTableModelListener(new StatusesTableModelListener());
                 statusesTableModel.fireTableDataChanged();
                 readSavedFilenames();
+                fillCheckInCommentArea();
                 
                 /* Give some feedback to demonstrate we're not broken if there's nothing to show. */
                 boolean nothingModified = (statusesTableModel.getRowCount() == 0);
@@ -469,13 +477,7 @@ public class CheckInWindow extends JFrame {
             commitButton.setEnabled(haveFiles);
 
             if (checkInCommentArea.isEnabled() != haveFiles) {
-                if (haveFiles) {
-                    readSavedComment();
-                    checkInCommentArea.setEnabled(true);
-                } else {
-                    checkInCommentArea.setEnabled(false);
-                    checkInCommentArea.setText(INSTRUCTIONS);
-                }
+                fillCheckInCommentArea();
             }
             
             if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 0) {
