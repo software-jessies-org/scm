@@ -11,7 +11,7 @@ import java.util.regex.*;
  */
 public class BugDatabaseHighlighter extends PHyperlinkTextStyler {
     public BugDatabaseHighlighter(PTextArea textArea) {
-        super(textArea, "\\b((?:(?:D(?:efect)?|(?:Bug[z ]?(?:ID)?)))\\s*[#]?([0-9]+))");
+        super(textArea, "(?i)\\b((?:(?:D(?:efect)?|(?:Bug[z ]?(?:ID)?)))\\s*[#]?([0-9]+))");
     }
     
     public void hyperlinkClicked(CharSequence linkText, Matcher matcher) {
