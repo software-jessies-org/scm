@@ -87,7 +87,14 @@ public class BitKeeper extends RevisionControlSystem {
         }
         return false;
     }
-
+    
+    /**
+     * Returns true, because BitKeeper has all the meta-data locally.
+     */
+    public boolean isMetaDataCheap() {
+        return true;
+    }
+    
     public boolean supportsChangeSets() {
         return true;
     }

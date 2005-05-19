@@ -138,7 +138,17 @@ public abstract class RevisionControlSystem {
      * Tests whether a given file has been locally modified.
      */
     public abstract boolean isLocallyModified(String filename);
-
+    
+    /**
+     * Tests whether meta-data is cheap to access, which generally means it's
+     * stored locally, as with BitKeeper. This can be used to enable/disable
+     * advanced features that work okay for (say) BitKeeper, but are too slow
+     * to use with broken designs like Subversion's.
+     */
+    public boolean isMetaDataCheap() {
+        return false;
+    }
+    
     /**
      * Tests whether this revision control system supports the notion of
      * change sets, where a number of files are grouped together as a single

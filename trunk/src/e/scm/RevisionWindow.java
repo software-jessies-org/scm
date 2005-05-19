@@ -41,7 +41,7 @@ public class RevisionWindow extends JFrame {
         return range;
     }
             
-    public int translateLineNumberInOneStep(Revision fromRevision, Revision toRevision, int fromLineNumber) {
+    private int translateLineNumberInOneStep(Revision fromRevision, Revision toRevision, int fromLineNumber) {
         Patch patch = new Patch(RevisionWindow.this, backEnd, filePath, fromRevision, toRevision);
         int toLineNumber = patch.translateLineNumberInFromRevision(fromLineNumber);
         //System.err.println("(" + fromRevision + ") => (" + toRevision + ") maps (" + fromLineNumber + " => " + toLineNumber + ")");
@@ -49,14 +49,20 @@ public class RevisionWindow extends JFrame {
     }
     
     public int translateLineNumberStepByStep(Revision fromRevision, Revision toRevision, int lineNumber) {
+        if (backEnd.isMetaDataCheap() == false) {
+            return translateLineNumberInOneStep(fromRevision, toRevision, lineNumber);
+        }
+        
         try {
             List revisionRange = getRevisionRange(fromRevision, toRevision);
             Revision previousRevision = fromRevision;
             for (int i = 1 /* sic */; i < revisionRange.size(); ++i) {
+                setStatus("Tracing line back to revision " + toRevision.number + " (currently at " + previousRevision.number + ")...");
                 Revision revision = (Revision) revisionRange.get(i);
                 lineNumber = translateLineNumberInOneStep(previousRevision, revision, lineNumber);
                 previousRevision = revision;
             }
+            clearStatus();
         } catch (Exception exception) {
             // Jumping to the same line number in the target revision is crap but it's better than not jumping to
             // the right revision and it's better than jumping to the top.
