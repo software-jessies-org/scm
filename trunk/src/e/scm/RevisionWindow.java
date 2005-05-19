@@ -50,7 +50,12 @@ public class RevisionWindow extends JFrame {
     
     public int translateLineNumberStepByStep(Revision fromRevision, Revision toRevision, int lineNumber) {
         if (backEnd.isMetaDataCheap() == false) {
-            return translateLineNumberInOneStep(fromRevision, toRevision, lineNumber);
+            // FIXME: "return translateLineNumberInOneStep(fromRevision, toRevision, lineNumber);" would be better,
+            // but it's still too slow across the Atlantic. Really, cheapness
+            // of meta-data access isn't binary. I can imagine sites where you
+            // can't afford to trace back step-by-step, but you could afford a
+            // single step. Why isn't programming with timeouts easier?
+            return lineNumber;
         }
         
         try {
