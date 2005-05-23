@@ -99,8 +99,8 @@ public class Patch {
         // At the moment, we know that we're always called with fromRevision newer than toRevision.
         boolean isPatchReversed = true;
         String[] command = backEnd.getDifferencesCommand(toRevision, fromRevision, filePath);
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(directory, command, lines, errors);
         // CVS returns the number of differences as the status or some such idiocy.
         if (errors.size() > 0) {

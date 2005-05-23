@@ -132,7 +132,7 @@ public abstract class RevisionControlSystem {
      * Parses the lines returned on standard output by the command from
      * getLogCommand, building a RevisionListModel.
      */
-    public abstract RevisionListModel parseLog(List lines);
+    public abstract RevisionListModel parseLog(List<String> lines);
 
     /**
      * Tests whether a given file has been locally modified.
@@ -180,13 +180,13 @@ public abstract class RevisionControlSystem {
      * Returns status information for all the added, deleted, modified or
      * unmanaged files and directories in the repository.
      */
-    public abstract List getStatuses(WaitCursor waitCursor);
+    public abstract List<FileStatus> getStatuses(WaitCursor waitCursor);
     
     /**
      * Commits the files from the given list of FileStatus objects using the comment
      * supplied.
      */
-    public abstract void commit(String comment, List/*<FileStatus>*/ fileStatuses);
+    public abstract void commit(String comment, List<FileStatus> fileStatuses);
     
     // This only copes with spaces in commands, not other shell special punctuation and specifically not ".
     // Fix it when it bites you.
@@ -212,10 +212,10 @@ public abstract class RevisionControlSystem {
      * Executes a command in the given directory, and dumps all the output from it.
      * Useful until we do something funkier.
      */
-    public void execAndDump(List commandAsList) {
-        String[] command = (String[]) commandAsList.toArray(new String[commandAsList.size()]);
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
+    public void execAndDump(List<String> commandAsList) {
+        String[] command = commandAsList.toArray(new String[commandAsList.size()]);
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
         System.err.println("Running " + quoteCommand(commandAsList));
         int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
@@ -247,9 +247,8 @@ public abstract class RevisionControlSystem {
         throw new RuntimeException(message);
     }
     
-    public static void addFilenames(Collection collection, List/*<FileStatus>*/ fileStatuses) {
-        for (int i = 0; i < fileStatuses.size(); ++i) {
-            FileStatus file = (FileStatus) fileStatuses.get(i);
+    public static void addFilenames(Collection<String> collection, List<FileStatus> fileStatuses) {
+        for (FileStatus file : fileStatuses) {
             collection.add(file.getName());
         }
     }
@@ -258,19 +257,18 @@ public abstract class RevisionControlSystem {
         return FileUtilities.createTemporaryFile("e.scm.RevisionControlSystem-comment", "comment file", comment);
     }
     
-    protected static String createFileListFile(List/*<FileStatus>*/ fileStatuses) {
+    protected static String createFileListFile(List<FileStatus> fileStatuses) {
         StringBuffer content = new StringBuffer();
         for (int i = 0; i < fileStatuses.size(); ++i) {
-            content.append(((FileStatus) fileStatuses.get(i)).getName());
+            content.append(fileStatuses.get(i).getName());
             content.append("\n");
         }
         return FileUtilities.createTemporaryFile("e.scm.RevisionControlSystem-file-list", "list of files", content.toString());
     }
     
-    public static List justNewFiles(List/*<FileStatus>*/ fileStatuses) {
-        ArrayList result = new ArrayList();
-        for (int i = 0; i < fileStatuses.size(); ++i) {
-            FileStatus file = (FileStatus) fileStatuses.get(i);
+    public static List<FileStatus> justNewFiles(List<FileStatus> fileStatuses) {
+        ArrayList<FileStatus> result = new ArrayList<FileStatus>();
+        for (FileStatus file : fileStatuses) {
             if (file.getState() == FileStatus.NEW) {
                 result.add(file);
             }
@@ -281,12 +279,12 @@ public abstract class RevisionControlSystem {
     /**
      * Used by CVS and Subversion.
      */
-    public void scheduleNewFiles(String commandName, boolean useNonRecursiveSwitch, List/*<FileStatus>*/ fileStatuses) {
-        List newFiles = justNewFiles(fileStatuses);
+    public void scheduleNewFiles(String commandName, boolean useNonRecursiveSwitch, List<FileStatus> fileStatuses) {
+        List<FileStatus> newFiles = justNewFiles(fileStatuses);
         if (newFiles.isEmpty()) {
             return;
         }
-        ArrayList command = new ArrayList();
+        ArrayList<String> command = new ArrayList<String>();
         command.add(commandName);
         command.add("add");
         if (useNonRecursiveSwitch) {

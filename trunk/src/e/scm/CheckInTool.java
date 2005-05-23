@@ -6,15 +6,15 @@ import java.util.*;
 public class CheckInTool implements Launchable {
     private RevisionControlSystem backEnd;
     
-    public void parseCommandLine(List/*<String*/ arguments) {
+    public void parseCommandLine(List<String> arguments) {
         backEnd = RevisionControlSystem.forPath(System.getProperty("user.dir"));
         if (backEnd == null) {
             System.err.println("Not in a directory that is under revision control.");
             System.exit(1);
         }
         
-        for (int i = 0; i < arguments.size(); ++i) {
-            System.err.println("Unknown argument '" + arguments.get(i) + "'.");
+        for (String argument : arguments) {
+            System.err.println("Unknown argument '" + argument + "'.");
         }
         if (arguments.size() > 0) {
             System.exit(1);

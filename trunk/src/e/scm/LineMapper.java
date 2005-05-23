@@ -3,10 +3,10 @@ package e.scm;
 import java.util.*;
 
 public class LineMapper {
-  private TreeMap treeMap = new TreeMap();
+  private TreeMap<Integer, Integer> treeMap = new TreeMap<Integer, Integer>();
   
   public void addMapping(int fromLine, int toLine) {
-    treeMap.put(new Integer(fromLine), new Integer(toLine));
+    treeMap.put(fromLine, toLine);
   }
   
   private void printVerboseDiagnostics(String line) {
@@ -14,15 +14,14 @@ public class LineMapper {
   }
   
   public int translate(int fromLine) {
-    int toLine = translateInteger(new Integer(fromLine)).intValue();
+    int toLine = translateInteger(fromLine);
     printVerboseDiagnostics("(" + fromLine + " => " + toLine + ")");
     return toLine;
   }
   
-  private int getOffsetAtFromLine(Object fromLineObject) {
-    Integer fromLine = (Integer) fromLineObject;
-    Integer toLine = (Integer) treeMap.get(fromLine);
-    int offset = toLine.intValue() - fromLine.intValue();
+  private int getOffsetAtFromLine(int fromLine) {
+    int toLine = treeMap.get(fromLine);
+    int offset = toLine - fromLine;
     printVerboseDiagnostics("(" + fromLine + " => " + toLine + ") gives an offset of " + offset);
     return offset;
   }
@@ -30,10 +29,10 @@ public class LineMapper {
   public Integer translateInteger(Integer fromLine) {
     if (treeMap.containsKey(fromLine)) {
       printVerboseDiagnostics("Found fromLine directly in map");
-      return (Integer) treeMap.get(fromLine);
+      return treeMap.get(fromLine);
     }
     
-    SortedMap previousContextLines = treeMap.headMap(fromLine);
+    SortedMap<Integer, Integer> previousContextLines = treeMap.headMap(fromLine);
     if (previousContextLines.isEmpty()) {
       printVerboseDiagnostics("Nothing before fromLine in map");
       return fromLine;
@@ -41,7 +40,7 @@ public class LineMapper {
     int offsetAtPreviousContextLine = getOffsetAtFromLine(previousContextLines.lastKey());
     int toLineAccordingToPreviousContext = fromLine.intValue() + offsetAtPreviousContextLine;
     
-    SortedMap followingContextLines = treeMap.tailMap(fromLine);
+    SortedMap<Integer, Integer> followingContextLines = treeMap.tailMap(fromLine);
     if (followingContextLines.isEmpty()) {
       printVerboseDiagnostics("Nothing after fromLine in map");
       return new Integer(toLineAccordingToPreviousContext);

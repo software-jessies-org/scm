@@ -7,7 +7,7 @@ import e.util.*;
 
 public class Cvs extends RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
-        ArrayList command = new ArrayList();
+        ArrayList<String> command = new ArrayList<String>();
         command.add("cvs");
         command.add("annotate");
         if (revision != Revision.LOCAL_REVISION) {
@@ -15,11 +15,11 @@ public class Cvs extends RevisionControlSystem {
             command.add(revision.number);
         }
         command.add(filename);
-        return (String[]) command.toArray(new String[command.size()]);
+        return command.toArray(new String[command.size()]);
     }
 
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename) {
-        ArrayList result = new ArrayList();
+        ArrayList<String> result = new ArrayList<String>();
         result.add("cvs");
         result.add("diff");
         result.add("-u");
@@ -33,7 +33,7 @@ public class Cvs extends RevisionControlSystem {
             }
         }
         result.add(filename);
-        return (String[]) result.toArray(new String[result.size()]);
+        return result.toArray(new String[result.size()]);
     }
 
     public String[] getLogCommand(String filename) {
@@ -49,8 +49,8 @@ public class Cvs extends RevisionControlSystem {
     //date: 2002/11/25 14:41:42;  author: ericb;  state: Exp;  lines: +12 -1
     private static final Pattern LOG_PATTERN = Pattern.compile("^date: (\\d\\d\\d\\d)[-/](\\d\\d)[-/](\\d\\d)[^;]*;\\s+author: ([^;]+);\\s+.*");
 
-    public RevisionListModel parseLog(List linesList) {
-        String[] lines = (String[]) linesList.toArray(new String[linesList.size()]);
+    public RevisionListModel parseLog(List<String> linesList) {
+        String[] lines = linesList.toArray(new String[linesList.size()]);
 
         String separator = "----------------------------";
         String endMarker = "=============================================================================";
@@ -84,8 +84,8 @@ public class Cvs extends RevisionControlSystem {
 
     public boolean isLocallyModified(String filename) {
         String[] command = new String[] { "cvs", "status", filename };
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             String line = (String) lines.get(i);
@@ -114,7 +114,7 @@ public class Cvs extends RevisionControlSystem {
     public void revert(String filename) {
         File file = FileUtilities.fileFromParentAndString(getRoot().toString(), filename);
         file.delete();
-        ArrayList command = new ArrayList();
+        ArrayList<String> command = new ArrayList<String>();
         command.add("cvs");
         command.add("update");
         // Although this might seem like the right thing to do, CVS will then
@@ -125,13 +125,13 @@ public class Cvs extends RevisionControlSystem {
         execAndDump(command);
     }
 
-    public List getStatuses(WaitCursor waitCursor) {
+    public List<FileStatus> getStatuses(WaitCursor waitCursor) {
         String[] command = new String[] { "cvs", "-q", "update", "-dP" };
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         
-        ArrayList statuses = new ArrayList();
+        ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
         Pattern pattern = Pattern.compile("^(.) (.+)$");
         for (int i = 0; i < lines.size(); ++i) {
             String line = (String) lines.get(i);
@@ -161,9 +161,9 @@ public class Cvs extends RevisionControlSystem {
         return statuses;
     }
     
-    public void commit(String comment, List fileStatuses) {
+    public void commit(String comment, List<FileStatus> fileStatuses) {
         scheduleNewFiles("cvs", false, fileStatuses);
-        ArrayList command = new ArrayList();
+        ArrayList<String> command = new ArrayList<String>();
         command.add("cvs");
         command.add("commit");
         command.add("-F");

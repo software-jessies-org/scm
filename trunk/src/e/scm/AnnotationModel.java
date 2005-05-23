@@ -5,7 +5,7 @@ import java.util.regex.*;
 import javax.swing.*;
 
 public class AnnotationModel extends AbstractListModel {
-    private ArrayList data = new ArrayList();
+    private ArrayList<AnnotatedLine> data = new ArrayList<AnnotatedLine>();
 
     public int getSize() {
         return data.size();
@@ -30,10 +30,9 @@ public class AnnotationModel extends AbstractListModel {
      * we know the patch must be good, and because we know the lines won't
      * actually match (because of the annotations).
      */
-    public void applyPatch(List/*<String>*/ patchLines, RevisionListModel revisions) {
+    public void applyPatch(List<String> patchLines, RevisionListModel revisions) {
         int lineNumber = -1;
-        for (int i = 0; i < patchLines.size(); ++i) {
-            String line = (String) patchLines.get(i);
+        for (String line : patchLines) {
             Matcher matcher = Patch.AT_AT_PATTERN.matcher(line);
             if (matcher.find()) {
                 String location = matcher.group(3);

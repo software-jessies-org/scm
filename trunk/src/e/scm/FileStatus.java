@@ -1,6 +1,6 @@
 package e.scm;
 
-public class FileStatus implements Comparable {
+public class FileStatus implements Comparable<FileStatus> {
     public static final int NEW = 0;
     public static final int ADDED = 1;
     public static final int REMOVED = 2;
@@ -61,8 +61,7 @@ public class FileStatus implements Comparable {
     /**
      * Allows FileStatus objects to be ordered by name.
      */
-    public int compareTo(Object o) {
-        FileStatus other = (FileStatus) o;
+    public int compareTo(FileStatus other) {
         return name.compareToIgnoreCase(other.name);
     }
     

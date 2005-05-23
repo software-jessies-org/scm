@@ -47,8 +47,8 @@ public class PatchView extends JList {
     }
     
     public void showPatch(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename) {
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
         int status = 0;
         WaitCursor waitCursor = new WaitCursor(this, "Getting patch...");
         try {
@@ -79,9 +79,9 @@ public class PatchView extends JList {
         ensureIndexIsVisible(0);
     }
     
-    private ArrayList annotatePatchUsingTags(RevisionControlSystem backEnd, ArrayList lines) {
-        ArrayList newLines = new ArrayList();
-        ArrayList newErrors = new ArrayList();
+    private ArrayList<String> annotatePatchUsingTags(RevisionControlSystem backEnd, ArrayList<String> lines) {
+        ArrayList<String> newLines = new ArrayList<String>();
+        ArrayList<String> newErrors = new ArrayList<String>();
         String patch = StringUtilities.join(lines, "\n") + "\n";
         String script = FileUtilities.getSalmaHayekFile("/bin/annotate-patch.rb").toString();
         String patchFilename = FileUtilities.createTemporaryFile("e.scm.PatchView-patch", "patch file", patch);

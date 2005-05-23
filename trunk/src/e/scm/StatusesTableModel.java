@@ -71,11 +71,11 @@ public class StatusesTableModel extends AbstractTableModel {
         fireTableCellUpdated(row, column);
     }
     
-    public void includeFiles(List/*<FileStatus>*/ fileStatuses) {
+    public void includeFiles(List<FileStatus> fileStatuses) {
         includeFilenames(fileStatusListToFilenameList(fileStatuses));
     }
     
-    public void includeFilenames(List/*<String>*/ names) {
+    public void includeFilenames(List<String> names) {
         for (int i = 0; i < getRowCount(); ++i) {
             String name = getFileStatus(i).getName();
             if (names.contains(name)) {
@@ -84,8 +84,8 @@ public class StatusesTableModel extends AbstractTableModel {
         }
     }
     
-    public List/*<FileStatus>*/ getIncludedFiles() {
-        ArrayList result = new ArrayList();
+    public List<FileStatus> getIncludedFiles() {
+        ArrayList<FileStatus> result = new ArrayList<FileStatus>();
         for (int i = 0; i < getRowCount(); ++i) {
             if (isIncluded[i].booleanValue()) {
                 result.add(getFileStatus(i));
@@ -94,7 +94,7 @@ public class StatusesTableModel extends AbstractTableModel {
         return result;
     }
     
-    public List/*<String>*/ getIncludedFilenames() {
+    public List<String> getIncludedFilenames() {
         return fileStatusListToFilenameList(getIncludedFiles());
     }
     
@@ -102,10 +102,9 @@ public class StatusesTableModel extends AbstractTableModel {
      * Converts a list of FileStatus instances to a list of String instances
      * by invoking getName on each FileStatus.
      */
-    private List/*<String>*/ fileStatusListToFilenameList(List/*<FileStatus>*/ files) {
-        ArrayList names = new ArrayList();
-        for (int i = 0; i < files.size(); ++i) {
-            FileStatus fileStatus = (FileStatus) files.get(i);
+    private List<String> fileStatusListToFilenameList(List<FileStatus> files) {
+        ArrayList<String> names = new ArrayList<String>();
+        for (FileStatus fileStatus : files) {
             names.add(fileStatus.getName());
         }
         return names;

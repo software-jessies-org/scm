@@ -239,7 +239,7 @@ public class CheckInWindow extends JFrame {
                 if (comment.endsWith("\n") == false) {
                     comment += "\n";
                 }
-                List/*<FileStatus>*/ filenames = statusesTableModel.getIncludedFiles();
+                List<FileStatus> filenames = statusesTableModel.getIncludedFiles();
                 try {
                     backEnd.commit(comment, filenames);
                 } catch (RuntimeException ex) {
@@ -402,10 +402,9 @@ public class CheckInWindow extends JFrame {
      * SCM's own dot files removed. This saves the user from having to teach
      * their back-end to ignore our files.
      */
-    private List/*<FileStatuses>*/ removeScmDotFiles(List/*<FileStatus>*/ list) {
-        ArrayList result = new ArrayList();
-        for (int i = 0; i < list.size(); ++i) {
-            FileStatus fileStatus = (FileStatus) list.get(i);
+    private List<FileStatus> removeScmDotFiles(List<FileStatus> list) {
+        ArrayList<FileStatus> result = new ArrayList<FileStatus>();
+        for (FileStatus fileStatus : list) {
             if (fileStatus.getName().startsWith(".e.scm.") == false) {
                 result.add(fileStatus);
             }
@@ -415,7 +414,7 @@ public class CheckInWindow extends JFrame {
     
     private void updateFileStatuses() {
         new BlockingWorker(statusesTable, "Getting file statuses...") {
-            List statuses;
+            List<FileStatus> statuses;
             Exception failure;
             
             public void work() {
@@ -426,7 +425,7 @@ public class CheckInWindow extends JFrame {
                 try {
                     statuses = backEnd.getStatuses(getWaitCursor());
                 } catch (Exception ex) {
-                    statuses = new ArrayList();
+                    statuses = new ArrayList<FileStatus>();
                     failure = ex;
                 }
                 statuses = removeScmDotFiles(statuses);

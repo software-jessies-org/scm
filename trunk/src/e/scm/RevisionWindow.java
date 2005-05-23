@@ -19,8 +19,8 @@ public class RevisionWindow extends JFrame {
     private final AnnotatedLineRenderer annotatedLineRenderer =
         new AnnotatedLineRenderer(this);
     
-    public List getRevisionRange(Revision fromRevision, Revision toRevision) {
-        ArrayList range = new ArrayList();
+    public List<Revision> getRevisionRange(Revision fromRevision, Revision toRevision) {
+        ArrayList<Revision> range = new ArrayList<Revision>();
         Revision previousRevision = fromRevision;
         boolean withinRange = false;
         for (int i = 0; i < revisions.getSize(); ++i) {
@@ -361,8 +361,8 @@ public class RevisionWindow extends JFrame {
      * Factors out the data common to all BlockingWorker subclasses in this RevisionWindow.
      */
     public abstract class BackEndWorker extends BlockingWorker {
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
         String[] command;
         int status = 0;
         
@@ -416,8 +416,8 @@ public class RevisionWindow extends JFrame {
             // revision, not the locally modified file. So we have to fake
             // it by getting a patch and 'applying' it to the annotations.
             
-            ArrayList patchLines = new ArrayList();
-            ArrayList errors = new ArrayList();
+            ArrayList<String> patchLines = new ArrayList<String>();
+            ArrayList<String> errors = new ArrayList<String>();
             int status = 0;
             /* FIXME: do this in separate thread. */
             WaitCursor waitCursor = new WaitCursor(this, "Getting local modifications...");
@@ -625,12 +625,12 @@ public class RevisionWindow extends JFrame {
         desiredLineNumber = 0;
     }
 
-    private void showToolError(JList list, ArrayList lines) {
+    private void showToolError(JList list, ArrayList<String> lines) {
         list.setCellRenderer(new ToolErrorRenderer());
         list.setModel(new ToolErrorListModel(lines));
     }
     
-    private void showToolError(JList list, ArrayList lines, String[] command, int status) {
+    private void showToolError(JList list, ArrayList<String> lines, String[] command, int status) {
         if (status != 0) {
             lines.add("[Command '" + StringUtilities.join(command, " ") + "' returned status " + status + ".]");
         }

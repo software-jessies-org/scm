@@ -6,9 +6,9 @@ import e.util.*;
 
 public class RevisionTool implements Launchable {
     private static final Pattern GREP_ADDRESS = Pattern.compile("(.*):([0-9]+):?.*");
-    private ArrayList/*<Job>*/ jobs = new ArrayList();
+    private ArrayList<Job> jobs = new ArrayList<Job>();
     
-    public void parseCommandLine(List/*<String>*/ arguments) {
+    public void parseCommandLine(List<String> arguments) {
         if (arguments.size() == 0) {
             System.err.println("No file specified.");
             System.exit(1);

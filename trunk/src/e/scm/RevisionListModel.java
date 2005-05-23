@@ -9,8 +9,8 @@ import javax.swing.*;
  * the user interface.
  */
 public class RevisionListModel extends AbstractListModel {
-    private ArrayList data = new ArrayList();
-    private HashMap numberToRevisionMap = new HashMap();
+    private ArrayList<Revision> data = new ArrayList<Revision>();
+    private HashMap<String, Revision> numberToRevisionMap = new HashMap<String, Revision>();
     private int maxAuthorNameLength = 0;
     private int maxRevisionNumberLength = 0;
     
@@ -51,7 +51,7 @@ public class RevisionListModel extends AbstractListModel {
      * revision isn't known.
      */
     public Revision fromNumber(String number) {
-        return (Revision) numberToRevisionMap.get(number);
+        return numberToRevisionMap.get(number);
     }
 
     public int getMaxAuthorNameLength() {
@@ -67,11 +67,11 @@ public class RevisionListModel extends AbstractListModel {
      * corresponding to local uncommitted changes.
      */
     public Revision getLatestInRepository() {
-        Revision revision = (Revision) data.get(0);
+        Revision revision = data.get(0);
         if (revision != Revision.LOCAL_REVISION) {
             return revision;
         }
-        revision = (Revision) data.get(1);
+        revision = data.get(1);
         return revision;
     }
 }

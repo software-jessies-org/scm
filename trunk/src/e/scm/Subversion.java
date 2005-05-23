@@ -6,7 +6,7 @@ import e.util.*;
 
 public class Subversion extends RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
-        ArrayList command = new ArrayList();
+        ArrayList<String> command = new ArrayList<String>();
         command.add("svn");
         command.add("annotate");
         if (revision != Revision.LOCAL_REVISION) {
@@ -14,11 +14,11 @@ public class Subversion extends RevisionControlSystem {
             command.add(revision.number);
         }
         command.add(filename);
-        return (String[]) command.toArray(new String[command.size()]);
+        return command.toArray(new String[command.size()]);
     }
 
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename) {
-        ArrayList result = new ArrayList();
+        ArrayList<String> result = new ArrayList<String>();
         result.add("svn");
         result.add("diff");
         if (olderRevision != null) {
@@ -30,7 +30,7 @@ public class Subversion extends RevisionControlSystem {
             result.add(revisionArgument);
         }
         result.add(filename);
-        return (String[]) result.toArray(new String[result.size()]);
+        return result.toArray(new String[result.size()]);
     }
 
     public String[] getLogCommand(String filename) {
@@ -46,8 +46,8 @@ public class Subversion extends RevisionControlSystem {
     //r74 | elliotth | 2004-04-24 12:29:26 +0100 (Sat, 24 Apr 2004) | 3 lines
     private static final Pattern LOG_PATTERN = Pattern.compile("^r(\\d+) \\| (\\S+) \\| (\\d{4}-\\d{2}-\\d{2}) .* \\| (\\d+) lines?$");
 
-    public RevisionListModel parseLog(List linesList) {
-        String[] lines = (String[]) linesList.toArray(new String[linesList.size()]);
+    public RevisionListModel parseLog(List<String> linesList) {
+        String[] lines = linesList.toArray(new String[linesList.size()]);
 
         String separator = "------------------------------------------------------------------------";
         
@@ -84,11 +84,10 @@ public class Subversion extends RevisionControlSystem {
 
     public boolean isLocallyModified(String filename) {
         String[] command = new String[] { "svn", "status", filename };
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
-        for (int i = 0; i < lines.size(); ++i) {
-            String line = (String) lines.get(i);
+        for (String line : lines) {
             if (line.startsWith("M")) {
                 return true;
             }
@@ -110,23 +109,23 @@ public class Subversion extends RevisionControlSystem {
     }
 
     public void revert(String filename) {
-        ArrayList command = new ArrayList();
+        ArrayList<String> command = new ArrayList<String>();
         command.add("svn");
         command.add("revert");
         command.add(filename);
         execAndDump(command);
     }
 
-    public List getStatuses(WaitCursor waitCursor) {
+    public List<FileStatus> getStatuses(WaitCursor waitCursor) {
         String[] command = new String[] { "svn", "status" };
-        ArrayList lines = new ArrayList();
-        ArrayList errors = new ArrayList();
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
         }
         
-        ArrayList statuses = new ArrayList();
+        ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
         Pattern pattern = Pattern.compile("^(.)....\\s+(.+)$");
         for (int i = 0; i < lines.size(); ++i) {
             String line = (String) lines.get(i);
@@ -152,9 +151,9 @@ public class Subversion extends RevisionControlSystem {
         return statuses;
     }
     
-    public void commit(String comment, List fileStatuses) {
+    public void commit(String comment, List<FileStatus> fileStatuses) {
         scheduleNewFiles("svn", true, fileStatuses);
-        ArrayList command = new ArrayList();
+        ArrayList<String> command = new ArrayList<String>();
         command.add("svn");
         command.add("commit");
         command.add("--non-interactive");
