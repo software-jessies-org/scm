@@ -87,9 +87,8 @@ public class Cvs extends RevisionControlSystem {
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
-        for (int i = 0; i < lines.size(); ++i) {
-            String line = (String) lines.get(i);
-            if (line.indexOf("Status: Locally Modified") != -1) {
+        for (String line : lines) {
+            if (line.contains("Status: Locally Modified")) {
                 return true;
             }
         }

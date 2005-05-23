@@ -197,7 +197,7 @@ public abstract class RevisionControlSystem {
                 result.append(' ');
             }
             String argument = (String) command.get(i);
-            if (argument.indexOf(' ') != -1) {
+            if (argument.contains(" ")) {
                 result.append('"');
                 result.append(argument);
                 result.append('"');

@@ -497,7 +497,7 @@ public class CheckInWindow extends JFrame {
             FileStatus fileStatus = statusesTableModel.getFileStatus(e.getFirstRow());
             String name = fileStatus.getName() + ": ";
             String checkInComment = checkInCommentArea.getText();
-            if (checkInComment.indexOf(name) == -1) {
+            if (checkInComment.contains(name) == false) {
                 /**
                  * We want to encourage check-in comments like this:
                  * 
