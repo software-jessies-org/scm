@@ -33,8 +33,6 @@ public abstract class RevisionControlSystem {
      * at the given point.
      */
     private static File findRepositoryRoot(final String path) {
-        String clue = null;
-        
         String canonicalPath = path;
         try {
             canonicalPath = new File(path).getCanonicalPath();
@@ -45,30 +43,44 @@ public abstract class RevisionControlSystem {
         File directory = file.isDirectory() ? file : new File(file.getParent());
         for (String sibling : directory.list()) {
             if (sibling.equals("CVS")) {
-                clue = "CVS";
+                return ascendUntilSubdirectoryDisappears(directory, "CVS");
             } else if (sibling.equals("SCCS")) {
-                clue = "SCCS";
+                return ascendUntilSubdirectoryAppears(directory, "BitKeeper");
             } else if (sibling.equals(".svn")) {
-                clue = ".svn";
+                return ascendUntilSubdirectoryDisappears(directory, ".svn");
             }
         }
-        
-        if (clue == null) {
-            return null;
-        }
-        
+        return null;
+    }
+    
+    private static File ascendUntilSubdirectoryAppearsOrDisappears(final File directory, final String subdirectoryName, final boolean absenceDesired) {
         File root = directory;
         while (true) {
             File newRoot = new File(root.getParent());
             if (newRoot.exists() == false || newRoot.isDirectory() == false) {
                 return root;
             }
-            File scmDirectory = new File(newRoot, clue);
-            if (scmDirectory.exists() == false || scmDirectory.isDirectory() == false) {
-                return root;
+            File scmDirectory = new File(newRoot, subdirectoryName);
+            boolean absent = scmDirectory.exists() == false || scmDirectory.isDirectory() == false;
+            if (absenceDesired) {
+                if (absent) {
+                    return root;
+                }
+            } else {
+                if (absent == false) {
+                    return newRoot;
+                }                
             }
             root = newRoot;
         }
+    }
+    
+    private static File ascendUntilSubdirectoryDisappears(final File directory, final String subdirectoryName) {
+        return ascendUntilSubdirectoryAppearsOrDisappears(directory, subdirectoryName, true);
+    }
+    
+    private static File ascendUntilSubdirectoryAppears(final File directory, final String subdirectoryName) {
+        return ascendUntilSubdirectoryAppearsOrDisappears(directory, subdirectoryName, false);
     }
     
     /**
