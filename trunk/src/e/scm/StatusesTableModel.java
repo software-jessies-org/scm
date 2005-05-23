@@ -8,9 +8,9 @@ import javax.swing.table.*;
 
 public class StatusesTableModel extends AbstractTableModel {
     private Boolean[] isIncluded;
-    private List statuses;
+    private List<FileStatus> statuses;
     
-    public StatusesTableModel(List statuses) {
+    public StatusesTableModel(List<FileStatus> statuses) {
         this.statuses = statuses;
         this.isIncluded = new Boolean[statuses.size()];
         for (int i = 0; i < isIncluded.length; ++i) {
@@ -45,7 +45,7 @@ public class StatusesTableModel extends AbstractTableModel {
     }
     
     public FileStatus getFileStatus(int row) {
-        return (FileStatus) statuses.get(row);
+        return statuses.get(row);
     }
     
     public Object getPrototypeFor(int column) {

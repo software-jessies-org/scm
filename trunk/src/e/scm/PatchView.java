@@ -68,8 +68,8 @@ public class PatchView extends JList {
         lines = annotatePatchUsingTags(backEnd, lines);
         
         DefaultListModel differences = new DefaultListModel();
-        for (int i = 0; i < lines.size(); ++i) {
-            differences.addElement((String) lines.get(i));
+        for (String line : lines) {
+            differences.addElement(line);
         }
         setCellRenderer(PatchListCellRenderer.INSTANCE);
         setModel(differences);

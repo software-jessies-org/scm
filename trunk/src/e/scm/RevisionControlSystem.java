@@ -188,19 +188,18 @@ public abstract class RevisionControlSystem {
     
     // This only copes with spaces in commands, not other shell special punctuation and specifically not ".
     // Fix it when it bites you.
-    private static String quoteCommand(List command) {
+    private static String quoteCommand(List<String> command) {
         StringBuffer result = new StringBuffer();
-        for (int i = 0; i < command.size(); ++i) {
-            if (i > 0) {
+        for (String word : command) {
+            if (result.length() > 0) {
                 result.append(' ');
             }
-            String argument = (String) command.get(i);
-            if (argument.contains(" ")) {
+            if (word.contains(" ")) {
                 result.append('"');
-                result.append(argument);
+                result.append(word);
                 result.append('"');
             } else {
-                result.append(argument);
+                result.append(word);
             }
         }
         return result.toString();

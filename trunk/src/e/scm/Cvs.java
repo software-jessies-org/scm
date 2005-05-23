@@ -132,8 +132,7 @@ public class Cvs extends RevisionControlSystem {
         
         ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
         Pattern pattern = Pattern.compile("^(.) (.+)$");
-        for (int i = 0; i < lines.size(); ++i) {
-            String line = (String) lines.get(i);
+        for (String line : lines) {
             Matcher matcher = pattern.matcher(line);
             if (matcher.find()) {
                 char state = matcher.group(1).charAt(0);

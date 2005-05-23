@@ -263,7 +263,7 @@ public class CheckInWindow extends JFrame {
     
     private void discardSavedState() {
         checkInCommentArea.setText("");
-        statusesTableModel = new StatusesTableModel(new ArrayList());
+        statusesTableModel = new StatusesTableModel(new ArrayList<FileStatus>());
         updateSavedState();
     }
     

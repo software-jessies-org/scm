@@ -59,11 +59,11 @@ public class RevisionWindow extends JFrame {
         }
         
         try {
-            List revisionRange = getRevisionRange(fromRevision, toRevision);
+            List<Revision> revisionRange = getRevisionRange(fromRevision, toRevision);
             Revision previousRevision = fromRevision;
             for (int i = 1 /* sic */; i < revisionRange.size(); ++i) {
                 setStatus("Tracing line back to revision " + toRevision.number + " (currently at " + previousRevision.number + ")...");
-                Revision revision = (Revision) revisionRange.get(i);
+                Revision revision = revisionRange.get(i);
                 lineNumber = translateLineNumberInOneStep(previousRevision, revision, lineNumber);
                 previousRevision = revision;
             }
@@ -409,7 +409,7 @@ public class RevisionWindow extends JFrame {
         };
     }
 
-    private void updateAnnotationModel(Revision revision, List lines) {
+    private void updateAnnotationModel(Revision revision, List<String> lines) {
         annotationModel = parseAnnotations(lines);
         if (revision == Revision.LOCAL_REVISION) {
             // The annotations are wrong. They're actually for the head
@@ -440,10 +440,10 @@ public class RevisionWindow extends JFrame {
         switchAnnotationView(annotationModel, annotatedLineRenderer, annotationsDoubleClickListener);
     }
     
-    public AnnotationModel parseAnnotations(List lines) {
+    public AnnotationModel parseAnnotations(List<String> lines) {
         AnnotationModel result = new AnnotationModel();
-        for (int i = 0; i < lines.size(); ++i) {
-            result.add(backEnd.parseAnnotatedLine(revisions, (String) lines.get(i)));
+        for (String line : lines) {
+            result.add(backEnd.parseAnnotatedLine(revisions, line));
         }
         return result;
     }
@@ -531,8 +531,8 @@ public class RevisionWindow extends JFrame {
                 }
                 
                 DefaultListModel differences = new DefaultListModel();
-                for (int i = 0; i < lines.size(); ++i) {
-                    differences.addElement((String) lines.get(i));
+                for (String line : lines) {
+                    differences.addElement(line);
                 }
                 switchAnnotationView(differences, PatchListCellRenderer.INSTANCE, differencesDoubleClickListener);
                 

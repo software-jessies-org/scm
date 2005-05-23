@@ -24,11 +24,11 @@ public class Patch {
      */
     public static final Pattern AT_AT_PATTERN = Pattern.compile("^@@ -(\\d+),(\\d+) \\+(\\d+),(\\d+) @@(.*)$");
     
-    private void parsePatch(boolean isPatchReversed, List lines, PatchLineParser patchLineParser) {
+    private void parsePatch(boolean isPatchReversed, List<String> lines, PatchLineParser patchLineParser) {
         String fromPrefix = isPatchReversed ? "+" : "-";
         String toPrefix = isPatchReversed ? "-" : "+";
         for (int lineNumberWithinPatch = 0; lineNumberWithinPatch < lines.size(); ++lineNumberWithinPatch) {
-            String patchLine = (String) lines.get(lineNumberWithinPatch);
+            String patchLine = lines.get(lineNumberWithinPatch);
             Matcher matcher = AT_AT_PATTERN.matcher(patchLine);
             if (matcher.matches()) {
                 int fromBegin = Integer.parseInt(matcher.group(1));

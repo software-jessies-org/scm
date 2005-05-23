@@ -15,7 +15,7 @@ public class RevisionTool implements Launchable {
         }
         
         for (int i = 0; i < arguments.size(); ++i) {
-            String filename = (String) arguments.get(i);
+            String filename = arguments.get(i);
             int lineNumber = 0;
             Matcher matcher = GREP_ADDRESS.matcher(filename);
             if (matcher.matches()) {
@@ -24,7 +24,7 @@ public class RevisionTool implements Launchable {
                 lineNumber = Integer.parseInt(matcher.group(2));
             }
             if (i < arguments.size() - 1) {
-                String nextArg = (String) arguments.get(i + 1);
+                String nextArg = arguments.get(i + 1);
                 if (nextArg.startsWith("-@")) {
                     // BitKeeper-style line number.
                     lineNumber = Integer.parseInt(nextArg.substring(2));
@@ -45,8 +45,7 @@ public class RevisionTool implements Launchable {
     }
     
     public void startGui() {
-        for (int i = 0; i < jobs.size(); ++i) {
-            Job job = (Job) jobs.get(i);
+        for (Job job : jobs) {
             new RevisionWindow(job.filename, job.lineNumber);
         }
     }
