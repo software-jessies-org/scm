@@ -484,9 +484,9 @@ public class CheckInWindow extends JFrame {
             }
             
             FileStatus fileStatus = statusesTableModel.getFileStatus(e.getFirstRow());
-            String name = fileStatus.getName() + ": ";
+            String name = fileStatus.getName();
             String checkInComment = checkInCommentArea.getText();
-            if (checkInComment.contains("\n" + name) == false && checkInComment.startsWith(name) == false) {
+            if (("\n" + checkInComment).contains("\n" + name + ":") == false) {
                 /**
                  * We want to encourage check-in comments like this:
                  * 
@@ -498,17 +498,14 @@ public class CheckInWindow extends JFrame {
                  * with just a newline between adjacent filenames, but a
                  * blank line if you've actually added a comment.
                  */
-                if (checkInComment.length() > 0) {
-                    if (checkInComment.endsWith(": ")) {
-                        name = "\n" + name;
+                if (checkInComment.length() > 0 && checkInComment.endsWith("\n\n") == false) {
+                    if (checkInComment.matches("^.*(\n|: ?)$")) {
+                        checkInCommentArea.append("\n");
                     } else {
-                        if (checkInComment.endsWith("\n") == false) {
-                            name = "\n" + name;
-                        }
-                        name = "\n" + name;
+                        checkInCommentArea.append("\n\n");
                     }
                 }
-                checkInCommentArea.append(name);
+                checkInCommentArea.append(name + ": ");
                 final int newOffset = checkInCommentArea.getTextBuffer().length();
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
