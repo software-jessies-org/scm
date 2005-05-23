@@ -316,7 +316,7 @@ public class CheckInWindow extends JFrame {
      * Edits the currently selected file, at the given line number.
      */
     private void editFileAtLine(int lineNumber) {
-        String editor = getEditor();
+        String editor = System.getenv("SCM_EDITOR");
         if (editor == null) {
             System.err.println("Set the environment variable $SCM_EDITOR to the command you want to be invoked.");
             return;
@@ -325,17 +325,6 @@ public class CheckInWindow extends JFrame {
         FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
         String command = editor + " " + ("+" + lineNumber) + " " + fileStatus.getName();
         ProcessUtilities.spawn(backEnd.getRoot(), new String[] { "bash", "-c", command });
-    }
-    
-    private String getEditor() {
-        String result = null;
-        try {
-            result = System.getenv("SCM_EDITOR");
-        } catch (Error error) {
-            // Sun were really stupid there. Ignore them and wait for 1.5!
-            error = error;
-        }
-        return result;
     }
     
     private void initCheckInCommentArea() {
