@@ -43,13 +43,12 @@ public abstract class RevisionControlSystem {
         }
         File file = new File(canonicalPath);
         File directory = file.isDirectory() ? file : new File(file.getParent());
-        String[] siblings = directory.list();
-        for (int i = 0; i < siblings.length; ++i) {
-            if (siblings[i].equals("CVS")) {
+        for (String sibling : directory.list()) {
+            if (sibling.equals("CVS")) {
                 clue = "CVS";
-            } else if (siblings[i].equals("SCCS")) {
+            } else if (sibling.equals("SCCS")) {
                 clue = "SCCS";
-            } else if (siblings[i].equals(".svn")) {
+            } else if (sibling.equals(".svn")) {
                 clue = ".svn";
             }
         }
@@ -79,13 +78,12 @@ public abstract class RevisionControlSystem {
      * as the file.
      */
     private static RevisionControlSystem selectRevisionControlSystem(File repositoryRoot) {
-        String[] siblings = repositoryRoot.list();
-        for (int i = 0; i < siblings.length; ++i) {
-            if (siblings[i].equals("CVS")) {
+        for (String sibling : repositoryRoot.list()) {
+            if (sibling.equals("CVS")) {
                 return new Cvs();
-            } else if (siblings[i].equals("SCCS")) {
+            } else if (sibling.equals("SCCS")) {
                 return new BitKeeper();
-            } else if (siblings[i].equals(".svn")) {
+            } else if (sibling.equals(".svn")) {
                 return new Subversion();
             }
         }

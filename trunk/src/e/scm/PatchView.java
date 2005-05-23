@@ -102,8 +102,8 @@ public class PatchView extends JList {
             model.addElement("(" + status.getName() + " is a binary file.)");
         } else {
             String[] lines = StringUtilities.readLinesFromFile(file.getAbsolutePath());
-            for (int i = 0; i < lines.length; ++i) {
-                model.addElement(lines[i]);
+            for (String line : lines) {
+                model.addElement(line);
             }
             if (model.getSize() == 0) {
                 model.addElement("(" + status.getName() + " is empty.)");
