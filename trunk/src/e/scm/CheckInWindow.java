@@ -499,7 +499,7 @@ public class CheckInWindow extends JFrame {
                  * blank line if you've actually added a comment.
                  */
                 if (checkInComment.length() > 0 && checkInComment.endsWith("\n\n") == false) {
-                    if (checkInComment.matches("^.*(\n|: ?)$")) {
+                    if (checkInComment.endsWith("\n") || checkInComment.endsWith(": ")) {
                         checkInCommentArea.append("\n");
                     } else {
                         checkInCommentArea.append("\n\n");
