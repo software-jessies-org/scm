@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import e.gui.*;
@@ -499,7 +500,9 @@ public class CheckInWindow extends JFrame {
                  * blank line if you've actually added a comment.
                  */
                 if (checkInComment.length() > 0 && checkInComment.endsWith("\n\n") == false) {
-                    if (checkInComment.endsWith("\n") || checkInComment.endsWith(": ")) {
+                    Matcher lastLineMatcher = Pattern.compile("(.*): ?$").matcher(checkInComment);
+                    boolean isLastLineLabel = lastLineMatcher.find() && isAnIncludedFilename(lastLineMatcher.group(1));
+                    if (checkInComment.endsWith("\n") || isLastLineLabel) {
                         checkInCommentArea.append("\n");
                     } else {
                         checkInCommentArea.append("\n\n");
@@ -515,6 +518,10 @@ public class CheckInWindow extends JFrame {
                 });
             }
         }
+    }
+    
+    private boolean isAnIncludedFilename(String filename) {
+        return statusesTableModel.getIncludedFilenames().contains(filename);
     }
     
     public void clearStatus() {
