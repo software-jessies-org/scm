@@ -33,7 +33,7 @@ public class BitKeeper extends RevisionControlSystem {
     }
 
     public String[] getLogCommand(String filename) {
-        return new String[] { "bk", "prs", filename };
+        return new String[] { "bk", "prs", "-d:DSUMMARY:\n:COMMENTS:" + LOG_SEPARATOR + "\n", filename };
     }
 
     private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^([^\t]+)\t([^\t]+)\t(.*)$");
@@ -45,14 +45,14 @@ public class BitKeeper extends RevisionControlSystem {
     //D 1.2 04/02/15 13:02:22+00:00 elliotth@mercury.local 3 2 4/0/356
     //D 1.144 01/03/28 11:56:53-00:00 hughc 145 144 0/3/3528
     private static final Pattern LOG_PATTERN = Pattern.compile("^D ([0-9.]+) (\\d\\d)/(\\d\\d)/(\\d\\d) \\S+ ([^@ ]+).*");
-
+    private static final String LOG_SEPARATOR = "------------------------------------------------";
+    
     public RevisionListModel parseLog(List<String> linesList) {
         String[] lines = linesList.toArray(new String[linesList.size()]);
 
-        String separator = "------------------------------------------------";
         RevisionListModel result = new RevisionListModel();
         for (int i = 0; i < lines.length; ++i) {
-            if (lines[i].equals(separator)) {
+            if (lines[i].equals(LOG_SEPARATOR)) {
                 continue;
             }
             
@@ -62,7 +62,7 @@ public class BitKeeper extends RevisionControlSystem {
                 String author = matcher.group(5);
                 String date = "20" + matcher.group(2) + "-" + matcher.group(3) + "-" + matcher.group(4);
                 StringBuffer comment = new StringBuffer();
-                while (++i < lines.length && lines[i].equals(separator) == false) {
+                while (++i < lines.length && lines[i].equals(LOG_SEPARATOR) == false) {
                     comment.append(lines[i].substring(2));
                     comment.append("\n");
                 }
