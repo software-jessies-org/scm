@@ -34,4 +34,7 @@ public class BugDatabaseHighlighter extends PHyperlinkTextStyler {
     private String urlForMatcher(Matcher matcher) {
         return "http://try4.fogbugz.com/default.asp?pg=pgEditBug&command=view&ixBug=" + matcher.group(2);
     }
+    
+    public void addKeywordsTo(java.util.Collection<String> collection) {
+    }
 }
