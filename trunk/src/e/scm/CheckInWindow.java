@@ -209,24 +209,15 @@ public class CheckInWindow extends JFrame {
     }
     
     private void initStatusesTableContextMenu() {
-        final EPopupMenu contextMenu = new EPopupMenu();
-        contextMenu.add(new EditFileAction());
-        contextMenu.add(new DiscardChangesAction());
-        contextMenu.addSeparator();
-        contextMenu.add(new ShowHistoryAction());
-        contextMenu.addSeparator();
-        contextMenu.add(new RefreshListAction());
-        statusesTable.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-                maybeShowContextMenu(e);
-            }
-            public void mouseReleased(MouseEvent e) {
-                maybeShowContextMenu(e);
-            }
-            private void maybeShowContextMenu(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    contextMenu.show(e.getComponent(), e.getX(), e.getY());
-                }
+        EPopupMenu menu = new EPopupMenu(statusesTable);
+        menu.addMenuItemProvider(new MenuItemProvider() {
+            public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+                actions.add(new EditFileAction());
+                actions.add(new DiscardChangesAction());
+                actions.add(null);
+                actions.add(new ShowHistoryAction());
+                actions.add(null);
+                actions.add(new RefreshListAction());
             }
         });
     }
