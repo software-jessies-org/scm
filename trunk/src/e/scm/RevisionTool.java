@@ -36,9 +36,7 @@ public class RevisionTool implements Launchable {
                 }
             }
             final RevisionControlSystem backEnd = RevisionControlSystem.forPath(filename);
-            if (backEnd == null) {
-                System.err.println(filename + " is not in a directory that is under revision control.");
-            } else {
+            if (backEnd != null) {
                 jobs.add(new Job(filename, lineNumber));
             }
         }

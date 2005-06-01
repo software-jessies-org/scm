@@ -9,7 +9,6 @@ public class CheckInTool implements Launchable {
     public void parseCommandLine(List<String> arguments) {
         backEnd = RevisionControlSystem.forPath(System.getProperty("user.dir"));
         if (backEnd == null) {
-            System.err.println("Not in a directory that is under revision control.");
             System.exit(1);
         }
         

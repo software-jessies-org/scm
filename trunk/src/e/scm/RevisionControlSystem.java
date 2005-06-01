@@ -40,6 +40,10 @@ public abstract class RevisionControlSystem {
             ex.printStackTrace();
         }
         File file = new File(canonicalPath);
+        if (file.exists() == false) {
+            System.err.println(file + " does not exist");
+            return null;
+        }
         File directory = file.isDirectory() ? file : new File(file.getParent());
         for (String sibling : directory.list()) {
             if (sibling.equals("CVS")) {
@@ -50,6 +54,7 @@ public abstract class RevisionControlSystem {
                 return ascendUntilSubdirectoryDisappears(directory, ".svn");
             }
         }
+        System.err.println(file + " is not in a directory that is under revision control");
         return null;
     }
     
