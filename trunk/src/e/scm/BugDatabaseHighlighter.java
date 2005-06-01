@@ -11,7 +11,7 @@ import java.util.regex.*;
  */
 public class BugDatabaseHighlighter extends PHyperlinkTextStyler {
     public BugDatabaseHighlighter(PTextArea textArea) {
-        super(textArea, "(?i)\\b((?:(?:D(?:efect)?|(?:Bug[z ]?(?:ID)?)))\\s*[#]?([0-9]+))");
+        super(textArea, "(?i)\\b((?:(Sun |bug |D)([0-9]+)))");
     }
     
     public void hyperlinkClicked(CharSequence linkText, Matcher matcher) {
@@ -32,7 +32,16 @@ public class BugDatabaseHighlighter extends PHyperlinkTextStyler {
     }
     
     private String urlForMatcher(Matcher matcher) {
-        return "http://try4.fogbugz.com/default.asp?pg=pgEditBug&command=view&ixBug=" + matcher.group(2);
+        String id = matcher.group(3);
+        String vendor = matcher.group(2);
+        if (vendor != null) {
+            if (vendor.equals("Sun ")) {
+                return "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=" + id;
+            } else if (vendor.equals("bug ")) {
+                return "http://fogbugz.local/fogbugz/default.php?pg=pgEditBug&command=view&ixBug=" + id;
+            }
+        }
+        return "http://woggle/" + id;
     }
     
     public void addKeywordsTo(java.util.Collection<String> collection) {
