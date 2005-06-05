@@ -58,26 +58,27 @@ public abstract class RevisionControlSystem {
         return null;
     }
     
-    private static File ascendUntilSubdirectoryAppearsOrDisappears(final File directory, final String subdirectoryName, final boolean absenceDesired) {
+    private static boolean isScmDirectoryAbsent(final File directory, final String subdirectoryName) {
+        File scmDirectory = new File(directory, subdirectoryName);
+        return scmDirectory.exists() == false || scmDirectory.isDirectory() == false;
+    }
+    private static File ascendUntilSubdirectoryAppearsOrDisappears(final File directory, final String subdirectoryName, final boolean stopWhenAbsent) {
+        File previousRoot = null;
         File root = directory;
-        while (true) {
-            File newRoot = new File(root.getParent());
-            if (newRoot.exists() == false || newRoot.isDirectory() == false) {
-                return root;
+        while (isScmDirectoryAbsent(root, subdirectoryName) != stopWhenAbsent) {
+            String parentName = root.getParent();
+            if (parentName == null) {
+                return null;
             }
-            File scmDirectory = new File(newRoot, subdirectoryName);
-            boolean absent = scmDirectory.exists() == false || scmDirectory.isDirectory() == false;
-            if (absenceDesired) {
-                if (absent) {
-                    return root;
-                }
-            } else {
-                if (absent == false) {
-                    return newRoot;
-                }                
+            previousRoot = root;
+            root = new File(parentName);
+            if (root.exists() == false || root.isDirectory() == false) {
+                return null;
             }
-            root = newRoot;
         }
+        // Always return the highest directory which did contain the scmDirectory,
+        // even if we only stop when we've higher.
+        return stopWhenAbsent ? previousRoot : root;
     }
     
     private static File ascendUntilSubdirectoryDisappears(final File directory, final String subdirectoryName) {
