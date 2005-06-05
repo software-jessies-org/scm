@@ -322,7 +322,7 @@ public class CheckInWindow extends JFrame {
     private void initCheckInCommentArea() {
         checkInCommentArea = makeTextArea(8);
         checkInCommentArea.setEnabled(false);
-        checkInCommentArea.setTextStyler(new BugDatabaseHighlighter(checkInCommentArea));
+        checkInCommentArea.addStyleApplicator(new BugDatabaseHighlighter(checkInCommentArea));
     }
     
     private void fillCheckInCommentArea() {

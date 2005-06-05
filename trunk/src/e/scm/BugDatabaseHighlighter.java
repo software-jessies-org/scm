@@ -3,35 +3,27 @@ package e.scm;
 import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
+import java.awt.event.*;
 import java.io.*;
+import java.util.*;
 import java.util.regex.*;
 
 /**
  * Links to a bug database from check-in comments.
  */
-public class BugDatabaseHighlighter extends PHyperlinkTextStyler {
+public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
+    private static final EnumSet<PStyle> SOURCE_STYLES = EnumSet.of(PStyle.NORMAL, PStyle.COMMENT);
+    
     public BugDatabaseHighlighter(PTextArea textArea) {
         // Group 1 - the text to be underlined.
         // Group 2 - the vendor, used to choose a URL template.
         // Group 3 - the id, inserted into the template.
-        super(textArea, "(?i)\\b((?:(Sun |bug |D)([0-9]+)))");
+        super(textArea, "(?i)\\b((?:(Sun |bug |D)([0-9]+)))", PStyle.HYPERLINK);
     }
     
-    public void hyperlinkClicked(CharSequence linkText, Matcher matcher) {
-        String url = urlForMatcher(matcher);
-        try {
-            BrowserLauncher.openURL(url);
-        } catch (IOException ex) {
-            SimpleDialog.showDetails(null, "Bug Database Link", ex);
-        }
-    }
-    
-    public boolean isAcceptableMatch(CharSequence line, Matcher matcher) {
-        return true;
-    }
-    
-    public String makeToolTip(Matcher matcher) {
-        return urlForMatcher(matcher);
+    @Override
+    public EnumSet<PStyle> getSourceStyles() {
+        return SOURCE_STYLES;
     }
     
     private String urlForMatcher(Matcher matcher) {
@@ -47,6 +39,26 @@ public class BugDatabaseHighlighter extends PHyperlinkTextStyler {
         return "http://woggle/" + id;
     }
     
-    public void addKeywordsTo(java.util.Collection<String> collection) {
+    @Override
+    protected void configureSegment(PTextSegment segment, Matcher matcher) {
+        String url = urlForMatcher(matcher);
+        segment.setLinkAction(new BugLinkActionListener(url));
+        segment.setToolTip(url);
+    }
+    
+    private static class BugLinkActionListener implements ActionListener {
+        private String url;
+        
+        public BugLinkActionListener(String url) {
+            this.url = url;
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            try {
+                BrowserLauncher.openURL(url);
+            } catch (IOException ex) {
+                SimpleDialog.showDetails(null, "Bug Database Link", ex);
+            }
+        }
     }
 }
