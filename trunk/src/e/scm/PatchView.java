@@ -29,7 +29,7 @@ public class PatchView extends JList {
     
     private void copySelectedItemsToClipboard() {
         // Make a StringSelection corresponding to the selected lines.
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         Object[] selectedLines = getSelectedValues();
         for (int i = 0; i < selectedLines.length; ++i) {
             String line = selectedLines[i].toString();

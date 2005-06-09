@@ -71,7 +71,7 @@ public class Cvs extends RevisionControlSystem {
             if (matcher.matches()) {
                 String author = matcher.group(4);
                 String date = matcher.group(1) + "-" + matcher.group(2) + "-" + matcher.group(3);
-                StringBuffer comment = new StringBuffer();
+                StringBuilder comment = new StringBuilder();
                 while (i < lines.length && lines[i].equals(endMarker) == false && lines[i].equals(separator) == false) {
                     comment.append(lines[i++]);
                     comment.append("\n");

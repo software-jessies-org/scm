@@ -66,7 +66,7 @@ public class AnnotatedLine {
         }
 
         // Return a string of 's' followed by a suitable number of spaces.
-        StringBuffer result = new StringBuffer(s);
+        StringBuilder result = new StringBuilder(s);
         for (int i = length; i < width; ++i) {
             result.append(' ');
         }

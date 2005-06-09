@@ -68,7 +68,7 @@ public class Subversion extends RevisionControlSystem {
                     Log.warn("expected blank line when parsing log");
                 }
                 ++i; // Skip blank line.
-                StringBuffer comment = new StringBuffer();
+                StringBuilder comment = new StringBuilder();
                 for (; commentLineCount > 0; --commentLineCount) {
                     comment.append(lines[i++]);
                     comment.append("\n");

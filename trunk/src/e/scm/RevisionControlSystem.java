@@ -207,7 +207,7 @@ public abstract class RevisionControlSystem {
     // This only copes with spaces in commands, not other shell special punctuation and specifically not ".
     // Fix it when it bites you.
     private static String quoteCommand(List<String> command) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (String word : command) {
             if (result.length() > 0) {
                 result.append(' ');
@@ -273,7 +273,7 @@ public abstract class RevisionControlSystem {
     }
     
     protected static String createFileListFile(List<FileStatus> fileStatuses) {
-        StringBuffer content = new StringBuffer();
+        StringBuilder content = new StringBuilder();
         for (int i = 0; i < fileStatuses.size(); ++i) {
             content.append(fileStatuses.get(i).getName());
             content.append("\n");

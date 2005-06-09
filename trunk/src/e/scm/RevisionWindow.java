@@ -499,7 +499,7 @@ public class RevisionWindow extends JFrame {
 
     private void copyAnnotationViewSelectionToClipboard() {
         // Make a StringSelection corresponding to the selected lines.
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         Object[] selectedLines = annotationView.getSelectedValues();
         for (int i = 0; i < selectedLines.length; ++i) {
             String line = selectedLines[i].toString();
@@ -545,7 +545,7 @@ public class RevisionWindow extends JFrame {
     }
 
     private String summaryOfAllRevisions() {
-        StringBuffer summary = new StringBuffer();
+        StringBuilder summary = new StringBuilder();
         for (int i = 0; i < revisions.getSize(); ++i) {
             Revision revision = (Revision) revisions.getElementAt(i);
 
@@ -686,7 +686,7 @@ public class RevisionWindow extends JFrame {
                 Revision newerRevision = (Revision) values[0];
                 Revision olderRevision = (Revision) values[values.length - 1];
 
-                StringBuffer comment = new StringBuffer();
+                StringBuilder comment = new StringBuilder();
                 comment.append("Differences between revisions ");
                 comment.append(olderRevision.number);
                 comment.append(" and ");
