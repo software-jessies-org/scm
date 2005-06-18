@@ -471,14 +471,13 @@ public class CheckInWindow extends JFrame {
          * comment when the file is marked for inclusion in this commit.
          */
         private void checkBoxUpdated(TableModelEvent e) {
-            if (statusesTableModel.isIncluded(e.getFirstRow()) == false) {
-                return;
-            }
+            boolean addedFile = statusesTableModel.isIncluded(e.getFirstRow());
             
             FileStatus fileStatus = statusesTableModel.getFileStatus(e.getFirstRow());
             String name = fileStatus.getName();
             String checkInComment = checkInCommentArea.getText();
-            if (("\n" + checkInComment).contains("\n" + name + ":") == false) {
+            boolean filenameAlreadyIncluded = ("\n" + checkInComment).contains("\n" + name + ":");
+            if (addedFile && filenameAlreadyIncluded == false) {
                 /**
                  * We want to encourage check-in comments like this:
                  * 
@@ -500,14 +499,25 @@ public class CheckInWindow extends JFrame {
                     }
                 }
                 checkInCommentArea.append(name + ": ");
-                final int newOffset = checkInCommentArea.getTextBuffer().length();
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        checkInCommentArea.select(newOffset, newOffset);
-                        checkInCommentArea.requestFocus();
-                    }
-                });
+            } else if (filenameAlreadyIncluded && addedFile == false) {
+                // Try to remove the existing filename (but not any
+                // accompanying text). This works well enough for the typical
+                // case where you accidentally include a file and immediately
+                // exclude it without typing anything.
+                String pattern = "(\n|^)" + StringUtilities.regularExpressionFromLiteral(name) + ": \n?";
+                String newComment = checkInComment.replaceFirst(pattern, "");
+                checkInCommentArea.setText(newComment);
+            } else {
+                return;
             }
+            
+            final int newOffset = checkInCommentArea.getTextBuffer().length();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    checkInCommentArea.select(newOffset, newOffset);
+                    checkInCommentArea.requestFocus();
+                }
+            });
         }
     }
     
