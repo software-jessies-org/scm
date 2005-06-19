@@ -216,9 +216,9 @@ public class RevisionWindow extends JFrame {
     private JButton changeSetButton;
     
     public RevisionWindow(String filename, int initialLineNumber) {
-        super(filename);
         this.backEnd = RevisionControlSystem.forPath(filename);
         setFilename(filename);
+        setTitle(FileUtilities.getUserFriendlyName(filename));
         makeUserInterface(initialLineNumber);
 
         readListOfRevisions(initialLineNumber);
