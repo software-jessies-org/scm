@@ -12,8 +12,6 @@ import java.util.regex.*;
  * Links to a bug database from check-in comments.
  */
 public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
-    private static final EnumSet<PStyle> SOURCE_STYLES = EnumSet.of(PStyle.NORMAL, PStyle.COMMENT);
-    
     public BugDatabaseHighlighter(PTextArea textArea) {
         // Group 1 - the text to be underlined.
         // Group 2 - the vendor, used to choose a URL template.
@@ -22,8 +20,8 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
     }
     
     @Override
-    public EnumSet<PStyle> getSourceStyles() {
-        return SOURCE_STYLES;
+    public boolean canApplyStylingTo(PStyle style) {
+        return (style == PStyle.NORMAL || style == PStyle.COMMENT);
     }
     
     private String urlForMatcher(Matcher matcher) {
