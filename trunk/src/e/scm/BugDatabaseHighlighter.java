@@ -31,7 +31,7 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
             if (vendor.equals("Sun ")) {
                 return "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=" + id;
             } else if (vendor.equals("bug ")) {
-                return "http://fogbugz.local/fogbugz/default.php?pg=pgEditBug&command=view&ixBug=" + id;
+                return "http://fogbugz.jessies.org/fogbugz/default.php?pg=pgEditBug&command=view&ixBug=" + id;
             }
         }
         return "http://woggle/" + id;
