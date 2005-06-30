@@ -317,12 +317,12 @@ public class CheckInWindow extends JFrame {
     private void editFileAtLine(int lineNumber) {
         String editor = System.getenv("SCM_EDITOR");
         if (editor == null) {
-            System.err.println("Set the environment variable $SCM_EDITOR to the command you want to be invoked.");
+            SimpleDialog.showAlert(this, "Edit", "Set the environment variable $SCM_EDITOR to the command you want to be invoked.");
             return;
         }
         
         FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
-        String command = editor + " " + ("+" + lineNumber) + " " + fileStatus.getName();
+        String command = editor + " +" + lineNumber + " " + fileStatus.getName();
         ProcessUtilities.spawn(backEnd.getRoot(), new String[] { "bash", "-c", command });
     }
     
