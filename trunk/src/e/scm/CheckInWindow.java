@@ -287,7 +287,7 @@ public class CheckInWindow extends JFrame {
                     // it ourselves...
                     boolean deleted = file.delete();
                     if (deleted == false) {
-                        SimpleDialog.showDetails(CheckInWindow.this, "Discard", "Couldn't delete file \"" + FileUtilities.getUserFriendlyName(file) + "\".");
+                        SimpleDialog.showAlert(CheckInWindow.this, "Discard", "Couldn't delete file \"" + FileUtilities.getUserFriendlyName(file) + "\".");
                     }
                 } else {
                     backEnd.revert(filename);
