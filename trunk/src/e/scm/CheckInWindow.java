@@ -264,33 +264,39 @@ public class CheckInWindow extends JFrame {
      */
     private void discardChanges() {
         patchView.setModel(new DefaultListModel());
-        
-        // Which file?
-        FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
-        String filename = fileStatus.getName();
-        File file = FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), filename);
-        
-        // Keep a backup. The file may not exist if the change we're discarding
-        // is a local "rm". FIXME: Recognize that case ('!' status in svn), and
-        // change the UI to something like "restore"?
-        if (file.exists()) {
-            String oldContent = StringUtilities.readFile(file);
-            File backupFile = FileUtilities.fileFromParentAndString(System.getProperty("java.io.tmpdir"), StringUtilities.urlEncode(filename));
-            StringUtilities.writeFile(backupFile, oldContent);
-        }
-        // FIXME: offer an "Undo Discard Changes" menu option?
-        
-        // Revert.
-        if (fileStatus.getState() == FileStatus.NEW) {
-            // If the file isn't under version control, we'll have to remove
-            // it ourselves...
-            boolean deleted = file.delete();
-            // FIXME: report errors properly. (We still need a general mechanism for this!)
-            System.err.println(deleted);
-        } else {
-            backEnd.revert(filename);
-        }
-        updateFileStatuses();
+        new BlockingWorker(statusesTable, "Discarding changes...") {
+            public void work() {
+                // Which file?
+                FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
+                String filename = fileStatus.getName();
+                File file = FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), filename);
+                
+                // Keep a backup. The file may not exist if the change we're discarding
+                // is a local "rm". FIXME: Recognize that case ('!' status in svn), and
+                // change the UI to something like "restore"?
+                if (file.exists()) {
+                    String oldContent = StringUtilities.readFile(file);
+                    File backupFile = FileUtilities.fileFromParentAndString(System.getProperty("java.io.tmpdir"), StringUtilities.urlEncode(filename));
+                    StringUtilities.writeFile(backupFile, oldContent);
+                }
+                // FIXME: offer an "Undo Discard Changes" menu option?
+                
+                // Revert.
+                if (fileStatus.getState() == FileStatus.NEW) {
+                    // If the file isn't under version control, we'll have to remove
+                    // it ourselves...
+                    boolean deleted = file.delete();
+                    // FIXME: report errors properly. (We still need a general mechanism for this!)
+                    System.err.println(deleted);
+                } else {
+                    backEnd.revert(filename);
+                }
+            }
+            
+            public void finish() {
+                updateFileStatuses();
+            }
+        };
     }
     
     /**
