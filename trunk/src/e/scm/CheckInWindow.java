@@ -438,9 +438,7 @@ public class CheckInWindow extends JFrame {
                 }
                 
                 if (failure != null) {
-                    String message = failure.getMessage();
-                    message += "\n";
-                    SimpleDialog.showAlert(CheckInWindow.this, "Back-end problem", message);
+                    SimpleDialog.showDetails(CheckInWindow.this, "Back-End Problem", failure);
                 }
                 
                 /*

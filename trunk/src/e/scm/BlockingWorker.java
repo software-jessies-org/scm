@@ -1,5 +1,6 @@
 package e.scm;
 
+import e.gui.*;
 import java.awt.*;
 import javax.swing.*;
 
@@ -59,6 +60,6 @@ public abstract class BlockingWorker extends Thread {
      * dispatch thread, so you can safely modify the UI here.
      */
     public void reportException(Exception ex) {
-        ex.printStackTrace();
+        SimpleDialog.showDetails(null, message, ex);
     }
 }

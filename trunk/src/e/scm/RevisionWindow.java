@@ -68,16 +68,15 @@ public class RevisionWindow extends JFrame {
                 previousRevision = revision;
             }
             clearStatus();
-        } catch (Exception exception) {
-            // Jumping to the same line number in the target revision is crap but it's better than not jumping to
+        } catch (Exception ex) {
+            // Jumping to the same line number in the target revision isn't ideal, but it's better than not jumping to
             // the right revision and it's better than jumping to the top.
             // The only known reason for there to be an exception is if we were asked to translate a line number
             // into a newer revision.
             // Although the back-end makes this difficult by insisting that diffs be asked for in old-to-new order,
             // the Patch class contains an isPatchReversed boolean to let us work around this.
             // Once we get round to using it.
-            System.err.println(exception);
-            exception.printStackTrace();
+            Log.warn("Couldn't translate line number", ex);
         }
         return lineNumber;
     }

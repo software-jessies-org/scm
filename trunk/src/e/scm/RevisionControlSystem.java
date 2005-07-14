@@ -37,7 +37,7 @@ public abstract class RevisionControlSystem {
         try {
             canonicalPath = new File(path).getCanonicalPath();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Log.warn("Couldn't canonicalize path", ex);
         }
         File file = new File(canonicalPath);
         if (file.exists() == false) {
