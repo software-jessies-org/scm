@@ -352,7 +352,7 @@ public class RevisionWindow extends JFrame {
             filename = file.getCanonicalPath();
             this.filePath = filename.substring(backEnd.getRoot().toString().length() + File.separator.length());
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Log.warn("Problem working out repository root", ex);
         }
     }
     
