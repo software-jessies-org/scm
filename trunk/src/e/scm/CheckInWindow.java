@@ -225,7 +225,7 @@ public class CheckInWindow extends JFrame {
     private void commit() {
         commitButton.setEnabled(false);
         patchView.setModel(new DefaultListModel());
-        new BlockingWorker(statusesTable, "Committing changes...") {
+        new Thread(new BlockingWorker(statusesTable, "Committing changes...") {
             public void work() {
                 String comment = checkInCommentArea.getText();
                 if (comment.endsWith("\n") == false) {
@@ -250,7 +250,7 @@ public class CheckInWindow extends JFrame {
                 discardSavedState();
                 updateFileStatuses();
             }
-        };
+        }).start();
     }
     
     private void discardSavedState() {
@@ -264,7 +264,7 @@ public class CheckInWindow extends JFrame {
      */
     private void discardChanges() {
         patchView.setModel(new DefaultListModel());
-        new BlockingWorker(statusesTable, "Discarding changes...") {
+        new Thread(new BlockingWorker(statusesTable, "Discarding changes...") {
             public void work() {
                 // Which file?
                 FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
@@ -297,7 +297,7 @@ public class CheckInWindow extends JFrame {
             public void finish() {
                 updateFileStatuses();
             }
-        };
+        }).start();
     }
     
     /**
@@ -401,7 +401,7 @@ public class CheckInWindow extends JFrame {
     }
     
     private void updateFileStatuses() {
-        new BlockingWorker(statusesTable, "Getting file statuses...") {
+        new Thread(new BlockingWorker(statusesTable, "Getting file statuses...") {
             List<FileStatus> statuses;
             Exception failure;
             
@@ -452,7 +452,7 @@ public class CheckInWindow extends JFrame {
                     statusesTable.requestFocus();
                 }
             }
-        };
+        }).start();
     }
     
     private static final String INSTRUCTIONS = "\n 1. Check all those files in the list to the left that you wish to commit.\n\n 2. Edit the resulting comment in this area.\n\n 3. Click the \"Commit\" button when done.";

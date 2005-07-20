@@ -4,7 +4,7 @@ import e.gui.*;
 import java.awt.*;
 import javax.swing.*;
 
-public abstract class BlockingWorker extends Thread {
+public abstract class BlockingWorker implements Runnable {
     private Component component;
     private String message;
     private Exception caughtException;
@@ -13,7 +13,6 @@ public abstract class BlockingWorker extends Thread {
     public BlockingWorker(Component component, String message) {
         this.component = component;
         this.message = message;
-        start();
     }
     
     public final void run() {

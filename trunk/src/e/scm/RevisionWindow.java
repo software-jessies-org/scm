@@ -371,7 +371,7 @@ public class RevisionWindow extends JFrame {
     }
 
     private void showAnnotationsForRevision(final Revision revision, final int lineNumber) {
-        new BackEndWorker("Getting annotations for revision " + revision.number + "...") {
+        new Thread(new BackEndWorker("Getting annotations for revision " + revision.number + "...") {
             public void work() {
                 command = backEnd.getAnnotateCommand(revision, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
@@ -388,14 +388,14 @@ public class RevisionWindow extends JFrame {
                 showSpecificLineInAnnotations(lineNumber);
                 setAnnotatedRevision(revision);
             }
-        };
+        }).start();
     }
     
     /**
      * Here, the line number corresponds to a line number in fromRevision.
      */
     private void showAnnotationsForRevision(final Revision toRevision, final Revision fromRevision, final int fromLineNumber) {
-        new BlockingWorker(this, "Tracing line back to revision " + toRevision.number + "...") {
+        new Thread(new BlockingWorker(this, "Tracing line back to revision " + toRevision.number + "...") {
             private int toLineNumber;
             
             public void work() {
@@ -405,7 +405,7 @@ public class RevisionWindow extends JFrame {
             public void finish() {
                 showAnnotationsForRevision(toRevision, toLineNumber);
             }
-        };
+        }).start();
     }
 
     private void updateAnnotationModel(Revision revision, List<String> lines) {
@@ -516,7 +516,7 @@ public class RevisionWindow extends JFrame {
     }
     
     private void showDifferencesBetweenRevisions(final Revision olderRevision, final Revision newerRevision) {
-        new BackEndWorker("Getting differences between revisions...") {
+        new Thread(new BackEndWorker("Getting differences between revisions...") {
             public void work() {
                 command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
@@ -540,7 +540,7 @@ public class RevisionWindow extends JFrame {
                 annotationView.ensureIndexIsVisible(0);
                 setAnnotatedRevision(null);
             }
-        };
+        }).start();
     }
 
     private String summaryOfAllRevisions() {
@@ -588,7 +588,7 @@ public class RevisionWindow extends JFrame {
     }
     
     private void readListOfRevisions(final int initialLineNumber) {
-        new BackEndWorker("Getting list of revisions...") {
+        new Thread(new BackEndWorker("Getting list of revisions...") {
             public void work() {
                 command = backEnd.getLogCommand(filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
@@ -614,7 +614,7 @@ public class RevisionWindow extends JFrame {
                     showSummaryOfAllRevisions();
                 }
             }
-        };
+        }).start();
     }
 
     public void selectRevision(Revision revision, int lineNumber) {
