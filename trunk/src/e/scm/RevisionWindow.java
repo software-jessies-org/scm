@@ -16,8 +16,7 @@ import e.util.*;
 public class RevisionWindow extends JFrame {
     private static final Font FONT = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
 
-    private final AnnotatedLineRenderer annotatedLineRenderer =
-        new AnnotatedLineRenderer(this);
+    private final AnnotatedLineRenderer annotatedLineRenderer = new AnnotatedLineRenderer(this);
     
     public List<Revision> getRevisionRange(Revision fromRevision, Revision toRevision) {
         ArrayList<Revision> range = new ArrayList<Revision>();
@@ -81,125 +80,123 @@ public class RevisionWindow extends JFrame {
         return lineNumber;
     }
     
-    private final MouseListener annotationsDoubleClickListener =
-        new MouseAdapter() {
-            private int index;
-            
-            /**
-             * Dispatches clicks and double-clicks on annotated lines.
-             */
-            public void mouseClicked(MouseEvent e) {
-                AnnotatedLine annotatedLine = lineForEvent(e);
-                if (e.getClickCount() == 2) {
-                    doubleClick(annotatedLine);
-                } else if (e.getClickCount() == 1) {
-                    click(annotatedLine);
-                }
+    private final MouseListener annotationsDoubleClickListener = new MouseAdapter() {
+        private int index;
+        
+        /**
+         * Dispatches clicks and double-clicks on annotated lines.
+         */
+        public void mouseClicked(MouseEvent e) {
+            AnnotatedLine annotatedLine = lineForEvent(e);
+            if (e.getClickCount() == 2) {
+                doubleClick(annotatedLine);
+            } else if (e.getClickCount() == 1) {
+                click(annotatedLine);
             }
-            
-            private AnnotatedLine lineForEvent(MouseEvent e) {
-                this.index = annotationView.locationToIndex(e.getPoint());
-                return (AnnotatedLine) annotationView.getModel().getElementAt(index);
+        }
+        
+        private AnnotatedLine lineForEvent(MouseEvent e) {
+            this.index = annotationView.locationToIndex(e.getPoint());
+            return (AnnotatedLine) annotationView.getModel().getElementAt(index);
+        }
+        
+        /**
+         * Handles double-clicks on annotated lines by switching to the
+         * revision of that line.
+         */
+        private void doubleClick(AnnotatedLine annotatedLine) {
+            Revision fromRevision = getAnnotatedRevision();
+            Revision toRevision = annotatedLine.revision;
+            if (toRevision == fromRevision) {
+                return;
             }
-
-            /**
-             * Handles double-clicks on annotated lines by switching to the
-             * revision of that line.
-             */
-            private void doubleClick(AnnotatedLine annotatedLine) {
-                Revision fromRevision = getAnnotatedRevision();
-                Revision toRevision = annotatedLine.revision;
-                if (toRevision == fromRevision) {
+            int fromLineNumber = 1 + index;
+            showAnnotationsForRevision(toRevision, fromRevision, fromLineNumber);
+            revisionsList.setSelectedValue(toRevision, true);
+        }
+        
+        /**
+         * Handles single-clicks by showing the comment associated with
+         * the line's revision.
+         */
+        private void click(AnnotatedLine annotatedLine) {
+            showComment(annotatedLine.revision.comment);
+        }
+    };
+    
+    private final MouseListener differencesDoubleClickListener = new MouseAdapter() {
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                Object[] values = revisionsList.getSelectedValues();
+                Revision newerRevision = (Revision) values[0];
+                Revision olderRevision = (Revision) values[values.length - 1];
+                
+                ListModel model = annotationView.getModel();
+                final int index = annotationView.locationToIndex(e.getPoint());
+                String lineOfInterest = (String) model.getElementAt(index);
+                
+                // Only lines removed or added can be jumped to.
+                if (lineOfInterest.matches("^[-+].*") == false) {
+                    // FIXME: give some feedback?
                     return;
                 }
-                int fromLineNumber = 1 + index;
-                showAnnotationsForRevision(toRevision, fromRevision, fromLineNumber);
-                revisionsList.setSelectedValue(toRevision, true);
-            }
-
-            /**
-             * Handles single-clicks by showing the comment associated with
-             * the line's revision.
-             */
-            private void click(AnnotatedLine annotatedLine) {
-                showComment(annotatedLine.revision.comment);
-            }
-        };
-
-    private final MouseListener differencesDoubleClickListener =
-        new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    Object[] values = revisionsList.getSelectedValues();
-                    Revision newerRevision = (Revision) values[0];
-                    Revision olderRevision = (Revision) values[values.length - 1];
-
-                    ListModel model = annotationView.getModel();
-                    final int index = annotationView.locationToIndex(e.getPoint());
-                    String lineOfInterest = (String) model.getElementAt(index);
-
-                    // Only lines removed or added can be jumped to.
-                    if (lineOfInterest.matches("^[-+].*") == false) {
-                        // FIXME: give some feedback?
-                        return;
-                    }
-
-                    // What revision are we going to?
-                    Revision desiredRevision = olderRevision;
-                    if (lineOfInterest.startsWith("+")) {
-                        desiredRevision = newerRevision;
-                    }
-
-                    // Search backwards for the previous @@ line to help find out where we are.
-                    int newerStartLine = 0;
-                    int olderStartLine = 0;
-                    int linesIntoHunk = 0;
-                    for (int i = index; i >= 0; --i) {
-                        String line = (String) model.getElementAt(i);
-                        Matcher matcher = Patch.AT_AT_PATTERN.matcher(line);
-                        if (matcher.matches()) {
-                            olderStartLine = Integer.parseInt(matcher.group(1));
-                            newerStartLine = Integer.parseInt(matcher.group(3));
-                            break;
-                        } else if (line.startsWith("+")) {
-                            if (desiredRevision == newerRevision) {
-                                ++linesIntoHunk;
-                            }
-                        } else if (line.startsWith("-")) {
-                            if (desiredRevision == olderRevision) {
-                                ++linesIntoHunk;
-                            }
-                        } else {
-                            // Context lines count for both revisions.
+                
+                // What revision are we going to?
+                Revision desiredRevision = olderRevision;
+                if (lineOfInterest.startsWith("+")) {
+                    desiredRevision = newerRevision;
+                }
+                
+                // Search backwards for the previous @@ line to help find out where we are.
+                int newerStartLine = 0;
+                int olderStartLine = 0;
+                int linesIntoHunk = 0;
+                for (int i = index; i >= 0; --i) {
+                    String line = (String) model.getElementAt(i);
+                    Matcher matcher = Patch.AT_AT_PATTERN.matcher(line);
+                    if (matcher.matches()) {
+                        olderStartLine = Integer.parseInt(matcher.group(1));
+                        newerStartLine = Integer.parseInt(matcher.group(3));
+                        break;
+                    } else if (line.startsWith("+")) {
+                        if (desiredRevision == newerRevision) {
                             ++linesIntoHunk;
                         }
+                    } else if (line.startsWith("-")) {
+                        if (desiredRevision == olderRevision) {
+                            ++linesIntoHunk;
+                        }
+                    } else {
+                        // Context lines count for both revisions.
+                        ++linesIntoHunk;
                     }
-
-                    // The line numbers in the @@ line actually refer to the
-                    // line after.
-                    --newerStartLine;
-                    --olderStartLine;
-
-                    int startLine = ((desiredRevision == olderRevision) ? olderStartLine : newerStartLine);
-                    int desiredLineNumber = startLine + linesIntoHunk;
-
-                    if (false) {
-                        // Remove this when I'm confident this code is right.
-                        System.err.println("going to " + ((desiredRevision == olderRevision) ? "older" : "newer") + " revision");
-                        System.err.println("old=" + olderStartLine + " new=" + newerStartLine);
-                        System.err.println("linesIntoHunk=" + linesIntoHunk);
-                        System.err.println("startLine=" + startLine + "  desiredLineNumber=" + desiredLineNumber);
-                    }
-
-                    selectRevision(desiredRevision, desiredLineNumber);
                 }
+                
+                // The line numbers in the @@ line actually refer to the
+                // line after.
+                --newerStartLine;
+                --olderStartLine;
+                
+                int startLine = ((desiredRevision == olderRevision) ? olderStartLine : newerStartLine);
+                int desiredLineNumber = startLine + linesIntoHunk;
+                
+                if (false) {
+                    // Remove this when I'm confident this code is right.
+                    System.err.println("going to " + ((desiredRevision == olderRevision) ? "older" : "newer") + " revision");
+                    System.err.println("old=" + olderStartLine + " new=" + newerStartLine);
+                    System.err.println("linesIntoHunk=" + linesIntoHunk);
+                    System.err.println("startLine=" + startLine + "  desiredLineNumber=" + desiredLineNumber);
+                }
+                
+                selectRevision(desiredRevision, desiredLineNumber);
             }
-        };
-
+        }
+    };
+    
     private String filePath;
-
+    
     private RevisionControlSystem backEnd;
-        
+    
     // The revision we're annotating, if we're annotating, otherwise null.
     private Revision annotatedRevision;
     // Non-zero if we don't want to keep the currently selected line.
@@ -211,6 +208,8 @@ public class RevisionWindow extends JFrame {
     private JList revisionsList;
     private PTextArea revisionCommentArea;
     private JList annotationView;
+    
+    private JAsynchronousProgressIndicator progressIndicator = new JAsynchronousProgressIndicator();
     private JLabel statusLine = new JLabel(" ");
     private JButton changeSetButton;
     
@@ -247,6 +246,7 @@ public class RevisionWindow extends JFrame {
                 backEnd.showChangeSet(filePath, getAnnotatedRevision());
             }
         });
+        changeSetButton.setEnabled(false);
 
         JButton showLogButton = new JButton("Show Log");
         showLogButton.addActionListener(new ActionListener() {
@@ -255,10 +255,6 @@ public class RevisionWindow extends JFrame {
             }
         });
 
-        JPanel buttonsPanel = new JPanel(new BorderLayout());
-        buttonsPanel.add(changeSetButton, BorderLayout.EAST);
-        buttonsPanel.add(showLogButton, BorderLayout.WEST);
-        
         final JTextField searchField = new SearchField();
         searchField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -290,12 +286,17 @@ public class RevisionWindow extends JFrame {
             }
         });
         
-        JPanel statusPanel = new JPanel(new BorderLayout());
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
+        buttonsPanel.add(changeSetButton);
+        buttonsPanel.add(showLogButton);
+        buttonsPanel.add(searchField);
+        
+        JPanel statusPanel = new JPanel(new BorderLayout(4, 0));
         statusPanel.setBorder(new javax.swing.border.EmptyBorder(10, 0, 10, 0));
+        statusPanel.add(progressIndicator, BorderLayout.WEST);
         statusPanel.add(statusLine, BorderLayout.CENTER);
-        statusPanel.add(buttonsPanel, BorderLayout.WEST);
-        statusPanel.add(searchField, BorderLayout.EAST);
-
+        statusPanel.add(buttonsPanel, BorderLayout.EAST);
+        
         JPanel contentPane = new JPanel(new BorderLayout());
         contentPane.setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
         contentPane.add(ui, BorderLayout.CENTER);
@@ -357,16 +358,62 @@ public class RevisionWindow extends JFrame {
     }
     
     /**
-     * Factors out the data common to all BlockingWorker subclasses in this RevisionWindow.
+     * Similar to BlockingWorker. FIXME: replace both classes with SwingWorker for Java 6.
      */
-    public abstract class BackEndWorker extends BlockingWorker {
+    public abstract class BackEndWorker implements Runnable {
+        private String message;
+        private Exception caughtException;
+        
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         String[] command;
         int status = 0;
         
         public BackEndWorker(final String message) {
-            super(RevisionWindow.this, message);
+            setStatus(message);
+        }
+        
+        public final void run() {
+            try {
+                progressIndicator.startAnimation();
+                work();
+            } catch (Exception ex) {
+                caughtException = ex;
+            } finally {
+                progressIndicator.stopAnimation();
+                setStatus("");
+            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (caughtException != null) {
+                        reportException(caughtException);
+                    } else {
+                        finish();
+                    }
+                }
+            });
+        }
+        
+        /**
+         * Override this to do the potentially time-consuming work.
+         */
+        public abstract void work();
+        
+        /**
+         * Override this to do the finishing up that needs to be done back
+         * on the event dispatch thread. This will only be invoked if your
+         * 'work' method didn't throw an exception (if an exception was
+         * thrown, 'reportException' will be invoked instead).
+         */
+        public abstract void finish();
+        
+        /**
+         * Invoked if 'work' threw an exception. The default implementation
+         * simply prints the stack trace. This method is run on the event
+         * dispatch thread, so you can safely modify the UI here.
+         */
+        public void reportException(Exception ex) {
+            SimpleDialog.showDetails(RevisionWindow.this, message, ex);
         }
     }
 
@@ -395,7 +442,7 @@ public class RevisionWindow extends JFrame {
      * Here, the line number corresponds to a line number in fromRevision.
      */
     private void showAnnotationsForRevision(final Revision toRevision, final Revision fromRevision, final int fromLineNumber) {
-        new Thread(new BlockingWorker(this, "Tracing line back to revision " + toRevision.number + "...") {
+        new Thread(new BackEndWorker("Tracing line back to revision " + toRevision.number + "...") {
             private int toLineNumber;
             
             public void work() {
