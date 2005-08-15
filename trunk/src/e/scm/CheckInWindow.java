@@ -517,7 +517,7 @@ public class CheckInWindow extends JFrame {
             }
             
             final int newOffset = checkInCommentArea.getTextBuffer().length();
-            SwingUtilities.invokeLater(new Runnable() {
+            EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     checkInCommentArea.select(newOffset, newOffset);
                     checkInCommentArea.requestFocus();

@@ -25,7 +25,7 @@ public abstract class BlockingWorker implements Runnable {
         } finally {
             waitCursor.stop();
         }
-        SwingUtilities.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
             public void run() {
                 if (caughtException != null) {
                     reportException(caughtException);

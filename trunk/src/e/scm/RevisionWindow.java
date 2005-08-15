@@ -383,7 +383,7 @@ public class RevisionWindow extends JFrame {
                 progressIndicator.stopAnimation();
                 setStatus("");
             }
-            SwingUtilities.invokeLater(new Runnable() {
+            EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     if (caughtException != null) {
                         reportException(caughtException);
@@ -497,7 +497,7 @@ public class RevisionWindow extends JFrame {
     private void showSpecificLineInAnnotations(int lineNumber) {
         // FIXME: this only works while the implementation is synchronous.
         final int index = lineNumber - 1;
-        SwingUtilities.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
             public void run() {
                 // Select the appropriate index.
                 annotationView.setSelectedIndex(index);
