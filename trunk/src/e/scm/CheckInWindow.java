@@ -182,8 +182,8 @@ public class CheckInWindow extends JFrame {
     }
     
     private class DiscardChangesAction extends AbstractAction {
-        DiscardChangesAction() {
-            super("Discard Changes");
+        DiscardChangesAction(String name) {
+            super(name);
         }
         public void actionPerformed(ActionEvent e) {
             discardChanges();
@@ -213,11 +213,19 @@ public class CheckInWindow extends JFrame {
         menu.addMenuItemProvider(new MenuItemProvider() {
             public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
                 actions.add(new EditFileAction());
-                actions.add(new DiscardChangesAction());
+                actions.add(new DiscardChangesAction(chooseDiscardActionName()));
                 actions.add(null);
                 actions.add(new ShowHistoryAction());
                 actions.add(null);
                 actions.add(new RefreshListAction());
+            }
+            
+            // It doesn't make sense to talk about discarding changes to an unmodified file.
+            // FIXME: should we disable the action if the file's been added or removed?
+            private String chooseDiscardActionName() {
+                FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
+                String quotedFilename = "'" + fileStatus.getName() + "'";
+                return (fileStatus.getState() == FileStatus.MODIFIED) ? "Discard Changes to " + quotedFilename : "Discard File " + quotedFilename;
             }
         });
     }
