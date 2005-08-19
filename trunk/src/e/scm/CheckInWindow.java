@@ -176,6 +176,9 @@ public class CheckInWindow extends JFrame {
         EditFileAction() {
             super("Edit File");
         }
+        public boolean isEnabled() {
+            return (statusesTable.getSelectedRow() != -1);
+        }
         public void actionPerformed(ActionEvent e) {
             editFileAtLine(1);
         }
@@ -185,6 +188,9 @@ public class CheckInWindow extends JFrame {
         DiscardChangesAction(String name) {
             super(name);
         }
+        public boolean isEnabled() {
+            return (statusesTable.getSelectedRow() != -1);
+        }
         public void actionPerformed(ActionEvent e) {
             discardChanges();
         }
@@ -193,6 +199,9 @@ public class CheckInWindow extends JFrame {
     private class ShowHistoryAction extends AbstractAction {
         ShowHistoryAction() {
             super("Show History...");
+        }
+        public boolean isEnabled() {
+            return (statusesTable.getSelectedRow() != -1);
         }
         public void actionPerformed(ActionEvent e) {
             showHistory();
@@ -223,9 +232,14 @@ public class CheckInWindow extends JFrame {
             // It doesn't make sense to talk about discarding changes to an unmodified file.
             // FIXME: should we disable the action if the file's been added or removed?
             private String chooseDiscardActionName() {
-                FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
-                String quotedFilename = "'" + fileStatus.getName() + "'";
-                return (fileStatus.getState() == FileStatus.MODIFIED) ? "Discard Changes to " + quotedFilename : "Discard File " + quotedFilename;
+                String result = "Discard";
+                int row = statusesTable.getSelectedRow();
+                if (row != -1) {
+                    FileStatus fileStatus = statusesTableModel.getFileStatus(row);
+                    String quotedFilename = "'" + fileStatus.getName() + "'";
+                    result += ((fileStatus.getState() == FileStatus.MODIFIED) ? " Changes to " : " File ") + quotedFilename;
+                }
+                return result;
             }
         });
     }
