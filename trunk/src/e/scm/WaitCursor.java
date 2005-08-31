@@ -6,10 +6,8 @@ import javax.swing.*;
 import e.util.*;
 
 public class WaitCursor {
-    private static final Cursor DEFAULT_CURSOR =
-        Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
-    private static final Cursor WAIT_CURSOR =
-        Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
+    private static final Cursor DEFAULT_CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+    private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
     
     private static final MouseAdapter MOUSE_EVENT_SWALLOWER = new MouseAdapter() {
     };
@@ -38,21 +36,23 @@ public class WaitCursor {
     private Timer sheetTimer;
     
     private JProgressBar progressBar;
+    private JComponent content;
     
     private Object component;
     private String message;
-    private Component glassPane;
+    private JPanel glassPane;
     
     public WaitCursor(Object component, String message) {
         this.component = component;
         this.message = message;
-        this.glassPane = getGlassPane();
+        this.glassPane = (JPanel) getGlassPane();
         this.progressBar = new JProgressBar();
     }
     
     public synchronized void start() {
         glassPane.setCursor(WAIT_CURSOR);
         glassPane.addMouseListener(MOUSE_EVENT_SWALLOWER);
+        glassPane.removeAll();
         glassPane.setVisible(true);
         
         scheduleSheetAppearance();
@@ -99,6 +99,7 @@ public class WaitCursor {
      */
     private void unsafeHideSheet() {
         // Work around Sun 4995929 for Java 1.4.2 users.
+        // This bug seems to persist in Apple's Java 5.
         progressBar.setIndeterminate(false);
         
         if (sheet != null) {
@@ -127,46 +128,68 @@ public class WaitCursor {
     private synchronized void showSheet() {
         hideSheet();
         createSheet();
-        sheet.setVisible(true);
     }
     
     private synchronized void createSheet() {
+        Dimension size = new Dimension(400, 120);
+        
         // Create the content.
-        progressBar.setIndeterminate(true);
-        JComponent content = new JPanel(new BorderLayout(20, 20));
+        content = new JPanel(new BorderLayout(20, 20));
         content.add(makeCenteredPanel(progressBar), BorderLayout.CENTER);
         content.add(makeCenteredPanel(new JLabel(message)), BorderLayout.SOUTH);
         content.setBorder(progressBar.getBorder());
+        content.setSize(size);
+        
+        progressBar.setIndeterminate(true);
+        
+        final Frame frame = frameOf(glassPane);
         
         // Create the sheet itself.
-        sheet = new JDialog(frameOf(glassPane));
-        sheet.setContentPane(content);
-        sheet.setSize(new Dimension(400, 120));
-        sheet.setUndecorated(true);
-        
-        // Ensure we defer focus to our parent.
-        sheet.addFocusListener(new FocusAdapter() {
-            public void focusGained(FocusEvent e) {
-                sheet.getOwner().requestFocus();
-            }
-        });
-        
-        // Ensure we follow our parent around, as if attached.
-        sheet.getOwner().addComponentListener(sheetParentListener);
-        repositionSheet();
+        if (GuiUtilities.isMacOs()) {
+            sheet = new JDialog(frame);
+            sheet.setContentPane(content);
+            sheet.setUndecorated(true);
+            sheet.setSize(size);
+            
+            // Ensure we defer focus to our parent.
+            content.addFocusListener(new FocusAdapter() {
+                public void focusGained(FocusEvent e) {
+                    frame.requestFocus();
+                }
+            });
+            
+            // Ensure we follow our parent around, as if attached.
+            repositionSheet();
+            frame.addComponentListener(sheetParentListener);
+            sheet.setVisible(true);
+        } else {
+            initSheetLocation();
+        }
     }
     
-    /** Lines the sheet up with the middle of the top of the parent window. */
+    /** Keeps the sheet dialog lined up with the middle of the top of the parent window. */
     private void repositionSheet() {
-        Window owner = sheet.getOwner();
+        Frame owner = frameOf(glassPane);
         Point location = owner.getLocationOnScreen();
-        if (GuiUtilities.isMacOs()) {
-            location.y += owner.getInsets().top;
-        } else {
-            location.y += (owner.getHeight() - sheet.getHeight()) / 2;
-        }
-        location.x += (owner.getWidth() - sheet.getWidth()) / 2;
+        location.x += (owner.getWidth() - content.getWidth()) / 2;
+        location.y += owner.getInsets().top;
         sheet.setLocation(location);
+    }
+    
+    /** Puts the sheet content panel in the right place on the glass pane. */
+    private void initSheetLocation() {
+        Frame owner = frameOf(glassPane);
+        Point location = new Point();
+        location.x += (owner.getWidth() - content.getWidth()) / 2;
+        location.y += (owner.getHeight() - content.getHeight()) / 2;
+        
+        JPanel glassPanel = (JPanel) glassPane;
+        glassPanel.setLayout(null);
+        glassPanel.add(content);
+        content.setBounds(location.x, location.y, content.getWidth(), content.getHeight());
+        content.invalidate();
+        content.validate();
+        content.repaint();
     }
 
     private Component getGlassPane() {
@@ -183,7 +206,7 @@ public class WaitCursor {
      * Returns the Frame containing the given component.
      */
     private static Frame frameOf(Component c) {
-        return (Frame) SwingUtilities.getAncestorOfClass(Frame.class, c);
+        return Frame.class.cast(SwingUtilities.getAncestorOfClass(Frame.class, c));
     }
     
     /**
