@@ -471,7 +471,7 @@ public class CheckInWindow extends JFrame {
                 if (statusesTable.getRowCount() != 0) {
                     int chosenRow = statusesTableModel.chooseDefaultSelectedRow();
                     statusesTable.getSelectionModel().setSelectionInterval(chosenRow, chosenRow);
-                    statusesTable.requestFocus();
+                    statusesTable.requestFocusInWindow();
                 }
             }
         }).start();
@@ -542,7 +542,7 @@ public class CheckInWindow extends JFrame {
             EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     checkInCommentArea.select(newOffset, newOffset);
-                    checkInCommentArea.requestFocus();
+                    checkInCommentArea.requestFocusInWindow();
                 }
             });
         }
