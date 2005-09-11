@@ -44,6 +44,8 @@ public abstract class RevisionControlSystem {
             System.err.println(file + " does not exist");
             return null;
         }
+        
+        // Is there evidence of revision control in this directory?
         File directory = file.isDirectory() ? file : new File(file.getParent());
         for (String sibling : directory.list()) {
             if (sibling.equals("CVS")) {
@@ -54,7 +56,14 @@ public abstract class RevisionControlSystem {
                 return ascendUntilSubdirectoryDisappears(directory, ".svn");
             }
         }
-        System.err.println(file + " is not in a directory that is under revision control");
+        
+        // We've found nothing yet, so try again in the parent.
+        String parent = file.getParent();
+        if (parent != null) {
+            return findRepositoryRoot(parent);
+        }
+        
+        // We're in "/", so admit defeat.
         return null;
     }
     
