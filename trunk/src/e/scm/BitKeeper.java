@@ -201,7 +201,7 @@ public class BitKeeper extends RevisionControlSystem {
     
     public void commit(String comment, List<FileStatus> fileStatuses) {
         File resync = new File(getRoot(), "RESYNC");
-        if (resync.isDirectory()) {
+        if (resync.isDirectory() || getRoot().getName().equals("RESYNC")) {
             throw new RuntimeException("the BitKeeper back-end doesn't support committing of bk resolve merges - sorry, it's back to bk citool for you");
         }
         
