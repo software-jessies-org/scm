@@ -10,6 +10,10 @@ import java.util.regex.*;
 
 /**
  * Links to a bug database from check-in comments.
+ * 
+ * Examples:
+ *   Sun Java bug parade: Sun 6227617.
+ *   RFCs: RFC2229.
  */
 public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
     public BugDatabaseHighlighter(PTextArea textArea) {
