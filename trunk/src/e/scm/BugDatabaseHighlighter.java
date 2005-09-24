@@ -16,7 +16,7 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         // Group 1 - the text to be underlined.
         // Group 2 - the vendor, used to choose a URL template.
         // Group 3 - the id, inserted into the template.
-        super(textArea, "(?i)\\b((?:(Sun |bug |D)([0-9]+)))", PStyle.HYPERLINK);
+        super(textArea, "(?i)\\b((?:(Sun |bug |RFC ?|D)([0-9]+)))", PStyle.HYPERLINK);
     }
     
     @Override
@@ -32,6 +32,8 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
                 return "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=" + id;
             } else if (vendor.equals("bug ")) {
                 return "http://fogbugz.jessies.org/fogbugz/default.php?pg=pgEditBug&command=view&ixBug=" + id;
+            } else if (vendor.equals("RFC")) {
+                return "http://ftp.rfc-editor.org/in-notes/rfc" + id + ".txt";
             }
         }
         return "http://woggle/" + id;
