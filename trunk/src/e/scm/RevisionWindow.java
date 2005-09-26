@@ -330,6 +330,7 @@ public class RevisionWindow extends JFrame {
 
     private void initRevisionCommentArea() {
         revisionCommentArea = makeTextArea(8);
+        revisionCommentArea.addStyleApplicator(new BugDatabaseHighlighter(revisionCommentArea));
     }
 
     private PTextArea makeTextArea(final int rowCount) {
