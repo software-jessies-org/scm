@@ -382,7 +382,7 @@ public class RevisionWindow extends JFrame {
                 caughtException = ex;
             } finally {
                 progressIndicator.stopAnimation();
-                setStatus("");
+                clearStatus();
             }
             EventQueue.invokeLater(new Runnable() {
                 public void run() {
@@ -564,11 +564,12 @@ public class RevisionWindow extends JFrame {
     }
     
     private void showDifferencesBetweenRevisions(final Revision olderRevision, final Revision newerRevision) {
-        new Thread(new BackEndWorker("Getting differences between revisions...") {
+        new Thread(new BackEndWorker("Getting differences between revisions " + olderRevision.number + " and " + newerRevision.number + "...") {
             public void work() {
                 command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
                 if (wasSuccessful()) {
+                    setStatus("Annotating patch...");
                     lines = PatchView.annotatePatchUsingTags(backEnd, lines);
                 }
             }
