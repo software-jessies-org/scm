@@ -79,7 +79,7 @@ public class PatchView extends JList {
         ensureIndexIsVisible(0);
     }
     
-    private ArrayList<String> annotatePatchUsingTags(RevisionControlSystem backEnd, ArrayList<String> lines) {
+    public static ArrayList<String> annotatePatchUsingTags(RevisionControlSystem backEnd, ArrayList<String> lines) {
         ArrayList<String> newLines = new ArrayList<String>();
         ArrayList<String> newErrors = new ArrayList<String>();
         String patch = StringUtilities.join(lines, "\n") + "\n";

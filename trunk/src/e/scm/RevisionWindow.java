@@ -568,11 +568,18 @@ public class RevisionWindow extends JFrame {
             public void work() {
                 command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
+                if (wasSuccessful()) {
+                    lines = PatchView.annotatePatchUsingTags(backEnd, lines);
+                }
+            }
+            
+            private boolean wasSuccessful() {
+                // CVS returns a non-zero exit status if there were any differences, so we can't trust 'status'.
+                return (errors.size() == 0);
             }
             
             public void finish() {
-                // CVS returns a non-zero exit status if there were any differences.
-                if (errors.size() > 0) {
+                if (wasSuccessful() == false) {
                     showToolError(revisionsList, errors);
                     return;
                 }
