@@ -98,10 +98,6 @@ public class WaitCursor {
      * Implements hideSheet, which you should invoke instead.
      */
     private void unsafeHideSheet() {
-        // Work around Sun 4995929 for Java 1.4.2 users.
-        // This bug seems to persist in Apple's Java 5.
-        progressBar.setIndeterminate(false);
-        
         if (sheet != null) {
             sheet.getOwner().removeComponentListener(sheetParentListener);
             sheet.setVisible(false);
