@@ -1,25 +1,32 @@
-#!/bin/bash
-real_script=`readlink $0 || echo $0`
-tools_dir=`dirname $real_script`/..
+#!/usr/bin/ruby -w
 
-if [ $# == 0 ];
-then
-    echo "Use the 'checkintool' or 'revisiontool' scripts instead."
-    exit 1
-fi
+if ARGV.length() == 0
+    $stderr.puts("Use the 'checkintool' or 'revisiontool' scripts instead.")
+    exit(1)
+end
 
-tool_name=$1
+tool_name=ARGV.shift()
 
-class_path=$tools_dir/classes:$tools_dir/../salma-hayek/classes
+require 'fileutils.rb'
+require 'pathname.rb'
 
-shift
-case "`uname`" in
-Darwin)
-    os_specific_options=-Xdock:name=$tool_name
-    ;;
-*)
-    class_path=$class_path:$tools_dir/../salma-hayek/MRJ141Stubs.jar
-    ;;
-esac
+# Cope with symbolic links to this script.
+tools_dir = Pathname.new("#{__FILE__}/..").realpath().dirname()
+salma_hayek = "#{tools_dir}/../salma-hayek"
 
-exec java $os_specific_options -Xmx1g -cp $class_path e.util.Launcher $tool_name e.scm.$tool_name "$@"
+TARGET_OS=`#{salma_hayek}/bin/target-os.rb`.chomp()
+
+class_path = "#{tools_dir}/classes:#{salma_hayek}/classes"
+if TARGET_OS != "Darwin"
+    class_path = "#{class_path}:#{salma_hayek}/MRJ141Stubs.jar"
+end
+
+args = [ "java", "-Xmx1g", "-cp", class_path ]
+if TARGET_OS == "Darwin"
+    args << "-Xdock:name=#{tool_name}"
+end
+args << "e.util.Launcher"
+args << tool_name
+args << "e.scm.#{tool_name}"
+args.concat(ARGV)
+system(*args)
