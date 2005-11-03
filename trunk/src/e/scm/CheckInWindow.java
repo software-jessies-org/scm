@@ -498,6 +498,8 @@ public class CheckInWindow extends JFrame {
          * comment when the file is marked for inclusion in this commit.
          */
         private void checkBoxUpdated(TableModelEvent e) {
+            updateStatusLine();
+            
             boolean addedFile = statusesTableModel.isIncluded(e.getFirstRow());
             
             FileStatus fileStatus = statusesTableModel.getFileStatus(e.getFirstRow());
@@ -545,6 +547,11 @@ public class CheckInWindow extends JFrame {
                     checkInCommentArea.requestFocusInWindow();
                 }
             });
+        }
+        
+        private void updateStatusLine() {
+            int rowCount = statusesTableModel.getRowCount();
+            setStatus(statusesTableModel.getIncludedFileCount() + " of " + StringUtilities.pluralize(rowCount, "file", "files") + " will be committed.");
         }
     }
     
