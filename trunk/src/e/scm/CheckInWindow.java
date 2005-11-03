@@ -483,6 +483,8 @@ public class CheckInWindow extends JFrame {
         public void tableChanged(TableModelEvent e) {
             boolean haveFiles = statusesTableModel.isAtLeastOneFileIncluded();
             commitButton.setEnabled(haveFiles);
+            
+            updateStatusLine();
 
             if (checkInCommentArea.isEnabled() != haveFiles) {
                 fillCheckInCommentArea();
@@ -498,8 +500,6 @@ public class CheckInWindow extends JFrame {
          * comment when the file is marked for inclusion in this commit.
          */
         private void checkBoxUpdated(TableModelEvent e) {
-            updateStatusLine();
-            
             boolean addedFile = statusesTableModel.isIncluded(e.getFirstRow());
             
             FileStatus fileStatus = statusesTableModel.getFileStatus(e.getFirstRow());
@@ -548,15 +548,15 @@ public class CheckInWindow extends JFrame {
                 }
             });
         }
-        
-        private void updateStatusLine() {
-            int rowCount = statusesTableModel.getRowCount();
-            setStatus(statusesTableModel.getIncludedFileCount() + " of " + StringUtilities.pluralize(rowCount, "file", "files") + " will be committed.");
-        }
     }
     
     private boolean isAnIncludedFilename(String filename) {
         return statusesTableModel.getIncludedFilenames().contains(filename);
+    }
+    
+    private void updateStatusLine() {
+        int rowCount = statusesTableModel.getRowCount();
+        setStatus(statusesTableModel.getIncludedFileCount() + " of " + StringUtilities.pluralize(rowCount, "file", "files") + " will be committed.");
     }
     
     public void clearStatus() {
