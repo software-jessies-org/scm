@@ -555,8 +555,11 @@ public class CheckInWindow extends JFrame {
     }
     
     private void updateStatusLine() {
+        clearStatus();
         int rowCount = statusesTableModel.getRowCount();
-        setStatus(statusesTableModel.getIncludedFileCount() + " of " + StringUtilities.pluralize(rowCount, "file", "files") + " will be committed.");
+        if (rowCount > 1) {
+            setStatus(statusesTableModel.getIncludedFileCount() + " of " + StringUtilities.pluralize(rowCount, "file", "files") + " will be committed.");
+        }
     }
     
     public void clearStatus() {
