@@ -32,11 +32,11 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         String id = matcher.group(3);
         String vendor = matcher.group(2);
         if (vendor != null) {
-            if (vendor.equals("Sun ")) {
+            if (vendor.equalsIgnoreCase("Sun ")) {
                 return "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=" + id;
-            } else if (vendor.equals("bug ")) {
+            } else if (vendor.equalsIgnoreCase("bug ")) {
                 return "http://fogbugz.jessies.org/fogbugz/default.php?pg=pgEditBug&command=view&ixBug=" + id;
-            } else if (vendor.equals("RFC")) {
+            } else if (vendor.equalsIgnoreCase("RFC")) {
                 return "http://ftp.rfc-editor.org/in-notes/rfc" + id + ".txt";
             }
         }
