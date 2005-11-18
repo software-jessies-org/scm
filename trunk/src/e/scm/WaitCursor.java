@@ -179,9 +179,8 @@ public class WaitCursor {
         location.x += (owner.getWidth() - content.getWidth()) / 2;
         location.y += (owner.getHeight() - content.getHeight()) / 2;
         
-        JPanel glassPanel = (JPanel) glassPane;
-        glassPanel.setLayout(null);
-        glassPanel.add(content);
+        glassPane.setLayout(null);
+        glassPane.add(content);
         content.setBounds(location.x, location.y, content.getWidth(), content.getHeight());
         content.invalidate();
         content.validate();

@@ -14,7 +14,7 @@ public class BitKeeper extends RevisionControlSystem {
             command.add("-r" + revision.number);
         }
         command.add(filename);
-        return (String[]) command.toArray(new String[command.size()]);
+        return command.toArray(new String[command.size()]);
     }
 
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename) {
