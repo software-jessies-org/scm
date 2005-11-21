@@ -143,7 +143,7 @@ it then applies to each file, and to the change set.
 
 <h2>Writing <i>good</i> check-in comments</h2>
 
-<p>One reason check-in comments are useful is, as Chris Aston said to me, the fact assumption that "I'm not cleverer today than I was yesterday". So if you see something that's wrong, or weird, it's worth trying to find out where it came from. And that's when you're dealing with your own code! It's even more important to do a bit of archeology if you're working on someone else's code.
+<p>One reason check-in comments are useful is, as Chris Aston said to me, the safe assumption that "I'm not cleverer today than I was yesterday". So if you see something that's wrong, or weird, it's worth trying to find out where it came from. And that's when you're dealing with your own code! It's even more important to do a bit of archaeology if you're working on someone else's code.
 
 <p>This helps guide us in writing good check-in comments. As you write, imagine someone who's left the company has already written the comment, and you're only reading it. Think about what you'd most like to see.
 
@@ -156,7 +156,7 @@ it then applies to each file, and to the change set.
 <li><b>Alternatives rejected</b> - we can see what you <i>did</i> implement, but it's often interesting to know why you didn't implement other alternatives. Often this is interesting enough to warrant code comments instead. Especially useful if you're replacing one implementation with another is why the old implementation was no longer suitable.
 <li><b>Known limitations</b> - these should probably be FIXME or TODO comments in the code.
 <li><b>Known performance impact</b> - if you measured the performance impact of your change, say so. Mention the tests and the results.
-<li><b>Evidence to support "premature" optimization</b> - if you're introducing an optimization, point to a demonstration that it's useful, or details of the situations in which it's useful. This will discourage other from backing it out rather than fixing it when it's demonstrated to be incorrect.
+<li><b>Evidence to support "premature" optimization</b> - if you're introducing an optimization, point to a demonstration that it's useful, or details of the situations in which it's useful. This will discourage others from backing it out rather than fixing it when it's demonstrated to be incorrect.
 <li><b>Text of build errors fixed</b> - if you're fixing a build error, include the exact error text to help later reviewers determine whether it's the most appropriate fix or understand your problem so that they don't re-introduce the build error.
 </ul>
 
