@@ -21,9 +21,9 @@ they're limited to BitKeeper repositories, are somewhat idiosyncratic in
 design, look disgusting, and are missing little niceties like spelling
 checking for your comments.
 
-<p>SCM, on the other hand, is useful, simple, portable (in two senses: I use
-it on Linux and Mac OS, and I use it with BitKeeper, CVS and Subversion),
-and pretty.
+<p>SCM, on the other hand, is attractive, simple, useful, and portable across
+operating systems as well as revision control systems. I use
+it on Linux and Mac OS, and I use it with BitKeeper, CVS and Subversion.
 
 <P>Another important thing to realize is that SCM never asks for commitment
 from you: it doesn't have any kind of set-up process (you can install it
@@ -140,6 +140,31 @@ fits the idea of a change set as a coherent group of changes.
 
 <p>In effect, CheckInTool forces you to write only a change set comment, which
 it then applies to each file, and to the change set.
+
+<h2>Writing <i>good</i> check-in comments</h2>
+
+<p>One reason check-in comments are useful is, as Chris Aston said to me, the fact assumption that "I'm not cleverer today than I was yesterday". So if you see something that's wrong, or weird, it's worth trying to find out where it came from. And that's when you're dealing with your own code! It's even more important to do a bit of archeology if you're working on someone else's code.
+
+<p>This helps guide us in writing good check-in comments. As you write, imagine someone who's left the company has already written the comment, and you're only reading it. Think about what you'd most like to see.
+
+<p>I explained above why you should comment the "change set", naming all the files touched, and the relationship between the individual files' changes.
+
+<p>Here's a checklist of things you should try to get into a habit of going through in your mind as you write a check-in comment:
+<ul>
+<li><b>Bug/defect number</b> - if you have a bug database, reference it. There's likely to be plenty of extra information/dialog in there that shouldn't go to waste. This is why SCM and Edit go out of their way to turn your bug/defect numbers into links.</li>
+<li><b>Other people involved</b> - if you go under a bus on your way home from work, who else would be worth talking to when it comes to this code? Especially useful if you're doing something as the result of a request without a formal defect number, or as the result of group consensus.</li>
+<li><b>Alternatives rejected</b> - we can see what you <i>did</i> implement, but it's often interesting to know why you didn't implement other alternatives. Often this is interesting enough to warrant code comments instead. Especially useful if you're replacing one implementation with another is why the old implementation was no longer suitable.
+<li><b>Known limitations</b> - these should probably be FIXME or TODO comments in the code.
+<li><b>Known performance impact</b> - if you measured the performance impact of your change, say so. Mention the tests and the results.
+<li><b>Evidence to support "premature" optimization</b> - if you're introducing an optimization, point to a demonstration that it's useful, or details of the situations in which it's useful. This will discourage other from backing it out rather than fixing it when it's demonstrated to be incorrect.
+<li><b>Text of build errors fixed</b> - if you're fixing a build error, include the exact error text to help later reviewers determine whether it's the most appropriate fix or understand your problem so that they don't re-introduce the build error.
+</ul>
+
+<p>I won't insult you by reminding you that saying <i>what</i> you've done is never as useful as <i>why</i> you did it, though such comments can be useful if you accidentally add/change/remove code you didn't mean to touch. If it's not mentioned in the check-in comment, that lends credence to the belief that it was a mistake.
+
+<p>I also won't insult you by reminding you that duplication is bad in comments as well as code. Don't repeat yourself (except in mention bug/defect numbers, which should always appear in the check-in comment, and should often appear in the source too), and favor commenting the source. The main reason for commenting a check-in is that it's often the only way to express the commonality between changes made to different files. This is another reason to favor the "change set" style of commenting: someone looking at any file can trivially see the context of the change.
+
+<p>One final tip: the more likely it is that someone will need a piece of information to understand the code, the stronger the pressure to include that information in a code comment rather than a check-in comment.
 
 <h2>How do I install it?</h2>
 
