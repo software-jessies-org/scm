@@ -213,6 +213,8 @@ public class RevisionWindow extends JFrame {
     private JLabel statusLine = new JLabel(" ");
     private JButton changeSetButton;
     
+    private int expectedResultModCount;
+    
     public RevisionWindow(String filename, int initialLineNumber) {
         this.backEnd = RevisionControlSystem.forPath(filename);
         setFilename(filename);
@@ -370,8 +372,11 @@ public class RevisionWindow extends JFrame {
         String[] command;
         int status = 0;
         
+        private int thisWorkerModCount;
+        
         public BackEndWorker(final String message) {
             setStatus(message);
+            thisWorkerModCount = ++expectedResultModCount;
         }
         
         public final void run() {
@@ -381,6 +386,11 @@ public class RevisionWindow extends JFrame {
             } catch (Exception ex) {
                 caughtException = ex;
             } finally {
+                if (expectedResultModCount != thisWorkerModCount) {
+                    // This result is outdated. Forget it.
+                    // Note that startAnimation and stopAnimation don't nest, so it's correct that we don't call progressIndicator.stopAnimation in this case.
+                    return;
+                }
                 progressIndicator.stopAnimation();
                 clearStatus();
             }
