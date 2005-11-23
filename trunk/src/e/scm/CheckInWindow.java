@@ -114,7 +114,6 @@ public class CheckInWindow extends JFrame {
 
     private void initStatusesList() {
         statusesTable = new ETable();
-        statusesTable.setTableHeader(null);
         statusesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         statusesTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         initStatusesTableContextMenu();
@@ -129,6 +128,7 @@ public class CheckInWindow extends JFrame {
         // Try to make JTable look a little less weird.
         statusesTable.setIntercellSpacing(new Dimension());
         statusesTable.setShowGrid(false);
+        statusesTable.getTableHeader().setReorderingAllowed(false);
         
         // Work like Apple's Mail, where the arrow keys move through the headers/filenames,
         // and the page keys move through the current body/patch.

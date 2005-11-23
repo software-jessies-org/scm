@@ -28,7 +28,7 @@ public class StatusesTableModel extends AbstractTableModel {
     
     public String getColumnName(int column) {
         switch (column) {
-            case 0: return "Included";
+            case 0: return null;
             case 1: return "State";
             case 2: return "Name";
         }
@@ -154,19 +154,44 @@ public class StatusesTableModel extends AbstractTableModel {
         return isIncluded[row].booleanValue();
     }
     
+    private int getRendererWidth(JTable table, TableCellRenderer renderer, int columnIndex, Object value) {
+        Component component = renderer.getTableCellRendererComponent(table, value, false, false, 0, columnIndex);
+        return component.getPreferredSize().width;
+    }
+    
     public void initColumnWidths(JTable table) {
         TableColumnModel columns = table.getColumnModel();
         for (int i = 0; i < columns.getColumnCount() - 1; ++i) {
             TableColumn column = columns.getColumn(i);
             int columnIndex = column.getModelIndex();
             
-            TableCellRenderer renderer = table.getCellRenderer(0, i);
-            Component c = renderer.getTableCellRendererComponent(table, getPrototypeFor(columnIndex), false, false, 0, i);
-            final int columnWidth = c.getPreferredSize().width + columns.getColumnMargin();
+            // Find the renderers for the first cell in the column, and the column header.
+            TableCellRenderer cellRenderer = table.getCellRenderer(0, i);
+            TableCellRenderer headerRenderer = column.getHeaderRenderer();
+            if (headerRenderer == null) {
+                headerRenderer = table.getTableHeader().getDefaultRenderer();
+            }
+            
+            // Work out a width wide enough to comfortably contain the header and a typical cell.
+            int w1 = getRendererWidth(table, headerRenderer, columnIndex, getColumnName(columnIndex));
+            int w2 = getRendererWidth(table, cellRenderer, columnIndex, getPrototypeFor(columnIndex));
+            final int columnWidth = (120 * Math.max(w1, w2) / 100) + columns.getColumnMargin();
+            
+            // Constrain the column such that its initial width will be the desired width, but such that it will be possible to widen the column.
             if (columnWidth >= 0) {
-                column.setPreferredWidth(columnWidth);
                 column.setMinWidth(columnWidth);
+                // If we don't set the max width, the column will be too wide.
                 column.setMaxWidth(columnWidth);
+                // If we don't widen the column again, we won't be able to resize the column.
+                // If we make this "too big", the column will be too wide. An overflow in the implementation, I assume.
+                column.setMaxWidth(Short.MAX_VALUE);
+                // The preferred width must come last.
+                column.setPreferredWidth(columnWidth);
+            }
+            
+            // We want the checkbox column tight around the checkbox.
+            if (getColumnClass(columnIndex) == Boolean.class) {
+                column.setResizable(false);
             }
         }
     }
