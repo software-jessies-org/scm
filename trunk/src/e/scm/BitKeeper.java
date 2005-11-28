@@ -98,11 +98,14 @@ public class BitKeeper extends RevisionControlSystem {
         return true;
     }
 
-    public void showChangeSet(String filename, Revision revision) {
+    public List<String> listTouchedFilesInRevision(String filename, Revision revision) {
+        /*
         // bk csettool -r`bk r2c -r1.3 file.cpp` -ffile.cpp@1.3
         String command = "bk csettool -r`bk r2c -r" + revision.number + " " +
                          filename + "` -f" + filename + "@" + revision.number;
         ProcessUtilities.spawn(getRoot(), new String[] { "bash", "-c", command });
+        */
+        throw new UnsupportedOperationException("BitKeeper change sets not yet implemented");
     }
 
     public void revert(String filename) {

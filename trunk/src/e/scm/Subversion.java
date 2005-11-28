@@ -95,19 +95,40 @@ public class Subversion extends RevisionControlSystem {
         return false;
     }
 
-    /**
-     * Subversion has some notion of a change set, but it's a bit odd.
-     * Global revision numbers ought to give us all we need, if we can
-     * get a list of files modified in that revision.
-     */
     public boolean supportsChangeSets() {
-        return false; // FIXME: learn about svn global revisions.
+        return true;
     }
-
-    public void showChangeSet(String filename, Revision revision) {
-        throw new UnsupportedOperationException("Can't show a Subversion change set for " + filename + " revision " + revision.number);
+    
+    public List<String> listTouchedFilesInRevision(String filename, Revision revision) {
+        String[] command = new String[] { "svn", "log", "-v", "-r", revision.number };
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
+        if (status != 0) {
+            throwError(status, command, lines, errors);
+        }
+        
+        ArrayList<String> result = new ArrayList<String>();
+        boolean inChangedPaths = false;
+        Pattern changedPathPattern = Pattern.compile("^.... (.*)$");
+        for (String line : lines) {
+            if (line.equals("Changed paths:")) {
+                inChangedPaths = true;
+            } else if (inChangedPaths) {
+                if (line.length() == 0) {
+                    // The changed paths end with an empty line.
+                    break;
+                }
+                
+                Matcher matcher = changedPathPattern.matcher(line);
+                if (matcher.matches()) {
+                    result.add(matcher.group(1));
+                }
+            }
+        }
+        return result;
     }
-
+    
     public void revert(String filename) {
         ArrayList<String> command = new ArrayList<String>();
         command.add("svn");

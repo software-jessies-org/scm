@@ -106,8 +106,8 @@ public class Cvs extends RevisionControlSystem {
         return false;
     }
 
-    public void showChangeSet(String filename, Revision revision) {
-        throw new UnsupportedOperationException("Can't show a CVS change set for " + filename + " revision " + revision.number);
+    public List<String> listTouchedFilesInRevision(String filename, Revision revision) {
+        throw new UnsupportedOperationException("CVS change sets not yet implemented");
     }
     
     public void revert(String filename) {

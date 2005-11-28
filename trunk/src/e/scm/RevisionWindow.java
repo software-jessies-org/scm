@@ -245,7 +245,7 @@ public class RevisionWindow extends JFrame {
         changeSetButton = new JButton("Show Change Set");;
         changeSetButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                backEnd.showChangeSet(filePath, getAnnotatedRevision());
+                new ChangeSetWindow(backEnd, filePath, getAnnotatedRevision()).setVisible(true);
             }
         });
         changeSetButton.setEnabled(false);

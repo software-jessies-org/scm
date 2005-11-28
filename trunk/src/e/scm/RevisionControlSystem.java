@@ -180,12 +180,11 @@ public abstract class RevisionControlSystem {
      * change.
      */
     public abstract boolean supportsChangeSets();
-
+    
     /**
-     * Opens some kind of viewer for the change set corresponding to the
-     * given revision of the given file.
+     * Returns a list of the files touched (created or modified) in a given revision.
      */
-    public abstract void showChangeSet(String filename, Revision revision);
+    public abstract List<String> listTouchedFilesInRevision(String filename, Revision revision);
     
     //
     // Methods relating to reverting.
