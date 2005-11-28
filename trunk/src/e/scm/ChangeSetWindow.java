@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
+import org.jdesktop.swingworker.SwingWorker;
 
 public class ChangeSetWindow extends JFrame {
     private RevisionControlSystem backEnd;
@@ -41,10 +42,33 @@ public class ChangeSetWindow extends JFrame {
         pack();
         setLocationRelativeTo(null);
         
-        // FIXME: we shouldn't do this on the EDT.
-        List<String> changedPaths = backEnd.listTouchedFilesInRevision(filePath, revision);
-        for (String changedPath : changedPaths) {
-            fileChooser.addItem(changedPath);
+        // Fill the combo box without blocking the EDT; repository access may take some time.
+        new ComboBoxFiller(filePath, revision).execute();
+    }
+    
+    private class ComboBoxFiller extends SwingWorker<List<String>, Object> {
+        private String filePath;
+        private Revision revision;
+        private List<String> changedPaths;
+        
+        public ComboBoxFiller(final String filePath, final Revision revision) {
+            this.filePath = filePath;
+            this.revision = revision;
+            fileChooser.setEnabled(false);
+        }
+        
+        @Override
+        protected List<String> doInBackground() {
+            changedPaths = backEnd.listTouchedFilesInRevision(filePath, revision);
+            return changedPaths;
+        }
+        
+        @Override
+        public void done() {
+            for (String changedPath : changedPaths) {
+                fileChooser.addItem(changedPath);
+                fileChooser.setEnabled(true);
+            }
         }
     }
 }
