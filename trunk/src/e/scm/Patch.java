@@ -93,7 +93,7 @@ public class Patch {
         }
     }
 
-    public Patch(Component revisionWindow, RevisionControlSystem backEnd, String filePath, Revision fromRevision, Revision toRevision) {
+    public Patch(RevisionControlSystem backEnd, String filePath, Revision fromRevision, Revision toRevision) {
         File directory = backEnd.getRoot();
         // Elliott reckons that the back-end insists on the arguments being olderRevision, newerRevision.
         // At the moment, we know that we're always called with fromRevision newer than toRevision.

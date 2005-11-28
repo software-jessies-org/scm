@@ -9,15 +9,15 @@ public class AnnotatedLineRenderer extends e.gui.EListCellRenderer {
             BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
             10.0f, new float[] { 2.0f, 3.0f }, 0.0f);
 
-    /** The RevisionWindow we're rendering for. */
-    private RevisionWindow revisionWindow;
+    /** The RevisionView we're rendering for. */
+    private RevisionView revisionView;
 
     /** Whether or not we should draw a dashed line above this row. */
     private boolean shouldDrawLine;
 
-    public AnnotatedLineRenderer(RevisionWindow parentRevisionWindow) {
+    public AnnotatedLineRenderer(RevisionView parentRevisionView) {
         super(false);
-        this.revisionWindow = parentRevisionWindow;
+        this.revisionView = parentRevisionView;
     }
 
     public Component getListCellRendererComponent(JList list, Object value, int row, boolean isSelected, boolean isFocused) {
@@ -38,7 +38,7 @@ public class AnnotatedLineRenderer extends e.gui.EListCellRenderer {
 
         setText(line.formattedLine);
         if (isSelected == false) {
-            setForeground((revisionWindow.getAnnotatedRevision() == line.revision) ? Color.BLUE : Color.BLACK);
+            setForeground((revisionView.getAnnotatedRevision() == line.revision) ? Color.BLUE : Color.BLACK);
         }
         return this;
     }

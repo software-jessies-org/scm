@@ -122,7 +122,14 @@ public class Subversion extends RevisionControlSystem {
                 
                 Matcher matcher = changedPathPattern.matcher(line);
                 if (matcher.matches()) {
-                    result.add(matcher.group(1));
+                    // FIXME: how do we translate these into the paths that "svn diff" wants?
+                    // We deliberately drop any leading / or trunk/, but this won't let us cope with arbitrary branches.
+                    // Are we supposed to use the output of "svn info" to make URLs rather than working copy paths?
+                    String path = matcher.group(1);
+                    System.err.println(path);
+                    path = path.replaceAll("^/trunk/", "");
+                    path = path.replaceAll("^/", "");
+                    result.add(path);
                 }
             }
         }

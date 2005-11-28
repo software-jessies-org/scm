@@ -13,7 +13,7 @@ import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 
-public class RevisionWindow extends JFrame {
+public class RevisionView extends JComponent {
     private static final Font FONT = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
 
     private final AnnotatedLineRenderer annotatedLineRenderer = new AnnotatedLineRenderer(this);
@@ -41,7 +41,7 @@ public class RevisionWindow extends JFrame {
     }
             
     private int translateLineNumberInOneStep(Revision fromRevision, Revision toRevision, int fromLineNumber) {
-        Patch patch = new Patch(RevisionWindow.this, backEnd, filePath, fromRevision, toRevision);
+        Patch patch = new Patch(backEnd, filePath, fromRevision, toRevision);
         int toLineNumber = patch.translateLineNumberInFromRevision(fromLineNumber);
         //System.err.println("(" + fromRevision + ") => (" + toRevision + ") maps (" + fromLineNumber + " => " + toLineNumber + ")");
         return toLineNumber;
@@ -215,10 +215,9 @@ public class RevisionWindow extends JFrame {
     
     private int expectedResultModCount;
     
-    public RevisionWindow(String filename, int initialLineNumber) {
+    public RevisionView(String filename, int initialLineNumber) {
         this.backEnd = RevisionControlSystem.forPath(filename);
         setFilename(filename);
-        setTitle(FileUtilities.getUserFriendlyName(filename));
         makeUserInterface(initialLineNumber);
 
         readListOfRevisions(initialLineNumber);
@@ -299,15 +298,10 @@ public class RevisionWindow extends JFrame {
         statusPanel.add(statusLine, BorderLayout.CENTER);
         statusPanel.add(buttonsPanel, BorderLayout.EAST);
         
-        JPanel contentPane = new JPanel(new BorderLayout());
-        contentPane.setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
-        contentPane.add(ui, BorderLayout.CENTER);
-        contentPane.add(statusPanel, BorderLayout.SOUTH);
-        setContentPane(contentPane);
-        pack();
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setVisible(true);
+        setLayout(new BorderLayout());
+        setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
+        add(ui, BorderLayout.CENTER);
+        add(statusPanel, BorderLayout.SOUTH);
     }
 
     private void initRevisionsList() {
@@ -424,7 +418,7 @@ public class RevisionWindow extends JFrame {
          * dispatch thread, so you can safely modify the UI here.
          */
         public void reportException(Exception ex) {
-            SimpleDialog.showDetails(RevisionWindow.this, message, ex);
+            SimpleDialog.showDetails(RevisionView.this, message, ex);
         }
     }
 
