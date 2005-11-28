@@ -96,18 +96,18 @@ public class Cvs extends RevisionControlSystem {
     }
 
     /**
-     * CVS has no notion of a change set.
-     * FIXME: we could try to read filenames out of the revision comment,
-     * which in many cases will include all the other changed files. I don't
-     * know how we'd work out the appropriate revisions, though I guess the
-     * time stamps would be enough.
+     * CVS has no notion of a change set. We could try to read filenames out
+     * of the revision comment, which in many cases will include all the other
+     * changed files. I don't know how we'd work out the appropriate revisions,
+     * though I guess the time stamps would be enough. But CVS is dead, so this
+     * isn't going to happen.
      */
     public boolean supportsChangeSets() {
         return false;
     }
 
     public List<String> listTouchedFilesInRevision(String filename, Revision revision) {
-        throw new UnsupportedOperationException("CVS change sets not yet implemented");
+        throw new UnsupportedOperationException("CVS change set support not implemented");
     }
     
     public void revert(String filename) {
