@@ -36,18 +36,25 @@ public class CheckInWindow extends JFrame {
         // On the Mac, a user's likely to quit with C-Q, and not close our window at all.
         new com.apple.eawt.Application().addApplicationListener(new com.apple.eawt.ApplicationAdapter() {
             public void handleQuit(com.apple.eawt.ApplicationEvent e) {
-                updateSavedState();
+                CheckInWindow.this.handleQuit();
                 e.setHandled(true);
             }
         });
         // Elsewhere, it's window closing we need to watch for.
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                updateSavedState();
+                handleQuit();
             }
         });
     }
-
+    
+    private void handleQuit() {
+        // If we got as far as being fully initialized, save our state.
+        if (statusesTableModel != null) {
+                updateSavedState();
+        }
+    }
+    
     private void makeUserInterface() {
         initStatusesList();
         initCheckInCommentArea();
