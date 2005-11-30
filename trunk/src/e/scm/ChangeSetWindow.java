@@ -28,6 +28,7 @@ public class ChangeSetWindow extends JFrame {
                 Revision previousRevision = new Revision(Integer.toString(Integer.parseInt(revision.number) - 1), null, null, null);
                 // FIXME: we shouldn't do this on the EDT.
                 patchView.showPatch(backEnd, previousRevision, revision, (String) fileChooser.getSelectedItem());
+                // FIXME: PatchView.showPatch produces an empty patch for a new file. (And for a deleted file?) If we got more information from the back-end we'd at least know that we were dealing with an 'A' (or 'D') file rather than an 'M' file.
             }
         });
         
@@ -39,6 +40,7 @@ public class ChangeSetWindow extends JFrame {
         setLayout(new BorderLayout());
         add(fileChooser, BorderLayout.NORTH);
         add(scrollablePatchView, BorderLayout.CENTER);
+        // FIXME: the UI should offer a way to get to the revision history.
         pack();
         setLocationRelativeTo(null);
         
