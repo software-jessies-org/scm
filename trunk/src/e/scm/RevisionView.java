@@ -240,6 +240,7 @@ public class RevisionView extends JComponent {
             revisionsUi,
             new JScrollPane(annotationView));
         ui.setBorder(null);
+        ui.setDividerLocation(revisionsUi.getPreferredSize().height);
 
         changeSetButton = new JButton("Show Change Set");;
         changeSetButton.addActionListener(new ActionListener() {
