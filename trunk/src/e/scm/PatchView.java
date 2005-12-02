@@ -14,6 +14,16 @@ public class PatchView extends JList {
     private ListCellRenderer defaultCellRenderer;
     
     public PatchView() {
+        // JList calculates its preferred size based on the first row of its model, so provide a fake model so that our initial preferred size is 80 columns.
+        super(new AbstractListModel() {
+            public int getSize() {
+                return 1;
+            }
+            
+            public Object getElementAt(int i) {
+                return "                                                                                ";
+            }
+        });
         setFont(ScmUtilities.CODE_FONT);
         setCellRenderer(new EListCellRenderer(false));
         this.defaultCellRenderer = getCellRenderer();
