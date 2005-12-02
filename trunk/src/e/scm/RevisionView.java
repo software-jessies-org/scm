@@ -14,8 +14,6 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class RevisionView extends JComponent {
-    private static final Font FONT = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
-
     private final AnnotatedLineRenderer annotatedLineRenderer = new AnnotatedLineRenderer(this);
     
     public List<Revision> getRevisionRange(Revision fromRevision, Revision toRevision) {
@@ -309,13 +307,13 @@ public class RevisionView extends JComponent {
         revisionsList = new JList();
         revisionsList.setCellRenderer(new e.gui.EListCellRenderer(true));
         revisionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        revisionsList.setFont(FONT);
+        revisionsList.setFont(ScmUtilities.CODE_FONT);
         revisionsList.addListSelectionListener(new RevisionListSelectionListener());
     }
 
     private void initAnnotationView() {
         annotationView = new JList(new AnnotationModel());
-        annotationView.setFont(FONT);
+        annotationView.setFont(ScmUtilities.CODE_FONT);
         annotationView.setVisibleRowCount(34);
         ActionMap actionMap = annotationView.getActionMap();
         actionMap.put("copy", new AbstractAction("copy") {
@@ -326,16 +324,8 @@ public class RevisionView extends JComponent {
     }
 
     private void initRevisionCommentArea() {
-        revisionCommentArea = makeTextArea(8);
-        revisionCommentArea.addStyleApplicator(new BugDatabaseHighlighter(revisionCommentArea));
-    }
-
-    private PTextArea makeTextArea(final int rowCount) {
-        PTextArea textArea = new PTextArea(rowCount, 80);
-        textArea.setEditable(false);
-        textArea.setFont(FONT);
-        textArea.setWrapStyleWord(true);
-        return textArea;
+        revisionCommentArea = ScmUtilities.makeTextArea(8);
+        revisionCommentArea.setEditable(false);
     }
 
     /**
@@ -625,7 +615,8 @@ public class RevisionView extends JComponent {
     }
 
     private void showLog() {
-        PTextArea summary = makeTextArea(20);
+        PTextArea summary = ScmUtilities.makeTextArea(20);
+        summary.setEditable(false);
         summary.setText(summaryOfAllRevisions());
         summary.setCaretPosition(0);
         

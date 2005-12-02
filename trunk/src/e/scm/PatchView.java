@@ -12,7 +12,9 @@ import e.util.*;
 
 public class PatchView extends JList {
     private ListCellRenderer defaultCellRenderer;
+    
     public PatchView() {
+        setFont(ScmUtilities.CODE_FONT);
         setCellRenderer(new EListCellRenderer(false));
         this.defaultCellRenderer = getCellRenderer();
         

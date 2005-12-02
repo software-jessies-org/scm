@@ -13,8 +13,6 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class CheckInWindow extends JFrame {
-    private static final Font FONT = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
-
     private RevisionControlSystem backEnd;
     
     private JTable statusesTable;
@@ -75,7 +73,6 @@ public class CheckInWindow extends JFrame {
         topUi.setBorder(null);
         
         patchView = new PatchView();
-        patchView.setFont(FONT);
         patchView.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 updatePatchView();
@@ -356,7 +353,7 @@ public class CheckInWindow extends JFrame {
     }
     
     private void initCheckInCommentArea() {
-        checkInCommentArea = makeTextArea(8);
+        checkInCommentArea = ScmUtilities.makeTextArea(8);
         checkInCommentArea.setEnabled(false);
         checkInCommentArea.addStyleApplicator(new BugDatabaseHighlighter(checkInCommentArea));
     }
@@ -407,13 +404,6 @@ public class CheckInWindow extends JFrame {
         return FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), ".e.scm.CheckInWindow.savedFilenames");
     }
     
-    private PTextArea makeTextArea(final int rowCount) {
-        PTextArea textArea = new PTextArea(rowCount, 80);
-        textArea.setFont(FONT);
-        textArea.setWrapStyleWord(true);
-        return textArea;
-    }
-
     /**
      * Returns a copy of the given list with any entries corresponding to
      * SCM's own dot files removed. This saves the user from having to teach
