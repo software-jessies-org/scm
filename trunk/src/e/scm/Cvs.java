@@ -106,7 +106,7 @@ public class Cvs extends RevisionControlSystem {
         return false;
     }
 
-    public List<String> listTouchedFilesInRevision(String filename, Revision revision) {
+    public List<ChangeSetItem> listTouchedFilesInRevision(String filename, Revision revision) {
         throw new UnsupportedOperationException("CVS change set support not implemented");
     }
     

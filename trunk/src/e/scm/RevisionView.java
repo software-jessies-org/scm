@@ -643,8 +643,10 @@ public class RevisionView extends JComponent {
     public Revision getAnnotatedRevision() {
         return annotatedRevision;
     }
+    
     private void setAnnotatedRevision(Revision revision) {
         annotatedRevision = revision;
+        // FIXME: this should only be enabled if the particular revision touched more than one file. I think Revision needs to contain this information, so our initial "svn log" (or whatever) should be "svn log -v", and we can skip making effectively the same request again if/when the user asks to see the change set.
         changeSetButton.setEnabled(backEnd.supportsChangeSets() && annotatedRevision != null);
     }
     

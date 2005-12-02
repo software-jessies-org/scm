@@ -1,5 +1,6 @@
 package e.scm;
 
+import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -24,10 +25,12 @@ public class ChangeSetWindow extends JFrame {
         
         fileChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // FIXME: there must be a better way/more general way to get the patch from a particular revision. This will only work for Subversion.
-                Revision previousRevision = new Revision(Integer.toString(Integer.parseInt(revision.number) - 1), null, null, null);
+                ChangeSetItem changeSetItem = (ChangeSetItem) fileChooser.getSelectedItem();
+                // For systems like BitKeeper, the newRevision of this file isn't necessarily the same as the Revision of the file we're showing the change set for.
+                Revision oldRevision = new Revision(changeSetItem.oldRevision, null, null, null);
+                Revision newRevision = new Revision(changeSetItem.newRevision, null, null, null);
                 // FIXME: we shouldn't do this on the EDT.
-                patchView.showPatch(backEnd, previousRevision, revision, (String) fileChooser.getSelectedItem());
+                patchView.showPatch(backEnd, oldRevision, newRevision, changeSetItem.filename);
                 // FIXME: PatchView.showPatch produces an empty patch for a new file. (And for a deleted file?) If we got more information from the back-end we'd at least know that we were dealing with an 'A' (or 'D') file rather than an 'M' file.
             }
         });
@@ -42,16 +45,18 @@ public class ChangeSetWindow extends JFrame {
         add(scrollablePatchView, BorderLayout.CENTER);
         // FIXME: the UI should offer a way to get to the revision history.
         pack();
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         
         // Fill the combo box without blocking the EDT; repository access may take some time.
         new ComboBoxFiller(filePath, revision).execute();
     }
     
-    private class ComboBoxFiller extends SwingWorker<List<String>, Object> {
+    private class ComboBoxFiller extends SwingWorker<List<ChangeSetItem>, Object> {
         private String filePath;
         private Revision revision;
-        private List<String> changedPaths;
+        private List<ChangeSetItem> changeSet;
+        private Throwable failure;
         
         public ComboBoxFiller(final String filePath, final Revision revision) {
             this.filePath = filePath;
@@ -60,15 +65,24 @@ public class ChangeSetWindow extends JFrame {
         }
         
         @Override
-        protected List<String> doInBackground() {
-            changedPaths = backEnd.listTouchedFilesInRevision(filePath, revision);
-            return changedPaths;
+        protected List<ChangeSetItem> doInBackground() {
+            try {
+                changeSet = backEnd.listTouchedFilesInRevision(filePath, revision);
+            } catch (Throwable th) {
+                failure = th;
+            }
+            return changeSet;
         }
         
         @Override
         public void done() {
-            for (String changedPath : changedPaths) {
-                fileChooser.addItem(changedPath);
+            if (failure != null) {
+                SimpleDialog.showDetails(ChangeSetWindow.this, "Change Set View", failure);
+                return;
+            }
+            
+            for (ChangeSetItem changeSetItem : changeSet) {
+                fileChooser.addItem(changeSetItem);
                 fileChooser.setEnabled(true);
             }
         }

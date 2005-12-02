@@ -3,60 +3,6 @@
 
     svn diff --diff-cmd "/usr/bin/diff" -x "-U12"
 
-* Notes on why I can't stand bk csettool:
-
-    1. it's ugly enough to make me not want to have anything to do with it.
-
-    2. it's very idiosyncratic (I'm being as polite as I can), and so is
-       very hard to use, very hard to get used to, and impossible to feel
-       comfortable with. It's not even much like the other BitKeeper tools,
-       never mind anything i've seen on my planet.
-
-  The two things obviously interact and feed off one another.
-
-  I think i'd rather have links in Rev(ision)?Tool to each of the other
-  files in the change set, and have those open new Rev(ision)?Tool windows.
-  Or maybe a window with a list or combo box to choose a file from the
-  change set and an embedded Rev(ision)?Tool below. Whatever, I think the
-  critical (or at least most visible) flaw is that it reinvents
-  Rev(ision)?Tool. Badly. bk difftool (which is what it most closely
-  resembles) isn't something I have much time for, but if it exists at all,
-  it should be as a third view in Rev(ision)?Tool alongside the existing
-  annotation and patch views.
-
-* Martin explains how we can work with change sets:
-
-   Given the ChangeSet number from bk r2c, we can find the range of
-   revisions it compromises it each of its files:
-
-    doozer:~/xray/libs/genmgmtserver$ bk rset -r1.2887.110.4
-    ChangeSet|1.2887.110.3..1.2887.110.4
-    tcp/http/socket.cpp|1.78..1.79
-    libs/genmgmtserver/GenericManagementServer.h|1.29..1.30
-    libs/management/ftp/session.cpp|1.16..1.17
-    fsb/resolve/resolve.cpp|1.27..1.28
-    libs/telnet/telnet.cpp|1.75..1.76
-    libs/management/sictrlserver/MgmntServer.cpp|1.55..1.56
-    libs/genmgmtserver/connections.cpp|1.12..1.13
-    doozer:~/xray/libs/genmgmtserver$
-
-   We could grok this output and fork off new RevisionWindows for each
-   file, in patch view across the specified range of revisions. Revisiontool
-   didn't seem too happy about being asked to look at ChangeSet but, 'part
-   from that, sounds easy enough, dunnit?
-
-  I added:
-
-   We could make it work for CVS by pulling the other filenames out of
-   the revision comment for the first file you thought of.
-
-   We could make it work for Subversion by using this command to list the
-   files changed in a given revision: "svnlook changed -r <number>".
-
-   If we pulled the content pane out of RevisionWindow (as we should), we
-   could even have a ChangeSetWindow with a JTabbedPane with a tab per
-   file from the change set.
-
 * Some way of asking for the patch containing the most recent change to
   the current line. And a catchy enough name that we can put it on a
   sensibly-sized menu item or button!

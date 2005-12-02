@@ -97,17 +97,63 @@ public class BitKeeper extends RevisionControlSystem {
     public boolean supportsChangeSets() {
         return true;
     }
-
-    public List<String> listTouchedFilesInRevision(String filename, Revision revision) {
-        /*
-        // bk csettool -r`bk r2c -r1.3 file.cpp` -ffile.cpp@1.3
-        String command = "bk csettool -r`bk r2c -r" + revision.number + " " +
-                         filename + "` -f" + filename + "@" + revision.number;
-        ProcessUtilities.spawn(getRoot(), new String[] { "bash", "-c", command });
-        */
-        throw new UnsupportedOperationException("BitKeeper change sets not yet implemented");
+    
+    public List<ChangeSetItem> listTouchedFilesInRevision(String filename, Revision revision) {
+        String changeSetNumber = getChangeSetNumberForRevision(filename, revision);
+        List<String> changeSet = getChangeSetByNumber(changeSetNumber);
+        return extractChangeSetItems(changeSet);
     }
-
+    
+    /**
+     * Given a filename and a revision of that file, find the change set that change belongs to.
+     */
+    private String getChangeSetNumberForRevision(String filename, Revision revision) {
+        String[] command = new String[] { "bk", "r2c", "-r" + revision.number, filename };
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
+        if (status != 0) {
+            throwError(status, command, lines, errors);
+        }
+        return lines.get(0);
+    }
+    
+    /**
+     * Returns the contents of a change set given the change set number.
+     */
+    private List<String> getChangeSetByNumber(String changeSetNumber) {
+        String[] command = new String[] { "bk", "rset", "-r" + changeSetNumber };
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
+        if (status != 0) {
+            throwError(status, command, lines, errors);
+        }
+        return lines;
+    }
+    
+    private List<ChangeSetItem> extractChangeSetItems(List<String> changeSet) {
+        // The output consists of changes one per line, looking like this: "ChangeSet|1.4818..1.4818.1.1".
+        Pattern pattern = Pattern.compile("^(.*)\\|([\\d.]+)\\.\\.([\\d.]+)$");
+        ArrayList<ChangeSetItem> result = new ArrayList<ChangeSetItem>();
+        for (String change : changeSet) {
+            Matcher matcher = pattern.matcher(change);
+            if (matcher.matches()) {
+                String filename = matcher.group(1);
+                if (filename.equals("ChangeSet")) {
+                    // The file "ChangeSet" is a BitKeeper implementation detail which we shouldn't expose to the user.
+                    continue;
+                }
+                String oldRevision = matcher.group(2);
+                String newRevision = matcher.group(3);
+                result.add(new ChangeSetItem(filename, oldRevision, newRevision));
+            } else {
+                throw new RuntimeException("unintelligible line '" + change + "' from BitKeeper");
+            }
+        }
+        return result;
+    }
+    
     public void revert(String filename) {
         ArrayList<String> command = new ArrayList<String>();
         command.add("bk");

@@ -184,7 +184,7 @@ public abstract class RevisionControlSystem {
     /**
      * Returns a list of the files touched (created or modified) in a given revision.
      */
-    public abstract List<String> listTouchedFilesInRevision(String filename, Revision revision);
+    public abstract List<ChangeSetItem> listTouchedFilesInRevision(String filename, Revision revision);
     
     //
     // Methods relating to reverting.

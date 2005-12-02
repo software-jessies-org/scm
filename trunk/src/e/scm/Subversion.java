@@ -99,7 +99,7 @@ public class Subversion extends RevisionControlSystem {
         return true;
     }
     
-    public List<String> listTouchedFilesInRevision(String filename, Revision revision) {
+    public List<ChangeSetItem> listTouchedFilesInRevision(String filename, Revision revision) {
         String[] command = new String[] { "svn", "log", "-v", "-r", revision.number };
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
@@ -108,7 +108,7 @@ public class Subversion extends RevisionControlSystem {
             throwError(status, command, lines, errors);
         }
         
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<ChangeSetItem> result = new ArrayList<ChangeSetItem>();
         boolean inChangedPaths = false;
         Pattern changedPathPattern = Pattern.compile("^.... (.*)$");
         for (String line : lines) {
@@ -126,10 +126,10 @@ public class Subversion extends RevisionControlSystem {
                     // We deliberately drop any leading / or trunk/, but this won't let us cope with arbitrary branches.
                     // Are we supposed to use the output of "svn info" to make URLs rather than working copy paths?
                     String path = matcher.group(1);
-                    System.err.println(path);
                     path = path.replaceAll("^/trunk/", "");
                     path = path.replaceAll("^/", "");
-                    result.add(path);
+                    final String oldRevisionNumber = Integer.toString(Integer.parseInt(revision.number) - 1);
+                    result.add(new ChangeSetItem(path, oldRevisionNumber, revision.number));
                 }
             }
         }
