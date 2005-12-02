@@ -1,7 +1,6 @@
 package e.scm;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
@@ -304,23 +303,16 @@ public class RevisionView extends JComponent {
     }
 
     private void initRevisionsList() {
-        revisionsList = new JList();
+        revisionsList = ScmUtilities.makeList();
         revisionsList.setCellRenderer(new e.gui.EListCellRenderer(true));
         revisionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        revisionsList.setFont(ScmUtilities.CODE_FONT);
         revisionsList.addListSelectionListener(new RevisionListSelectionListener());
     }
 
     private void initAnnotationView() {
-        annotationView = new JList(new AnnotationModel());
-        annotationView.setFont(ScmUtilities.CODE_FONT);
+        annotationView = ScmUtilities.makeList();
+        annotationView.setModel(new AnnotationModel());
         annotationView.setVisibleRowCount(34);
-        ActionMap actionMap = annotationView.getActionMap();
-        actionMap.put("copy", new AbstractAction("copy") {
-            public void actionPerformed(ActionEvent e) {
-                copyAnnotationViewSelectionToClipboard();
-            }
-        });
     }
 
     private void initRevisionCommentArea() {
@@ -539,25 +531,6 @@ public class RevisionView extends JComponent {
         annotationView.addMouseListener(doubleClickListener);
     }
 
-    private void copyAnnotationViewSelectionToClipboard() {
-        // Make a StringSelection corresponding to the selected lines.
-        StringBuilder buffer = new StringBuilder();
-        Object[] selectedLines = annotationView.getSelectedValues();
-        for (int i = 0; i < selectedLines.length; ++i) {
-            String line = selectedLines[i].toString();
-            buffer.append(line);
-            buffer.append('\n');
-        }
-        StringSelection selection = new StringSelection(buffer.toString());
-
-        // Set the clipboard (and X11's nasty hacky semi-duplicate).
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        toolkit.getSystemClipboard().setContents(selection, selection);
-        if (toolkit.getSystemSelection() != null) {
-            toolkit.getSystemSelection().setContents(selection, selection);
-        }
-    }
-    
     private void showDifferencesBetweenRevisions(final Revision olderRevision, final Revision newerRevision) {
         new Thread(new BackEndWorker("Getting differences between revisions " + olderRevision.number + " and " + newerRevision.number + "...") {
             public void work() {
