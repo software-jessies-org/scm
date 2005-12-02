@@ -15,6 +15,7 @@ public class PatchView extends JList {
     
     public PatchView() {
         // JList calculates its preferred size based on the first row of its model, so provide a fake model so that our initial preferred size is 80 columns.
+        // We don't use setPrototypeCellValue because that would also affect our maximum size.
         super(new AbstractListModel() {
             public int getSize() {
                 return 1;
