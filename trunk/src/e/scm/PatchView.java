@@ -26,37 +26,13 @@ public class PatchView extends JList {
             }
         });
         setFont(ScmUtilities.CODE_FONT);
+        
         setCellRenderer(new EListCellRenderer(false));
         this.defaultCellRenderer = getCellRenderer();
         
+        JListCopyAction.fixCopyFor(this);
+        
         setVisibleRowCount(34);
-        
-        // JList has half an implementation of copy.
-        ActionMap actionMap = getActionMap();
-        actionMap.put("copy", new AbstractAction("copy") {
-            public void actionPerformed(ActionEvent e) {
-                copySelectedItemsToClipboard();
-            }
-        });
-    }
-    
-    private void copySelectedItemsToClipboard() {
-        // Make a StringSelection corresponding to the selected lines.
-        StringBuilder buffer = new StringBuilder();
-        Object[] selectedLines = getSelectedValues();
-        for (int i = 0; i < selectedLines.length; ++i) {
-            String line = selectedLines[i].toString();
-            buffer.append(line);
-            buffer.append('\n');
-        }
-        StringSelection selection = new StringSelection(buffer.toString());
-        
-        // Set the clipboard (and X11's nasty hacky semi-duplicate).
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        toolkit.getSystemClipboard().setContents(selection, selection);
-        if (toolkit.getSystemSelection() != null) {
-            toolkit.getSystemSelection().setContents(selection, selection);
-        }
     }
     
     public void showPatch(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename) {
