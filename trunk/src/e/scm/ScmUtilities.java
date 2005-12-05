@@ -22,7 +22,7 @@ public class ScmUtilities {
         PTextArea textArea = new PTextArea(rowCount, 80);
         textArea.setFont(ScmUtilities.CODE_FONT);
         textArea.setWrapStyleWord(true);
-        textArea.addStyleApplicator(new BugDatabaseHighlighter(textArea));
+        BugDatabaseHighlighter.highlightBugs(textArea);
         return textArea;
     }
     

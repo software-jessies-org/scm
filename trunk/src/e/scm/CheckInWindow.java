@@ -355,7 +355,7 @@ public class CheckInWindow extends JFrame {
     private void initCheckInCommentArea() {
         checkInCommentArea = ScmUtilities.makeTextArea(8);
         checkInCommentArea.setEnabled(false);
-        checkInCommentArea.addStyleApplicator(new BugDatabaseHighlighter(checkInCommentArea));
+        BugDatabaseHighlighter.highlightBugs(checkInCommentArea);
     }
     
     private void fillCheckInCommentArea() {

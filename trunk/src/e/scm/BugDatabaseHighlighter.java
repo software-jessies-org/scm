@@ -12,15 +12,33 @@ import java.util.regex.*;
  * Links to a bug database from check-in comments.
  * 
  * Examples:
- *   Sun Java bug parade: Sun 6227617.
+ *   Sun Java bug parade: Sun 6227617. Bug id 6227617. Bug 6227617.
  *   RFCs: RFC2229.
  */
 public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
-    public BugDatabaseHighlighter(PTextArea textArea) {
+    private String urlTemplate;
+    
+    private BugDatabaseHighlighter(PTextArea textArea, String regularExpression, String urlTemplate) {
+        super(textArea, regularExpression, PStyle.HYPERLINK);
+        this.urlTemplate = urlTemplate;
+    }
+    
+    public static void highlightBugs(PTextArea textArea) {
         // Group 1 - the text to be underlined.
-        // Group 2 - the vendor, used to choose a URL template.
-        // Group 3 - the id, inserted into the template.
-        super(textArea, "(?i)\\b((?:(Sun |bug |RFC ?|D)([0-9]+)))", PStyle.HYPERLINK);
+        // Group 2 - the id, inserted into the template.
+        
+        // Sun Java bugs.
+        highlightBug(textArea, "\\b(([4-6]\\d{6}))\\b", "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=%s");
+        
+        // RFCs.
+        highlightBug(textArea, "(?i)\\b(rfc\\s*(\\d{3,4}))\\b", "http://ftp.rfc-editor.org/in-notes/rfc%s");
+        
+        // BlueArc's internal bug database.
+        highlightBug(textArea, "\\b(D([1-2]\\d{4}))\\b", "http://woggle/%s");
+    }
+    
+    private static void highlightBug(PTextArea textArea, String regularExpression, String urlTemplate) {
+        textArea.addStyleApplicator(new BugDatabaseHighlighter(textArea, regularExpression, urlTemplate));
     }
     
     @Override
@@ -29,18 +47,7 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
     }
     
     private String urlForMatcher(Matcher matcher) {
-        String id = matcher.group(3);
-        String vendor = matcher.group(2);
-        if (vendor != null) {
-            if (vendor.equalsIgnoreCase("Sun ")) {
-                return "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=" + id;
-            } else if (vendor.equalsIgnoreCase("bug ")) {
-                return "http://fogbugz.jessies.org/fogbugz/default.php?pg=pgEditBug&command=view&ixBug=" + id;
-            } else if (vendor.equalsIgnoreCase("RFC")) {
-                return "http://ftp.rfc-editor.org/in-notes/rfc" + id + ".txt";
-            }
-        }
-        return "http://woggle/" + id;
+        return new Formatter().format(urlTemplate, matcher.group(2)).toString();
     }
     
     @Override
