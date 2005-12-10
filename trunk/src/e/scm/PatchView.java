@@ -78,6 +78,12 @@ public class PatchView extends JList {
         if (status != 0) {
             return lines;
         }
+        // Remove the file right away, since a CheckInTool user can cause an
+        // arbitrary number to be created during a session; one for each time
+        // they change the selection in the file list. We only remove the
+        // file if the script executed successfully; if it didn't, we might
+        // want to debug the problem.
+        FileUtilities.fileFromString(patchFilename).delete();
         return newLines;
     }
     
