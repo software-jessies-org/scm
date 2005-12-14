@@ -17,8 +17,7 @@ public class ChangeSetItem implements Comparable<ChangeSetItem> {
     }
     
     public String toString() {
-        // We return just the filename.
-        // martind argued that showing all the information would be best. In
+        // It might seem that showing all the information would be best. In
         // particular, he thought that the list should look familiar to people
         // who've seen us show the revision history of a file, and there we
         // show the version and date information. But that wouldn't be
