@@ -7,11 +7,12 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.event.*;
 import org.jdesktop.swingworker.SwingWorker;
 
 public class ChangeSetWindow extends JFrame {
     private RevisionControlSystem backEnd;
-    private JComboBox fileChooser;
+    private JList fileList;
     private PatchView patchView;
     
     public ChangeSetWindow(final RevisionControlSystem backEnd, final String filePath, final Revision revision) {
@@ -20,12 +21,18 @@ public class ChangeSetWindow extends JFrame {
         String title = FileUtilities.getUserFriendlyName(backEnd.getRoot().toString()) + " revision " + revision.number;
         setTitle(title);
         
-        this.fileChooser = new JComboBox();
+        this.fileList = ScmUtilities.makeList();
+        fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        fileList.setVisibleRowCount(8);
+        JScrollPane scrollableFileList = new JScrollPane(fileList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        
         this.patchView = new PatchView();
         
         // If you're going to have a scroll pane against the edge of the window on Mac OS, you need to always have the scroll bars visible or you risk having an inaccessible scroll bar arrow. You can't use a JScrollPane corner because, as the JavaDoc says, their size is completely determined by the size of the scroll bars. (This, I think, is a JScrollPane bug.) We could work around this problem in the way I did in Terminator, but that's a lot of work for very little gain.
         JScrollPane scrollablePatchView = new JScrollPane(patchView, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        
         // Remove the border so the scroll pane fits snugly against the window edge. This is right on Mac OS, but is it right on GNOME?
+        // FIXME: switch to a split pane instead.
         scrollablePatchView.setBorder(null);
         
         // FIXME: the UI should offer a way to get to the revision history.
@@ -34,7 +41,7 @@ public class ChangeSetWindow extends JFrame {
         // Per patch(1): "lines beginning with # ... are considered to be comments".
         
         setLayout(new BorderLayout());
-        add(fileChooser, BorderLayout.NORTH);
+        add(scrollableFileList, BorderLayout.NORTH);
         add(scrollablePatchView, BorderLayout.CENTER);
         pack();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -53,8 +60,11 @@ public class ChangeSetWindow extends JFrame {
         public ComboBoxFiller(final String filePath, final Revision revision) {
             this.filePath = filePath;
             this.revision = revision;
-            fileChooser.setEnabled(false);
-            fileChooser.addItem("Getting list of files in revision " + revision.number);
+            fileList.setEnabled(false);
+            
+            DefaultListModel model = new DefaultListModel();
+            model.addElement("Getting list of files in revision " + revision.number);
+            fileList.setModel(model);
         }
         
         @Override
@@ -75,10 +85,11 @@ public class ChangeSetWindow extends JFrame {
             }
             
             // Get the GUI component ready for real content.
-            fileChooser.removeAllItems();
-            fileChooser.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    ChangeSetItem changeSetItem = (ChangeSetItem) fileChooser.getSelectedItem();
+            DefaultListModel model = new DefaultListModel();
+            fileList.setModel(model);
+            fileList.addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    ChangeSetItem changeSetItem = (ChangeSetItem) fileList.getSelectedValue();
                     // For systems like BitKeeper, the newRevision of this file isn't necessarily the same as the Revision of the file we're showing the change set for.
                     Revision oldRevision = new Revision(changeSetItem.oldRevision, null, null, null);
                     Revision newRevision = new Revision(changeSetItem.newRevision, null, null, null);
@@ -91,8 +102,8 @@ public class ChangeSetWindow extends JFrame {
             // Put the change set items into the GUI component's model.
             Collections.sort(changeSet);
             for (ChangeSetItem changeSetItem : changeSet) {
-                fileChooser.addItem(changeSetItem);
-                fileChooser.setEnabled(true);
+                model.addElement(changeSetItem);
+                fileList.setEnabled(true);
             }
         }
     }
