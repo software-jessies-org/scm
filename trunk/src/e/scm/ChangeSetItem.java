@@ -17,7 +17,17 @@ public class ChangeSetItem implements Comparable<ChangeSetItem> {
     }
     
     public String toString() {
-        // FIXME
+        // We return just the filename.
+        // martind argued that showing all the information would be best. In
+        // particular, he thought that the list should look familiar to people
+        // who've seen us show the revision history of a file, and there we
+        // show the version and date information. But that wouldn't be
+        // consistent with the table we display when checking in, and what
+        // would it say anyway? You'd have the same user and the same date
+        // for all the files and, for subversion, the same version number.
+        // So, until we come up with an actual use for more information, rather
+        // than just a nagging feeling that we shouldn't be hiding it, we'll
+        // just return the filename.
         return filename;
     }
     
