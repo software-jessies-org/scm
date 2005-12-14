@@ -81,6 +81,7 @@ public class ChangeSetWindow extends JFrame {
                 return;
             }
             
+            Collections.sort(changeSet);
             for (ChangeSetItem changeSetItem : changeSet) {
                 fileChooser.addItem(changeSetItem);
                 fileChooser.setEnabled(true);

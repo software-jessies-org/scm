@@ -5,7 +5,7 @@ package e.scm;
  *
  * (At some point we should go through SCM and try to come up with consistent unambiguous non-confusing nomenclature, though I'm not confident that the problem is solvable.)
  */
-public class ChangeSetItem {
+public class ChangeSetItem implements Comparable<ChangeSetItem> {
     public String filename;
     public String oldRevision;
     public String newRevision;
@@ -19,5 +19,9 @@ public class ChangeSetItem {
     public String toString() {
         // FIXME
         return filename;
+    }
+    
+    public final int compareTo(ChangeSetItem other) {
+        return toString().compareTo(other.toString());
     }
 }
