@@ -212,25 +212,6 @@ public abstract class RevisionControlSystem {
      */
     public abstract void commit(String comment, List<FileStatus> fileStatuses);
     
-    // This only copes with spaces in commands, not other shell special punctuation and specifically not ".
-    // Fix it when it bites you.
-    private static String quoteCommand(List<String> command) {
-        StringBuilder result = new StringBuilder();
-        for (String word : command) {
-            if (result.length() > 0) {
-                result.append(' ');
-            }
-            if (word.contains(" ")) {
-                result.append('"');
-                result.append(word);
-                result.append('"');
-            } else {
-                result.append(word);
-            }
-        }
-        return result.toString();
-    }
-
     /**
      * Executes a command in the given directory, and dumps all the output from it.
      * Useful until we do something funkier.
@@ -239,7 +220,7 @@ public abstract class RevisionControlSystem {
         String[] command = commandAsList.toArray(new String[commandAsList.size()]);
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        System.err.println("Running " + quoteCommand(commandAsList));
+        System.err.println("Running " + ProcessUtilities.shellQuotedFormOf(commandAsList));
         int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             System.out.println(lines.get(i));
@@ -256,7 +237,7 @@ public abstract class RevisionControlSystem {
      * Reports an error in a dialog, and then throws a RuntimeException.
      */
     public static void throwError(int status, String[] command, List output, List errors) {
-        String message = "Command '" + quoteCommand(Arrays.asList(command)) + "' returned status " + status + ".";
+        String message = "Command '" + ProcessUtilities.shellQuotedFormOf(Arrays.asList(command)) + "' returned status " + status + ".";
         message += "\n\nErrors were [\n";
         if (errors.size() > 0) {
             message += StringUtilities.join(errors, "\n") + "\n";
