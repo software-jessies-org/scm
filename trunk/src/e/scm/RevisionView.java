@@ -209,6 +209,7 @@ public class RevisionView extends JComponent {
     private JAsynchronousProgressIndicator progressIndicator = new JAsynchronousProgressIndicator();
     private JLabel statusLine = new JLabel(" ");
     private JButton changeSetButton;
+    private JButton showLogButton;
     
     private int expectedResultModCount;
     
@@ -247,12 +248,13 @@ public class RevisionView extends JComponent {
         });
         changeSetButton.setEnabled(false);
 
-        JButton showLogButton = new JButton("Show Log");
+        showLogButton = new JButton("Show Log");
         showLogButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showLog();
             }
         });
+        showLogButton.setEnabled(false);
 
         final JTextField searchField = new SearchField();
         searchField.addActionListener(new ActionListener() {
@@ -632,6 +634,7 @@ public class RevisionView extends JComponent {
                     revisions.addLocalRevision(Revision.LOCAL_REVISION);
                 }
                 revisionsList.setModel(revisions);
+                showLogButton.setEnabled(true);
                 
                 // This doesn't really belong in here, but it can only be invoked after the code above has finished.
                 if (initialLineNumber != 0) {
