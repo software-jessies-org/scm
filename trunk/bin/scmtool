@@ -17,5 +17,5 @@ salma_hayek = "#{project_root}/../salma-hayek"
 require "#{salma_hayek}/bin/invoke-java.rb"
 
 invoker = Java.new(tool_name, "e/util/Launcher")
-invoker.dock_icon = "#{project_root}/lib/scm.icns"
+invoker.set_icons("#{project_root}/lib/scm.icns", "#{project_root}/lib/scm-128.png")
 invoker.invoke([ tool_name, "e.scm.#{tool_name}" ])
