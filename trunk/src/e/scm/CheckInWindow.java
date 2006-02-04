@@ -298,8 +298,8 @@ public class CheckInWindow extends JFrame {
                 File file = FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), filename);
                 
                 // Keep a backup. The file may not exist if the change we're discarding
-                // is a local "rm". FIXME: Recognize that case ('!' status in svn), and
-                // change the UI to something like "restore"?
+                // is a local "rm".
+                // FIXME: Recognize that case ('!' status in svn), and change the UI to something like "restore"?
                 if (file.exists() && file.isFile()) {
                     String oldContent = StringUtilities.readFile(file);
                     File backupFile = FileUtilities.fileFromParentAndString(System.getProperty("java.io.tmpdir"), StringUtilities.urlEncode(filename));
@@ -309,8 +309,8 @@ public class CheckInWindow extends JFrame {
                 
                 // Revert.
                 if (fileStatus.getState() == FileStatus.NEW) {
-                    // If the file isn't under version control, we'll have to remove
-                    // it ourselves...
+                    // If the file isn't under version control, we'll have to remove it ourselves...
+                    // FIXME: what if it's a non-empty directory?
                     boolean deleted = file.delete();
                     if (deleted == false) {
                         SimpleDialog.showAlert(CheckInWindow.this, "Discard", "Couldn't delete file \"" + FileUtilities.getUserFriendlyName(file) + "\".");
