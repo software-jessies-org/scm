@@ -14,8 +14,9 @@ public class RevisionWindow extends JFrame {
         setContentPane(new RevisionView(filename, initialLineNumber));
         pack();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        JFrameUtilities.setFrameIcon(this);
         setLocationRelativeTo(null);
+        JFrameUtilities.setFrameIcon(this);
+        JFrameUtilities.constrainToScreen(this);
         setVisible(true);
     }
 }

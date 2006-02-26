@@ -114,6 +114,7 @@ public class CheckInWindow extends JFrame {
         pack();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        JFrameUtilities.constrainToScreen(this);
         setVisible(true);
     }
 

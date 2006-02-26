@@ -45,8 +45,9 @@ public class ChangeSetWindow extends JFrame {
         add(scrollablePatchView, BorderLayout.CENTER);
         pack();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        JFrameUtilities.setFrameIcon(this);
         setLocationRelativeTo(null);
+        JFrameUtilities.setFrameIcon(this);
+        JFrameUtilities.constrainToScreen(this);
         
         // Fill the combo box without blocking the EDT; repository access may take some time.
         new ComboBoxFiller(filePath, revision).execute();
