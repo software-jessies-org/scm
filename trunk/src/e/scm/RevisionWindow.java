@@ -1,5 +1,6 @@
 package e.scm;
 
+import e.gui.*;
 import e.util.*;
 import javax.swing.*;
 
@@ -13,6 +14,7 @@ public class RevisionWindow extends JFrame {
         setContentPane(new RevisionView(filename, initialLineNumber));
         pack();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        JFrameUtilities.setFrameIcon(this);
         setLocationRelativeTo(null);
         setVisible(true);
     }

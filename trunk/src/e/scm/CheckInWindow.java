@@ -25,6 +25,7 @@ public class CheckInWindow extends JFrame {
     public CheckInWindow(final RevisionControlSystem backEnd) {
         this.backEnd = backEnd;
         setTitle(FileUtilities.getUserFriendlyName(backEnd.getRoot().toString()));
+        JFrameUtilities.setFrameIcon(this);
         makeUserInterface();
         updateFileStatuses();
         initQuitMonitoring();

@@ -599,6 +599,7 @@ public class RevisionView extends JComponent {
         panel.add(new JScrollPane(summary), BorderLayout.CENTER);
 
         JFrame frame = new JFrame("Revisions of " + filePath);
+        JFrameUtilities.setFrameIcon(frame);
         frame.setContentPane(panel);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
