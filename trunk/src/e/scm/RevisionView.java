@@ -13,6 +13,8 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class RevisionView extends JComponent {
+    private static final String COMMENT_SEPARATOR = "---------------------------------------------------\n";
+    
     private final AnnotatedLineRenderer annotatedLineRenderer = new AnnotatedLineRenderer(this);
     
     public List<Revision> getRevisionRange(Revision fromRevision, Revision toRevision) {
@@ -202,8 +204,10 @@ public class RevisionView extends JComponent {
     private AnnotationModel annotationModel;
     private RevisionListModel revisions;
     
+    private JSplitPane revisionsUi;
     private JList revisionsList;
     private PTextArea revisionCommentArea;
+    
     private JList annotationView;
     
     private JAsynchronousProgressIndicator progressIndicator = new JAsynchronousProgressIndicator();
@@ -226,7 +230,7 @@ public class RevisionView extends JComponent {
         initRevisionCommentArea();
         initAnnotationView();
 
-        JComponent revisionsUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+        revisionsUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
             new JScrollPane(revisionsList),
             new JScrollPane(revisionCommentArea,
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -306,7 +310,7 @@ public class RevisionView extends JComponent {
 
     private void initRevisionsList() {
         revisionsList = ScmUtilities.makeList();
-        revisionsList.setCellRenderer(new e.gui.EListCellRenderer(true));
+        revisionsList.setCellRenderer(new RevisionListCellRenderer());
         revisionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         revisionsList.addListSelectionListener(new RevisionListSelectionListener());
     }
@@ -573,12 +577,8 @@ public class RevisionView extends JComponent {
         StringBuilder summary = new StringBuilder();
         for (int i = 0; i < revisions.getSize(); ++i) {
             Revision revision = (Revision) revisions.getElementAt(i);
-
-            summary.append(revision);
-            summary.append("\n");
-
-            summary.append(revision.comment);
-            summary.append("\n");
+            summary.append(revision.summary());
+            summary.append(COMMENT_SEPARATOR);
         }
         return summary.toString();
     }
@@ -703,7 +703,7 @@ public class RevisionView extends JComponent {
             } else if (values.length == 1) {
                 // Show annotated revision.
                 Revision newRevision = (Revision) values[0];
-                showComment(newRevision.comment);
+                showComment(newRevision.summary());
                 boolean alreadyAnnotating = getAnnotatedRevision() != null;
                 boolean overrideCurrentLineNumber = desiredLineNumber != 0;
                 if (alreadyAnnotating && overrideCurrentLineNumber == false) {
@@ -722,18 +722,21 @@ public class RevisionView extends JComponent {
                 comment.append(olderRevision.number);
                 comment.append(" and ");
                 comment.append(newerRevision.number);
-                comment.append("\n");
+                comment.append(":\n\n");
                 for (int i = 0; i < values.length - 1; ++i) {
                     Revision revision = (Revision) values[i];
-                    comment.append("\n(");
-                    comment.append(revision.number);
-                    comment.append(") ");
-                    comment.append(revision.comment);
+                    comment.append(revision.summary());
+                    comment.append(COMMENT_SEPARATOR);
                 }
 
                 showComment(comment.toString());
                 showDifferencesBetweenRevisions(olderRevision, newerRevision);
             }
         }
+    }
+    
+    // Used to set the split pane divider locations, which are impossibly difficult to get right before the components are realized.
+    public void postPack() {
+        revisionsUi.setDividerLocation(revisionsUi.getWidth() - revisionCommentArea.getPreferredSize().width);
     }
 }

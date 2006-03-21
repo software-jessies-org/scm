@@ -44,7 +44,7 @@ public class BitKeeper extends RevisionControlSystem {
 
     //D 1.2 04/02/15 13:02:22+00:00 elliotth@mercury.local 3 2 4/0/356
     //D 1.144 01/03/28 11:56:53-00:00 hughc 145 144 0/3/3528
-    private static final Pattern LOG_PATTERN = Pattern.compile("^D ([0-9.]+) (\\d\\d)/(\\d\\d)/(\\d\\d) \\S+ ([^@ ]+).*");
+    private static final Pattern LOG_PATTERN = Pattern.compile("^D ([0-9.]+) (\\d\\d)/(\\d\\d)/(\\d\\d) (\\d{2}:\\d{2}:\\d{2}[-+]\\d{2}:\\d{2}) ([^@ ]+).*");
     private static final String LOG_SEPARATOR = "------------------------------------------------";
     
     public RevisionListModel parseLog(List<String> linesList) {
@@ -59,14 +59,15 @@ public class BitKeeper extends RevisionControlSystem {
             Matcher matcher = LOG_PATTERN.matcher(lines[i]);
             if (matcher.matches()) {
                 String number = matcher.group(1);
-                String author = matcher.group(5);
+                String time = matcher.group(5);
+                String author = matcher.group(6);
                 String date = "20" + matcher.group(2) + "-" + matcher.group(3) + "-" + matcher.group(4);
                 StringBuilder comment = new StringBuilder();
                 while (++i < lines.length && lines[i].equals(LOG_SEPARATOR) == false) {
                     comment.append(lines[i].substring(2));
                     comment.append("\n");
                 }
-                result.add(new Revision(number, date, author, comment.toString()));
+                result.add(new Revision(number, date, time, author, comment.toString()));
             }
         }
         return result;

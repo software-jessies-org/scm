@@ -93,8 +93,8 @@ public class ChangeSetWindow extends JFrame {
                 public void valueChanged(ListSelectionEvent e) {
                     ChangeSetItem changeSetItem = (ChangeSetItem) fileList.getSelectedValue();
                     // For systems like BitKeeper, the newRevision of this file isn't necessarily the same as the Revision of the file we're showing the change set for.
-                    Revision oldRevision = new Revision(changeSetItem.oldRevision, null, null, null);
-                    Revision newRevision = new Revision(changeSetItem.newRevision, null, null, null);
+                    Revision oldRevision = new Revision(changeSetItem.oldRevision, null, null, null, null);
+                    Revision newRevision = new Revision(changeSetItem.newRevision, null, null, null, null);
                     // FIXME: we shouldn't do this on the EDT.
                     patchView.showPatch(backEnd, oldRevision, newRevision, changeSetItem.filename);
                     // FIXME: PatchView.showPatch produces an empty patch for a new file. (And for a deleted file?) If we got more information from the back-end we'd at least know that we were dealing with an 'A' (or 'D') file rather than an 'M' file.
