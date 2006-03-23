@@ -230,24 +230,17 @@ public class RevisionView extends JComponent {
         initRevisionCommentArea();
         initAnnotationView();
 
-        revisionsUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-            new JScrollPane(revisionsList),
-            new JScrollPane(revisionCommentArea,
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED)
-        );
+        revisionsUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ScmUtilities.makeScrollable(revisionsList), ScmUtilities.makeScrollable(revisionCommentArea));
         revisionsUi.setBorder(null);
         
-        JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-            revisionsUi,
-            new JScrollPane(annotationView));
+        JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT, revisionsUi, ScmUtilities.makeScrollable(annotationView));
         ui.setBorder(null);
         ui.setDividerLocation(revisionsUi.getPreferredSize().height);
 
         changeSetButton = new JButton("Show Change Set");;
         changeSetButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ChangeSetWindow(backEnd, filePath, getAnnotatedRevision()).setVisible(true);
+                new ChangeSetWindow(backEnd, filePath, getAnnotatedRevision());
             }
         });
         changeSetButton.setEnabled(false);
@@ -596,7 +589,7 @@ public class RevisionView extends JComponent {
         summary.setCaretPosition(0);
         
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(new JScrollPane(summary), BorderLayout.CENTER);
+        panel.add(ScmUtilities.makeScrollable(summary), BorderLayout.CENTER);
 
         JFrame frame = new JFrame("Revisions of " + filePath);
         frame.setContentPane(panel);

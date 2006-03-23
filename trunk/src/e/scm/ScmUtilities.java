@@ -6,6 +6,7 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.event.*;
 
 public class ScmUtilities {
@@ -24,6 +25,14 @@ public class ScmUtilities {
         textArea.setWrapStyleWord(true);
         BugDatabaseHighlighter.highlightBugs(textArea);
         return textArea;
+    }
+    
+    public static JScrollPane makeScrollable(JComponent c) {
+        return new JScrollPane(c, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    }
+    
+    public static Border getFrameBorder() {
+        return new EmptyBorder(10, 10, 10, 10);
     }
     
     private ScmUtilities() {

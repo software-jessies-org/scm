@@ -59,18 +59,13 @@ public class CheckInWindow extends JFrame {
         initCheckInCommentArea();
         
         // Give the statuses table a sensible amount of space.
-        JScrollPane statusesScrollPane = new JScrollPane(statusesTable);
+        JScrollPane statusesScrollPane = ScmUtilities.makeScrollable(statusesTable);
         Dimension preferredSize = statusesScrollPane.getPreferredSize();
         preferredSize.height = getFontMetrics(statusesTable.getFont()).getHeight() * 10;
         statusesScrollPane.setPreferredSize(preferredSize);
         statusesScrollPane.getViewport().setBackground(statusesTable.getBackground());
         
-        JSplitPane topUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-            statusesScrollPane,
-            new JScrollPane(checkInCommentArea,
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED)
-        );
+        JSplitPane topUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, statusesScrollPane, ScmUtilities.makeScrollable(checkInCommentArea));
         topUi.setBorder(null);
         
         patchView = new PatchView();
@@ -90,9 +85,7 @@ public class CheckInWindow extends JFrame {
             }
         });
         
-        JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-            topUi,
-            new JScrollPane(patchView));
+        JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topUi, ScmUtilities.makeScrollable(patchView));
         ui.setBorder(null);
         
         commitButton = new JButton("Commit");
@@ -107,7 +100,7 @@ public class CheckInWindow extends JFrame {
         statusPanel.add(commitButton, BorderLayout.EAST);
 
         JPanel contentPane = new JPanel(new BorderLayout());
-        contentPane.setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
+        contentPane.setBorder(ScmUtilities.getFrameBorder());
         contentPane.add(ui, BorderLayout.CENTER);
         contentPane.add(statusPanel, BorderLayout.SOUTH);
         setContentPane(contentPane);
