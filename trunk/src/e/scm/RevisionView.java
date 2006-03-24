@@ -284,16 +284,16 @@ public class RevisionView extends JComponent {
             }
         });
         
-        JPanel buttonsPanel = new JPanel(new FlowLayout());
-        buttonsPanel.add(changeSetButton);
-        buttonsPanel.add(showLogButton);
-        buttonsPanel.add(searchField);
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.add(changeSetButton);
+        buttonPanel.add(showLogButton);
+        buttonPanel.add(searchField);
         
         JPanel statusPanel = new JPanel(new BorderLayout(4, 0));
         statusPanel.setBorder(new javax.swing.border.EmptyBorder(10, 0, 10, 0));
         statusPanel.add(progressIndicator, BorderLayout.WEST);
         statusPanel.add(statusLine, BorderLayout.CENTER);
-        statusPanel.add(buttonsPanel, BorderLayout.EAST);
+        statusPanel.add(buttonPanel, BorderLayout.EAST);
         
         setLayout(new BorderLayout());
         setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
@@ -583,21 +583,8 @@ public class RevisionView extends JComponent {
     }
 
     private void showLog() {
-        PTextArea summary = ScmUtilities.makeTextArea(20);
-        summary.setEditable(false);
-        summary.setText(summaryOfAllRevisions());
-        summary.setCaretPosition(0);
-        
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(ScmUtilities.makeScrollable(summary), BorderLayout.CENTER);
-
-        JFrame frame = new JFrame("Revisions of " + filePath);
-        frame.setContentPane(panel);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.pack();
+        JFrame frame = JFrameUtilities.makeTextWindow("Revisions of " + filePath, summaryOfAllRevisions());
         frame.setLocationRelativeTo(this);
-        JFrameUtilities.setFrameIcon(frame);
-        JFrameUtilities.constrainToScreen(frame);
         frame.setVisible(true);
     }
 
