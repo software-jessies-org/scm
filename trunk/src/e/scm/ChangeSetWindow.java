@@ -109,6 +109,10 @@ public class ChangeSetWindow extends JFrame {
                 model.addElement(changeSetItem);
                 fileList.setEnabled(true);
             }
+            
+            // Guess the user's most likely initial action.
+            fileList.setSelectedIndex(0);
+            fileList.requestFocus();
         }
     }
 }
