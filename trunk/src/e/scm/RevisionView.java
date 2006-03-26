@@ -240,7 +240,7 @@ public class RevisionView extends JComponent {
         changeSetButton = new JButton("Show Change Set");;
         changeSetButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new ChangeSetWindow(backEnd, filePath, getAnnotatedRevision());
+                new ChangeSetWindow(backEnd, filePath, revisions, getAnnotatedRevision());
             }
         });
         changeSetButton.setEnabled(false);
@@ -583,9 +583,7 @@ public class RevisionView extends JComponent {
     }
 
     private void showLog() {
-        JFrame frame = JFrameUtilities.makeTextWindow("Revisions of " + filePath, summaryOfAllRevisions());
-        frame.setLocationRelativeTo(this);
-        frame.setVisible(true);
+        JFrameUtilities.showTextWindow(this, "Revisions of " + filePath, summaryOfAllRevisions());
     }
 
     public Revision getAnnotatedRevision() {

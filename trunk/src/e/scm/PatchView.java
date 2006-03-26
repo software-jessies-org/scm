@@ -36,6 +36,11 @@ public class PatchView extends JList {
     }
     
     public void showPatch(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename) {
+        ArrayList<String> lines = getPatchLines(backEnd, olderRevision, newerRevision, filename);
+        showPatch(lines);
+    }
+    
+    public ArrayList<String> getPatchLines(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename) {
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = 0;
@@ -54,7 +59,10 @@ public class PatchView extends JList {
         }
         
         lines = annotatePatchUsingTags(backEnd, lines);
-        
+        return lines;
+    }
+    
+    public void showPatch(ArrayList<String> lines) {
         DefaultListModel differences = new DefaultListModel();
         for (String line : lines) {
             differences.addElement(line);
