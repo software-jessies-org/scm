@@ -127,26 +127,35 @@ public class WaitCursor {
     }
     
     private synchronized void createSheet() {
-        Dimension size = new Dimension(400, 120);
-        
         // Create the content.
-        content = new JPanel(new BorderLayout(20, 20));
+        content = new JPanel(new BorderLayout());
         content.add(makeCenteredPanel(progressBar), BorderLayout.CENTER);
         content.add(makeCenteredPanel(new JLabel(message)), BorderLayout.SOUTH);
-        content.setBorder(progressBar.getBorder());
-        content.setSize(size);
         
         progressBar.setIndeterminate(true);
         
         final Frame frame = frameOf(glassPane);
         
         // Create the sheet itself.
+        sheet = new JDialog(frame);
+        sheet.setContentPane(content);
+        
+        // Get rid of the title bar, but put back some kind of hard edge.
+        sheet.setUndecorated(true);
+        content.setBorder(new javax.swing.border.LineBorder(SystemColor.windowBorder));
+        
+        // Give it a decent size.
+        sheet.pack();
+        Dimension size = sheet.getSize();
+        if (size.width < 400) {
+            size.width = 400;
+        }
+        if (size.height < 120) {
+            size.height = 120;
+        }
+        sheet.setSize(size);
+        
         if (GuiUtilities.isMacOs()) {
-            sheet = new JDialog(frame);
-            sheet.setContentPane(content);
-            sheet.setUndecorated(true);
-            sheet.setSize(size);
-            
             // Ensure we defer focus to our parent.
             content.addFocusListener(new FocusAdapter() {
                 public void focusGained(FocusEvent e) {
@@ -157,10 +166,8 @@ public class WaitCursor {
             // Ensure we follow our parent around, as if attached.
             repositionSheet();
             frame.addComponentListener(sheetParentListener);
-            sheet.setVisible(true);
-        } else {
-            initSheetLocation();
         }
+        sheet.setVisible(true);
     }
     
     /** Keeps the sheet dialog lined up with the middle of the top of the parent window. */
@@ -172,21 +179,6 @@ public class WaitCursor {
         sheet.setLocation(location);
     }
     
-    /** Puts the sheet content panel in the right place on the glass pane. */
-    private void initSheetLocation() {
-        Frame owner = frameOf(glassPane);
-        Point location = new Point();
-        location.x += (owner.getWidth() - content.getWidth()) / 2;
-        location.y += (owner.getHeight() - content.getHeight()) / 2;
-        
-        glassPane.setLayout(null);
-        glassPane.add(content);
-        content.setBounds(location.x, location.y, content.getWidth(), content.getHeight());
-        content.invalidate();
-        content.validate();
-        content.repaint();
-    }
-
     private Component getGlassPane() {
         RootPaneContainer container = null;
         if (component instanceof RootPaneContainer) {
