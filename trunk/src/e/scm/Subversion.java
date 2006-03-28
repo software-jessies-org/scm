@@ -77,7 +77,8 @@ public class Subversion extends RevisionControlSystem {
                 if (lines[i].equals(separator) == false) {
                     Log.warn("expected separator line when parsing log");
                 }
-                result.add(new Revision(number, date, time, author, comment.toString()));
+                Revision revision = new Revision(number, date, time, author, comment.toString());
+                result.add(revision);
             }
         }
         return result;
@@ -129,6 +130,8 @@ public class Subversion extends RevisionControlSystem {
                     String path = matcher.group(1);
                     path = path.replaceAll("^/trunk/", "");
                     path = path.replaceAll("^/", "");
+                    // Subtracting one doesn't give the number of the previous revision of the file.
+                    // This means that we can't, in general, successfully look up the revision.oldRevision in a RevisionListModel.
                     final String oldRevisionNumber = Integer.toString(Integer.parseInt(revision.number) - 1);
                     result.add(new ChangeSetItem(path, oldRevisionNumber, revision.number));
                 }
