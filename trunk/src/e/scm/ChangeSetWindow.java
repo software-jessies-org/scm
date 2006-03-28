@@ -192,6 +192,7 @@ public class ChangeSetWindow extends JFrame {
         StringBuilder patch = new StringBuilder();
         patch.append("# " + getTitle() + "\n");
         ListModel model = fileList.getModel();
+        String previousComment = "";
         for (int i = 0; i < model.getSize(); ++i) {
             ChangeSetItem changeSetItem = (ChangeSetItem) model.getElementAt(i);
             
@@ -200,11 +201,14 @@ public class ChangeSetWindow extends JFrame {
             Revision oldRevision = new Revision(changeSetItem.oldRevision, null, null, null, null);            
             Revision newRevision = revisions.fromNumber(changeSetItem.newRevision);
             
-            // FIXME: don't repeat the comments for systems where every file in a revision has the same comment.
             // FIXME: we should display the comments for all of the revisions between oldRevision and newRevision.
-            for (String commentLine : newRevision.comment.split("\n")) {
-                patch.append("# " + commentLine + "\n");
+            String comment = newRevision.comment;
+            if (comment.equals(previousComment) == false) {
+                for (String commentLine : comment.split("\n")) {
+                    patch.append("# " + commentLine + "\n");
+                }
             }
+            previousComment = comment;
             
             // FIXME: we shouldn't do this on the EDT.
             ArrayList<String> lines = patchView.getPatchLines(backEnd, oldRevision, newRevision, changeSetItem.filename);
