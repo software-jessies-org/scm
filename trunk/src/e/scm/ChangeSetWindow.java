@@ -13,16 +13,17 @@ import org.jdesktop.swingworker.SwingWorker;
 
 public class ChangeSetWindow extends JFrame {
     private RevisionControlSystem backEnd;
-    private RevisionListModel revisions;
+    private RevisionListModel initialFileRevisions;
     
     private JList fileList;
     private PatchView patchView;
     
-    public ChangeSetWindow(final RevisionControlSystem backEnd, final String filePath, final RevisionListModel revisions, final Revision revision) {
+    public ChangeSetWindow(final RevisionControlSystem backEnd, final String initialFilePath, final RevisionListModel initialFileRevisions, final Revision initialFileRevision) {
         this.backEnd = backEnd;
-        this.revisions = revisions;
+        this.initialFileRevisions = initialFileRevisions;
         
-        String title = FileUtilities.getUserFriendlyName(backEnd.getRoot().toString()) + " revision " + revision.number;
+        // FIXME: Specifying a revision that, with BitKeeper, is file-specific without specifying the file doesn't make sense.
+        String title = FileUtilities.getUserFriendlyName(backEnd.getRoot().toString()) + " revision " + initialFileRevision.number;
         setTitle(title);
         
         this.fileList = ScmUtilities.makeList();
@@ -52,7 +53,7 @@ public class ChangeSetWindow extends JFrame {
         splitPane.setDividerLocation(fileList.getPreferredScrollableViewportSize().height);
         
         // Fill the combo box without blocking the EDT; repository access may take some time.
-        new ComboBoxFiller(filePath, revision).execute();
+        new ComboBoxFiller(initialFilePath, initialFileRevision).execute();
     }
     
     private JComponent makeButtonPanel() {
@@ -78,11 +79,12 @@ public class ChangeSetWindow extends JFrame {
             ChangeSetItem changeSetItem = (ChangeSetItem) model.getElementAt(i);
             
             // FIXME: don't repeat the comments for systems where every file in a revision has the same comment.
-            for (String commentLine : revisions.fromNumber(changeSetItem.newRevision).comment.split("\n")) {
+            // FIXME: we only have the RevisionListModel for the initial file.
+            // FIXME: we should display the comments for all of the revisions between oldRevision and newRevision.
+            for (String commentLine : initialFileRevisions.fromNumber(changeSetItem.newRevision).comment.split("\n")) {
                 patch.append("# " + commentLine + "\n");
             }
             
-            // FIXME: why can't we use Revision instances retrieved via revisions.fromNumber?
             Revision oldRevision = new Revision(changeSetItem.oldRevision, null, null, null, null);
             Revision newRevision = new Revision(changeSetItem.newRevision, null, null, null, null);
             
@@ -111,6 +113,7 @@ public class ChangeSetWindow extends JFrame {
             fileList.setEnabled(false);
             
             DefaultListModel model = new DefaultListModel();
+            // FIXME: Specifying a revision that, with BitKeeper, is file-specific without specifying the file doesn't make sense.
             model.addElement("Getting list of files in revision " + revision.number);
             fileList.setModel(model);
         }
