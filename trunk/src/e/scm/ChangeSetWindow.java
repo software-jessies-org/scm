@@ -5,6 +5,7 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -32,6 +33,8 @@ public class ChangeSetWindow extends JFrame {
         fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fileList.setVisibleRowCount(8);
         JScrollPane scrollableFileList = ScmUtilities.makeScrollable(fileList);
+        
+        fileList.addMouseListener(fileListDoubleClickListener);
         
         this.patchView = new PatchView();
         JScrollPane scrollablePatchView = ScmUtilities.makeScrollable(patchView);
@@ -66,8 +69,6 @@ public class ChangeSetWindow extends JFrame {
                 showPatch();
             }
         });
-        
-        // FIXME: the UI should offer a way to get to the revision history.
         
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(showPatchButton);
@@ -287,4 +288,25 @@ public class ChangeSetWindow extends JFrame {
             fileList.requestFocus();
         }
     }
+    
+    
+    private final MouseListener fileListDoubleClickListener = new MouseAdapter() {
+        public void mouseClicked(MouseEvent e) {
+            ChangeSetItem changeSetItem = lineForEvent(e);
+            if (e.getClickCount() == 2) {
+                doubleClick(changeSetItem);
+            }
+        }
+        
+        private ChangeSetItem lineForEvent(MouseEvent e) {
+            int index = fileList.locationToIndex(e.getPoint());
+            return (ChangeSetItem) fileList.getModel().getElementAt(index);
+        }
+        
+        private void doubleClick(ChangeSetItem changeSetItem) {
+            File file = FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), changeSetItem.filename);
+            // FIXME: There's already a FIXME in RevisionWindow for being able to start with changeSetItem.newRevision selected.
+            new RevisionWindow(file.toString(), 1);
+        }
+    };
 }
