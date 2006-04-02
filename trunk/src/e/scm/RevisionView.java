@@ -340,7 +340,6 @@ public class RevisionView extends JComponent {
      * Similar to BlockingWorker. FIXME: replace both classes with SwingWorker for Java 6.
      */
     public abstract class BackEndWorker implements Runnable {
-        // FIXME: This field appears to be used but not initialized.
         private String message;
         private Exception caughtException;
         
@@ -352,6 +351,7 @@ public class RevisionView extends JComponent {
         private int thisWorkerModCount;
         
         public BackEndWorker(final String message) {
+            this.message = message;
             setStatus(message);
             thisWorkerModCount = ++expectedResultModCount;
         }
