@@ -20,19 +20,19 @@ public class StatusReporter {
     statusPanel.add(statusLine, BorderLayout.CENTER);
   }
   
-  private void setMessage (String message) {
+  private void setMessage(String message) {
     if (message.length() == 0) {
       message = " ";
     }
     statusLine.setText(message);
   }
   
-  public void finishTask () {
+  public void finishTask() {
     progressIndicator.stopAnimation();
     setMessage ("");
   }
   
-  public int startTask (String message) {
+  public int startTask(String message) {
     setMessage (message);
     progressIndicator.startAnimation();
     return ++currentTaskHandle;
