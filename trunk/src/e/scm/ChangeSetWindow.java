@@ -135,10 +135,12 @@ public class ChangeSetWindow extends JFrame {
     
     public abstract class RevisionListWorker extends BackEndWorker {
         protected String filePath;
+        private JList listForErrors;
         
-        public RevisionListWorker(String filePath) {
+        public RevisionListWorker(String filePath, JList listForErrors) {
             super("Getting list of revisions...");
             this.filePath = filePath;
+            this.listForErrors = listForErrors;
         }
         
         public void work() {
@@ -156,7 +158,7 @@ public class ChangeSetWindow extends JFrame {
         
         public void finish() {
             if (status != 0 || errors.size() > 0) {
-                ScmUtilities.showToolError(fileList, errors, command, status);
+                ScmUtilities.showToolError(listForErrors, errors, command, status);
                 return;
             }
             
@@ -178,7 +180,7 @@ public class ChangeSetWindow extends JFrame {
         if (filePathToRevisionsMap.containsKey(filePath)) {
             return;
         }
-        new Thread(new RevisionListWorker(filePath) {
+        new Thread(new RevisionListWorker(filePath, fileList) {
             public void reportFileRevisions(RevisionListModel fileRevisions) {
                 filePathToRevisionsMap.put(filePath, fileRevisions);
                 reassessShowPatchAvailability();
