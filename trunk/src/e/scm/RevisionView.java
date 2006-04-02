@@ -642,8 +642,6 @@ public class RevisionView extends JComponent {
                 revisionsList.setModel(fileRevisions);
                 showLogButton.setEnabled(true);
                 
-                // FIXME: I think this change fixes the following pseudo-FIXME, which can therefore be removed.
-                // This doesn't really belong in here, but it can only be invoked after the code above has finished.
                 if (initialLineNumber != 0) {
                     Revision revision = revisions.getLatestInRepository();
                     selectRevision(revision, initialLineNumber);
