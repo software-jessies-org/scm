@@ -6,7 +6,6 @@ import javax.swing.*;
 
 public class StatusReporter {
   private Component owner;
-  private String message;
   private JAsynchronousProgressIndicator progressIndicator = new JAsynchronousProgressIndicator();
   private JLabel statusLine = new JLabel();
   private int currentTaskHandle = 0;
@@ -22,7 +21,6 @@ public class StatusReporter {
   }
   
   private void setMessage (String message) {
-    this.message = message;
     if (message.length() == 0) {
       message = " ";
     }
@@ -49,7 +47,7 @@ public class StatusReporter {
    * simply prints the stack trace. This method is run on the event
    * dispatch thread, so you can safely modify the UI here.
    */
-  public void reportException(Exception ex) {
+  public void reportException(String message, Exception ex) {
     SimpleDialog.showDetails(owner, message, ex);
   }
 }

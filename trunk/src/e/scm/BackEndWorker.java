@@ -7,8 +7,8 @@ import java.util.*;
  * Similar to BlockingWorker. FIXME: replace both classes with SwingWorker for Java 6.
  */
 public abstract class BackEndWorker implements Runnable {
-  private String message;
-  private StatusReporter statusReporter;
+  private BackEndTask task;
+  // A field so that it is accessible to an inner class.
   private Exception caughtException;
   
   ArrayList<String> lines = new ArrayList<String>();
@@ -16,12 +16,9 @@ public abstract class BackEndWorker implements Runnable {
   String[] command;
   int status = 0;
   
-  private int taskHandle;
-  
-  public BackEndWorker(final String message, StatusReporter statusReporter) {
-    this.message = message;
-    this.statusReporter = statusReporter;
-    taskHandle = statusReporter.startTask(message);
+  public BackEndWorker(BackEndTask task) {
+    this.task = task;
+    task.attachWorker();
   }
   
   public final void run() {
@@ -30,17 +27,16 @@ public abstract class BackEndWorker implements Runnable {
     } catch (Exception ex) {
       caughtException = ex;
     } finally {
-      if (statusReporter.isTaskOutdated(taskHandle)) {
+      task.detachWorker();
+      if (task.isOutdated()) {
         // This result is outdated. Forget it.
-        // Note that startAnimation and stopAnimation don't nest, so it's correct that we don't call progressIndicator.stopAnimation in this case.
         return;
       }
-      statusReporter.finishTask();
     }
     EventQueue.invokeLater(new Runnable() {
       public void run() {
         if (caughtException != null) {
-          statusReporter.reportException(caughtException);
+          task.reportException(caughtException);
         } else {
           finish();
         }

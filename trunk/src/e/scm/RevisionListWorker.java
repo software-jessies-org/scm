@@ -10,8 +10,8 @@ public abstract class RevisionListWorker extends BackEndWorker {
   protected String filePath;
   private JList listForErrors;
   
-  public RevisionListWorker(RevisionControlSystem backEnd, StatusReporter statusReporter, String filePath, JList listForErrors) {
-    super("Getting list of revisions...", statusReporter);
+  public RevisionListWorker(RevisionControlSystem backEnd, BackEndTask backEndTask, String filePath, JList listForErrors) {
+    super(backEndTask);
     this.backEnd = backEnd;
     this.filePath = filePath;
     this.listForErrors = listForErrors;

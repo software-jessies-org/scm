@@ -23,12 +23,7 @@ public class ChangeSetWindow extends JFrame {
     
     public ChangeSetWindow(final RevisionControlSystem backEnd, final String initialFilePath, final RevisionListModel initialFileRevisions, final Revision initialFileRevision) {
         this.backEnd = backEnd;
-        this.statusReporter = new StatusReporter(this) {
-            // We run several RevisionListWorkers in parallel and want all of the results.
-            public boolean isTaskOutdated(int taskHandle) {
-                return false;
-            }
-        };
+        this.statusReporter = new StatusReporter(this);
         this.filePathToRevisionsMap = new HashMap<String, RevisionListModel>();
         filePathToRevisionsMap.put(initialFilePath, initialFileRevisions);
         
@@ -86,11 +81,11 @@ public class ChangeSetWindow extends JFrame {
         showPatchButton.setEnabled(filePathToRevisionsMap.size() == fileList.getModel().getSize());
     }
     
-    private void readListOfRevisions(final String filePath) {
+    private void readListOfRevisions(final String filePath, BackEndTask revisionListTask) {
         if (filePathToRevisionsMap.containsKey(filePath)) {
             return;
         }
-        new Thread(new RevisionListWorker(backEnd, statusReporter, filePath, fileList) {
+        new Thread(new RevisionListWorker(backEnd, revisionListTask, filePath, fileList) {
             public void reportFileRevisions(RevisionListModel fileRevisions) {
                 filePathToRevisionsMap.put(filePath, fileRevisions);
                 reassessShowPatchAvailability();
@@ -184,11 +179,12 @@ public class ChangeSetWindow extends JFrame {
             });
             
             // Put the change set items into the GUI component's model.
+            BackEndTask revisionListTask = new BackEndTask("Getting list of revisions...", statusReporter);
             Collections.sort(changeSet);
             for (ChangeSetItem changeSetItem : changeSet) {
                 model.addElement(changeSetItem);
                 fileList.setEnabled(true);
-                readListOfRevisions(changeSetItem.filename);
+                readListOfRevisions(changeSetItem.filename, revisionListTask);
             }
             
             reassessShowPatchAvailability();

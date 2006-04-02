@@ -334,7 +334,7 @@ public class RevisionView extends JComponent {
     }
 
     private void showAnnotationsForRevision(final Revision revision, final int lineNumber) {
-        new Thread(new BackEndWorker("Getting annotations for revision " + revision.number + "...", statusReporter) {
+        new Thread(new BackEndWorker(new BackEndTask("Getting annotations for revision " + revision.number + "...", statusReporter)) {
             public void work() {
                 command = backEnd.getAnnotateCommand(revision, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
@@ -358,7 +358,7 @@ public class RevisionView extends JComponent {
      * Here, the line number corresponds to a line number in fromRevision.
      */
     private void showAnnotationsForRevision(final Revision toRevision, final Revision fromRevision, final int fromLineNumber) {
-        new Thread(new BackEndWorker("Tracing line back to revision " + toRevision.number + "...", statusReporter) {
+        new Thread(new BackEndWorker(new BackEndTask("Tracing line back to revision " + toRevision.number + "...", statusReporter)) {
             private int toLineNumber;
             
             public void work() {
@@ -460,7 +460,7 @@ public class RevisionView extends JComponent {
     }
 
     private void showDifferencesBetweenRevisions(final Revision olderRevision, final Revision newerRevision) {
-        new Thread(new BackEndWorker("Getting differences between revisions " + olderRevision.number + " and " + newerRevision.number + "...", statusReporter) {
+        new Thread(new BackEndWorker(new BackEndTask("Getting differences between revisions " + olderRevision.number + " and " + newerRevision.number + "...", statusReporter)) {
             public void work() {
                 command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
@@ -526,7 +526,7 @@ public class RevisionView extends JComponent {
     }
     
     private void readListOfRevisions(final int initialLineNumber) {
-        new Thread(new RevisionListWorker(backEnd, statusReporter, filePath, revisionsList) {
+        new Thread(new RevisionListWorker(backEnd, new BackEndTask("Getting list of revisions...", statusReporter), filePath, revisionsList) {
             public void reportFileRevisions(RevisionListModel fileRevisions) {
                 RevisionView.this.revisions = fileRevisions;
                 revisionsList.setModel(revisions);
