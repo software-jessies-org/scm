@@ -597,26 +597,52 @@ public class RevisionView extends JComponent {
         changeSetButton.setEnabled(backEnd.supportsChangeSets() && annotatedRevision != null);
     }
     
-    private void readListOfRevisions(final int initialLineNumber) {
-        new Thread(new BackEndWorker("Getting list of revisions...") {
-            public void work() {
-                command = backEnd.getLogCommand(filePath);
-                status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
+    public abstract class RevisionListWorker extends BackEndWorker {
+        protected String filePath;
+        private JList listForErrors;
+        
+        public RevisionListWorker(String filePath, JList listForErrors) {
+            super("Getting list of revisions...");
+            this.filePath = filePath;
+            this.listForErrors = listForErrors;
+        }
+        
+        public void work() {
+            command = backEnd.getLogCommand(filePath);
+            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
+        }
+        
+        private RevisionListModel parseRevisions() {
+            RevisionListModel revisions = backEnd.parseLog(lines);
+            if (backEnd.isLocallyModified(filePath)) {
+                revisions.addLocalRevision(Revision.LOCAL_REVISION);
+            }
+            return revisions;
+        }
+        
+        public void finish() {
+            if (status != 0 || errors.size() > 0) {
+                ScmUtilities.showToolError(listForErrors, errors, command, status);
+                return;
             }
             
-            public void finish() {
-                if (status != 0 || errors.size() > 0) {
-                    ScmUtilities.showToolError(revisionsList, errors, command, status);
-                    return;
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    reportFileRevisions(parseRevisions());
                 }
-                
-                revisions = backEnd.parseLog(lines);
-                if (backEnd.isLocallyModified(filePath)) {
-                    revisions.addLocalRevision(Revision.LOCAL_REVISION);
-                }
-                revisionsList.setModel(revisions);
+            });
+        }
+        
+        public abstract void reportFileRevisions(RevisionListModel fileRevisions);
+    }
+    
+    private void readListOfRevisions(final int initialLineNumber) {
+        new Thread(new RevisionListWorker(filePath, revisionsList) {
+            public void reportFileRevisions(RevisionListModel fileRevisions) {
+                revisionsList.setModel(fileRevisions);
                 showLogButton.setEnabled(true);
                 
+                // FIXME: I think this change fixes the following pseudo-FIXME, which can therefore be removed.
                 // This doesn't really belong in here, but it can only be invoked after the code above has finished.
                 if (initialLineNumber != 0) {
                     Revision revision = revisions.getLatestInRepository();
