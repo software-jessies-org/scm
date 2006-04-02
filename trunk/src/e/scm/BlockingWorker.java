@@ -13,20 +13,19 @@ public abstract class BlockingWorker implements Runnable {
     public BlockingWorker(Component component, String message) {
         this.component = component;
         this.message = message;
+        waitCursor = new WaitCursor(component, message);
+        waitCursor.start();
     }
     
     public final void run() {
-        waitCursor = new WaitCursor(component, message);
         try {
-            waitCursor.start();
             work();
         } catch (Exception ex) {
             caughtException = ex;
-        } finally {
-            waitCursor.stop();
         }
         EventQueue.invokeLater(new Runnable() {
             public void run() {
+                waitCursor.stop();
                 if (caughtException != null) {
                     reportException(caughtException);
                 } else {

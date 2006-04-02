@@ -49,7 +49,7 @@ public class WaitCursor {
         this.progressBar = new JProgressBar();
     }
     
-    public synchronized void start() {
+    public void start() {
         glassPane.setCursor(WAIT_CURSOR);
         glassPane.addMouseListener(MOUSE_EVENT_SWALLOWER);
         glassPane.removeAll();
@@ -58,7 +58,7 @@ public class WaitCursor {
         scheduleSheetAppearance();
     }
     
-    public synchronized void stop() {
+    public void stop() {
         if (sheetTimer != null) {
             sheetTimer.stop();
             sheetTimer = null;
@@ -77,27 +77,7 @@ public class WaitCursor {
         progressBar.setIndeterminate(false);
     }
     
-    private synchronized void hideSheet() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            unsafeHideSheet();
-            return;
-        }
-        // Avoid mutating the window on a thread other than the AWT thread.
-        try {
-            EventQueue.invokeAndWait(new Runnable() {
-                public void run() {
-                    unsafeHideSheet();
-                }
-            });
-        } catch (Exception ex) {
-            Log.warn("Problem hiding sheet", ex);
-        }
-    }
-    
-    /**
-     * Implements hideSheet, which you should invoke instead.
-     */
-    private void unsafeHideSheet() {
+    private void hideSheet() {
         if (sheet != null) {
             sheet.getOwner().removeComponentListener(sheetParentListener);
             sheet.setVisible(false);
@@ -121,12 +101,12 @@ public class WaitCursor {
         sheetTimer.start();
     }
     
-    private synchronized void showSheet() {
+    private void showSheet() {
         hideSheet();
         createSheet();
     }
     
-    private synchronized void createSheet() {
+    private void createSheet() {
         // Create the content.
         content = new JPanel(new BorderLayout());
         content.add(makeCenteredPanel(progressBar), BorderLayout.CENTER);
