@@ -23,7 +23,12 @@ public class ChangeSetWindow extends JFrame {
     
     public ChangeSetWindow(final RevisionControlSystem backEnd, final String initialFilePath, final RevisionListModel initialFileRevisions, final Revision initialFileRevision) {
         this.backEnd = backEnd;
-        this.statusReporter = new StatusReporter(this);
+        this.statusReporter = new StatusReporter(this) {
+            // We run several RevisionListWorkers in parallel and want all of the results.
+            public boolean isTaskOutdated(int taskHandle) {
+                return false;
+            }
+        };
         this.filePathToRevisionsMap = new HashMap<String, RevisionListModel>();
         filePathToRevisionsMap.put(initialFilePath, initialFileRevisions);
         
