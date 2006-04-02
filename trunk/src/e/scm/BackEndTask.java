@@ -13,11 +13,11 @@ public class BackEndTask {
     workers = 0;
   }
   
-  public void attachWorker() {
+  public synchronized void attachWorker() {
     ++workers;
   }
   
-  public void detachWorker() {
+  public synchronized void detachWorker() {
     --workers;
     if (workers != 0) {
       return;
