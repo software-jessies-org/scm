@@ -133,6 +133,43 @@ public class ChangeSetWindow extends JFrame {
         }
     }
     
+    public abstract class RevisionListWorker extends BackEndWorker {
+        protected String filePath;
+        
+        public RevisionListWorker(String filePath) {
+            super("Getting list of revisions...");
+            this.filePath = filePath;
+        }
+        
+        public void work() {
+            command = backEnd.getLogCommand(filePath);
+            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
+        }
+        
+        private RevisionListModel parseRevisions() {
+            RevisionListModel revisions = backEnd.parseLog(lines);
+            if (backEnd.isLocallyModified(filePath)) {
+                revisions.addLocalRevision(Revision.LOCAL_REVISION);
+            }
+            return revisions;
+        }
+        
+        public void finish() {
+            if (status != 0 || errors.size() > 0) {
+                ScmUtilities.showToolError(fileList, errors, command, status);
+                return;
+            }
+            
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    reportFileRevisions(parseRevisions());
+                }
+            });
+        }
+        
+        public abstract void reportFileRevisions(RevisionListModel fileRevisions);
+    }
+    
     void reassessShowPatchAvailability() {
         showPatchButton.setEnabled(filePathToRevisionsMap.size() == fileList.getModel().getSize());
     }
@@ -141,34 +178,8 @@ public class ChangeSetWindow extends JFrame {
         if (filePathToRevisionsMap.containsKey(filePath)) {
             return;
         }
-        new Thread(new BackEndWorker("Getting list of revisions...") {
-            public void work() {
-                command = backEnd.getLogCommand(filePath);
-                status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
-            }
-            
-            private RevisionListModel parseRevisions() {
-                RevisionListModel revisions = backEnd.parseLog(lines);
-                if (backEnd.isLocallyModified(filePath)) {
-                    revisions.addLocalRevision(Revision.LOCAL_REVISION);
-                }
-                return revisions;
-            }
-            
-            public void finish() {
-                if (status != 0 || errors.size() > 0) {
-                    ScmUtilities.showToolError(fileList, errors, command, status);
-                    return;
-                }
-                
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        reportFileRevisions(filePath, parseRevisions());
-                    }
-                });
-            }
-            
-            public void reportFileRevisions(String filePath, RevisionListModel fileRevisions) {
+        new Thread(new RevisionListWorker(filePath) {
+            public void reportFileRevisions(RevisionListModel fileRevisions) {
                 filePathToRevisionsMap.put(filePath, fileRevisions);
                 reassessShowPatchAvailability();
             }
