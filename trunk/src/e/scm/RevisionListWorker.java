@@ -1,9 +1,18 @@
+package e.scm;
+
+import e.util.*;
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
+
 public abstract class RevisionListWorker extends BackEndWorker {
+  private RevisionControlSystem backEnd;
   protected String filePath;
   private JList listForErrors;
   
-  public RevisionListWorker(String filePath, JList listForErrors) {
-    super("Getting list of revisions...");
+  public RevisionListWorker(RevisionControlSystem backEnd, StatusReporter statusReporter, String filePath, JList listForErrors) {
+    super("Getting list of revisions...", statusReporter);
+    this.backEnd = backEnd;
     this.filePath = filePath;
     this.listForErrors = listForErrors;
   }

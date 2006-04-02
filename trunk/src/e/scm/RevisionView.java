@@ -60,12 +60,12 @@ public class RevisionView extends JComponent {
             List<Revision> revisionRange = getRevisionRange(fromRevision, toRevision);
             Revision previousRevision = fromRevision;
             for (int i = 1 /* sic */; i < revisionRange.size(); ++i) {
-                setStatus("Tracing line back to revision " + toRevision.number + " (currently at " + previousRevision.number + ")...");
+                statusReporter.startTask("Tracing line back to revision " + toRevision.number + " (currently at " + previousRevision.number + ")...");
                 Revision revision = revisionRange.get(i);
                 lineNumber = translateLineNumberInOneStep(previousRevision, revision, lineNumber);
                 previousRevision = revision;
             }
-            clearStatus();
+            statusReporter.finishTask();
         } catch (Exception ex) {
             // Jumping to the same line number in the target revision isn't ideal, but it's better than not jumping to
             // the right revision and it's better than jumping to the top.
@@ -210,15 +210,13 @@ public class RevisionView extends JComponent {
     
     private JList annotationView;
     
-    private JAsynchronousProgressIndicator progressIndicator = new JAsynchronousProgressIndicator();
-    private JLabel statusLine = new JLabel(" ");
+    private StatusReporter statusReporter;
     private JButton changeSetButton;
     private JButton showLogButton;
     
-    private int expectedResultModCount;
-    
     public RevisionView(String filename, int initialLineNumber) {
         this.backEnd = RevisionControlSystem.forPath(filename);
+        this.statusReporter = new StatusReporter(this);
         setFilename(filename);
         makeUserInterface(initialLineNumber);
 
@@ -291,8 +289,7 @@ public class RevisionView extends JComponent {
         
         JPanel statusPanel = new JPanel(new BorderLayout(4, 0));
         statusPanel.setBorder(new javax.swing.border.EmptyBorder(10, 0, 10, 0));
-        statusPanel.add(progressIndicator, BorderLayout.WEST);
-        statusPanel.add(statusLine, BorderLayout.CENTER);
+        statusReporter.addToPanel(statusPanel);
         statusPanel.add(buttonPanel, BorderLayout.EAST);
         
         setLayout(new BorderLayout());
@@ -335,78 +332,9 @@ public class RevisionView extends JComponent {
             Log.warn("Problem working out repository root", ex);
         }
     }
-    
-    /**
-     * Similar to BlockingWorker. FIXME: replace both classes with SwingWorker for Java 6.
-     */
-    public abstract class BackEndWorker implements Runnable {
-        private String message;
-        private Exception caughtException;
-        
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
-        String[] command;
-        int status = 0;
-        
-        private int thisWorkerModCount;
-        
-        public BackEndWorker(final String message) {
-            this.message = message;
-            setStatus(message);
-            thisWorkerModCount = ++expectedResultModCount;
-        }
-        
-        public final void run() {
-            try {
-                progressIndicator.startAnimation();
-                work();
-            } catch (Exception ex) {
-                caughtException = ex;
-            } finally {
-                if (expectedResultModCount != thisWorkerModCount) {
-                    // This result is outdated. Forget it.
-                    // Note that startAnimation and stopAnimation don't nest, so it's correct that we don't call progressIndicator.stopAnimation in this case.
-                    return;
-                }
-                progressIndicator.stopAnimation();
-                clearStatus();
-            }
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    if (caughtException != null) {
-                        reportException(caughtException);
-                    } else {
-                        finish();
-                    }
-                }
-            });
-        }
-        
-        /**
-         * Override this to do the potentially time-consuming work.
-         */
-        public abstract void work();
-        
-        /**
-         * Override this to do the finishing up that needs to be done back
-         * on the event dispatch thread. This will only be invoked if your
-         * 'work' method didn't throw an exception (if an exception was
-         * thrown, 'reportException' will be invoked instead).
-         */
-        public abstract void finish();
-        
-        /**
-         * Invoked if 'work' threw an exception. The default implementation
-         * simply prints the stack trace. This method is run on the event
-         * dispatch thread, so you can safely modify the UI here.
-         */
-        public void reportException(Exception ex) {
-            SimpleDialog.showDetails(RevisionView.this, message, ex);
-        }
-    }
 
     private void showAnnotationsForRevision(final Revision revision, final int lineNumber) {
-        new Thread(new BackEndWorker("Getting annotations for revision " + revision.number + "...") {
+        new Thread(new BackEndWorker("Getting annotations for revision " + revision.number + "...", statusReporter) {
             public void work() {
                 command = backEnd.getAnnotateCommand(revision, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
@@ -430,7 +358,7 @@ public class RevisionView extends JComponent {
      * Here, the line number corresponds to a line number in fromRevision.
      */
     private void showAnnotationsForRevision(final Revision toRevision, final Revision fromRevision, final int fromLineNumber) {
-        new Thread(new BackEndWorker("Tracing line back to revision " + toRevision.number + "...") {
+        new Thread(new BackEndWorker("Tracing line back to revision " + toRevision.number + "...", statusReporter) {
             private int toLineNumber;
             
             public void work() {
@@ -532,12 +460,12 @@ public class RevisionView extends JComponent {
     }
 
     private void showDifferencesBetweenRevisions(final Revision olderRevision, final Revision newerRevision) {
-        new Thread(new BackEndWorker("Getting differences between revisions " + olderRevision.number + " and " + newerRevision.number + "...") {
+        new Thread(new BackEndWorker("Getting differences between revisions " + olderRevision.number + " and " + newerRevision.number + "...", statusReporter) {
             public void work() {
                 command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
                 if (wasSuccessful()) {
-                    setStatus("Annotating patch...");
+                    statusReporter.startTask("Annotating patch...");
                     lines = PatchView.annotatePatchUsingTags(backEnd, lines);
                 }
             }
@@ -597,47 +525,8 @@ public class RevisionView extends JComponent {
         changeSetButton.setEnabled(backEnd.supportsChangeSets() && annotatedRevision != null);
     }
     
-    public abstract class RevisionListWorker extends BackEndWorker {
-        protected String filePath;
-        private JList listForErrors;
-        
-        public RevisionListWorker(String filePath, JList listForErrors) {
-            super("Getting list of revisions...");
-            this.filePath = filePath;
-            this.listForErrors = listForErrors;
-        }
-        
-        public void work() {
-            command = backEnd.getLogCommand(filePath);
-            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
-        }
-        
-        private RevisionListModel parseRevisions() {
-            RevisionListModel revisions = backEnd.parseLog(lines);
-            if (backEnd.isLocallyModified(filePath)) {
-                revisions.addLocalRevision(Revision.LOCAL_REVISION);
-            }
-            return revisions;
-        }
-        
-        public void finish() {
-            if (status != 0 || errors.size() > 0) {
-                ScmUtilities.showToolError(listForErrors, errors, command, status);
-                return;
-            }
-            
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    reportFileRevisions(parseRevisions());
-                }
-            });
-        }
-        
-        public abstract void reportFileRevisions(RevisionListModel fileRevisions);
-    }
-    
     private void readListOfRevisions(final int initialLineNumber) {
-        new Thread(new RevisionListWorker(filePath, revisionsList) {
+        new Thread(new RevisionListWorker(backEnd, statusReporter, filePath, revisionsList) {
             public void reportFileRevisions(RevisionListModel fileRevisions) {
                 RevisionView.this.revisions = fileRevisions;
                 revisionsList.setModel(revisions);
@@ -658,17 +547,6 @@ public class RevisionView extends JComponent {
         desiredLineNumber = lineNumber;
         revisionsList.setSelectedValue(revision, true);
         desiredLineNumber = 0;
-    }
-    
-    public void clearStatus() {
-        setStatus("");
-    }
-
-    public void setStatus(String message) {
-        if (message.length() == 0) {
-            message = " ";
-        }
-        statusLine.setText(message);
     }
 
     /**

@@ -14,6 +14,7 @@ import org.jdesktop.swingworker.SwingWorker;
 
 public class ChangeSetWindow extends JFrame {
     private RevisionControlSystem backEnd;
+    private StatusReporter statusReporter;
     private Map<String, RevisionListModel> filePathToRevisionsMap;
     
     private JList fileList;
@@ -22,6 +23,7 @@ public class ChangeSetWindow extends JFrame {
     
     public ChangeSetWindow(final RevisionControlSystem backEnd, final String initialFilePath, final RevisionListModel initialFileRevisions, final Revision initialFileRevision) {
         this.backEnd = backEnd;
+        this.statusReporter = new StatusReporter(this);
         this.filePathToRevisionsMap = new HashMap<String, RevisionListModel>();
         filePathToRevisionsMap.put(initialFilePath, initialFileRevisions);
         
@@ -75,103 +77,6 @@ public class ChangeSetWindow extends JFrame {
         return buttonPanel;
     }
     
-    /**
-     * Similar to BlockingWorker. FIXME: replace both classes with SwingWorker for Java 6.
-     */
-    public abstract class BackEndWorker implements Runnable {
-        private String message;
-        private Exception caughtException;
-        
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
-        String[] command;
-        int status = 0;
-        
-        private int thisWorkerModCount;
-        
-        public BackEndWorker(final String message) {
-            this.message = message;
-        }
-        
-        public final void run() {
-            try {
-                work();
-            } catch (Exception ex) {
-                caughtException = ex;
-            }
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    if (caughtException != null) {
-                        reportException(caughtException);
-                    } else {
-                        finish();
-                    }
-                }
-            });
-        }
-        
-        /**
-         * Override this to do the potentially time-consuming work.
-         */
-        public abstract void work();
-        
-        /**
-         * Override this to do the finishing up that needs to be done back
-         * on the event dispatch thread. This will only be invoked if your
-         * 'work' method didn't throw an exception (if an exception was
-         * thrown, 'reportException' will be invoked instead).
-         */
-        public abstract void finish();
-        
-        /**
-         * Invoked if 'work' threw an exception. The default implementation
-         * simply prints the stack trace. This method is run on the event
-         * dispatch thread, so you can safely modify the UI here.
-         */
-        public void reportException(Exception ex) {
-            SimpleDialog.showDetails(ChangeSetWindow.this, message, ex);
-        }
-    }
-    
-    public abstract class RevisionListWorker extends BackEndWorker {
-        protected String filePath;
-        private JList listForErrors;
-        
-        public RevisionListWorker(String filePath, JList listForErrors) {
-            super("Getting list of revisions...");
-            this.filePath = filePath;
-            this.listForErrors = listForErrors;
-        }
-        
-        public void work() {
-            command = backEnd.getLogCommand(filePath);
-            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
-        }
-        
-        private RevisionListModel parseRevisions() {
-            RevisionListModel revisions = backEnd.parseLog(lines);
-            if (backEnd.isLocallyModified(filePath)) {
-                revisions.addLocalRevision(Revision.LOCAL_REVISION);
-            }
-            return revisions;
-        }
-        
-        public void finish() {
-            if (status != 0 || errors.size() > 0) {
-                ScmUtilities.showToolError(listForErrors, errors, command, status);
-                return;
-            }
-            
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    reportFileRevisions(parseRevisions());
-                }
-            });
-        }
-        
-        public abstract void reportFileRevisions(RevisionListModel fileRevisions);
-    }
-    
     void reassessShowPatchAvailability() {
         showPatchButton.setEnabled(filePathToRevisionsMap.size() == fileList.getModel().getSize());
     }
@@ -180,7 +85,7 @@ public class ChangeSetWindow extends JFrame {
         if (filePathToRevisionsMap.containsKey(filePath)) {
             return;
         }
-        new Thread(new RevisionListWorker(filePath, fileList) {
+        new Thread(new RevisionListWorker(backEnd, statusReporter, filePath, fileList) {
             public void reportFileRevisions(RevisionListModel fileRevisions) {
                 filePathToRevisionsMap.put(filePath, fileRevisions);
                 reassessShowPatchAvailability();
@@ -198,7 +103,7 @@ public class ChangeSetWindow extends JFrame {
             
             RevisionListModel revisions = filePathToRevisionsMap.get(changeSetItem.filename);
             // The Subversion back-end gives us old revision numbers which aren't necessarily in the file's history.
-            Revision oldRevision = new Revision(changeSetItem.oldRevision, null, null, null, null);            
+            Revision oldRevision = new Revision(changeSetItem.oldRevision, null, null, null, null);
             Revision newRevision = revisions.fromNumber(changeSetItem.newRevision);
             
             // FIXME: we should display the comments for all of the revisions between oldRevision and newRevision.

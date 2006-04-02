@@ -1,8 +1,14 @@
+package e.scm;
+
+import java.awt.*;
+import java.util.*;
+
 /**
  * Similar to BlockingWorker. FIXME: replace both classes with SwingWorker for Java 6.
  */
 public abstract class BackEndWorker implements Runnable {
   private String message;
+  private StatusReporter statusReporter;
   private Exception caughtException;
   
   ArrayList<String> lines = new ArrayList<String>();
@@ -10,33 +16,31 @@ public abstract class BackEndWorker implements Runnable {
   String[] command;
   int status = 0;
   
-  private int thisWorkerModCount;
+  private int taskHandle;
   
-  public BackEndWorker(final String message) {
+  public BackEndWorker(final String message, StatusReporter statusReporter) {
     this.message = message;
-    setStatus(message);
-    thisWorkerModCount = ++expectedResultModCount;
+    this.statusReporter = statusReporter;
+    taskHandle = statusReporter.startTask(message);
   }
   
   public final void run() {
     try {
-      progressIndicator.startAnimation();
       work();
     } catch (Exception ex) {
       caughtException = ex;
     } finally {
-      if (expectedResultModCount != thisWorkerModCount) {
+      if (statusReporter.isTaskOutdated(taskHandle)) {
         // This result is outdated. Forget it.
         // Note that startAnimation and stopAnimation don't nest, so it's correct that we don't call progressIndicator.stopAnimation in this case.
         return;
       }
-      progressIndicator.stopAnimation();
-      clearStatus();
+      statusReporter.finishTask();
     }
     EventQueue.invokeLater(new Runnable() {
       public void run() {
         if (caughtException != null) {
-          reportException(caughtException);
+          statusReporter.reportException(caughtException);
         } else {
           finish();
         }
@@ -56,13 +60,4 @@ public abstract class BackEndWorker implements Runnable {
    * thrown, 'reportException' will be invoked instead).
    */
   public abstract void finish();
-  
-  /**
-   * Invoked if 'work' threw an exception. The default implementation
-   * simply prints the stack trace. This method is run on the event
-   * dispatch thread, so you can safely modify the UI here.
-   */
-  public void reportException(Exception ex) {
-    SimpleDialog.showDetails(RevisionView.this, message, ex);
-  }
 }
