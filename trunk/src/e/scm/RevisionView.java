@@ -639,7 +639,8 @@ public class RevisionView extends JComponent {
     private void readListOfRevisions(final int initialLineNumber) {
         new Thread(new RevisionListWorker(filePath, revisionsList) {
             public void reportFileRevisions(RevisionListModel fileRevisions) {
-                revisionsList.setModel(fileRevisions);
+                RevisionView.this.revisions = fileRevisions;
+                revisionsList.setModel(revisions);
                 showLogButton.setEnabled(true);
                 
                 if (initialLineNumber != 0) {
