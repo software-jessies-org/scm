@@ -75,20 +75,6 @@ public class ChangeSetWindow extends JFrame {
         return buttonPanel;
     }
     
-    // FIXME: This is a verbatim copy of code from RevisionView.
-    private void showToolError(JList list, ArrayList<String> lines) {
-        list.setCellRenderer(new ToolErrorRenderer());
-        list.setModel(new ToolErrorListModel(lines));
-    }
-    
-    // FIXME: This is a verbatim copy of code from RevisionView.
-    private void showToolError(JList list, ArrayList<String> lines, String[] command, int status) {
-        if (status != 0) {
-            lines.add("[Command '" + StringUtilities.join(command, " ") + "' returned status " + status + ".]");
-        }
-        showToolError(list, lines);
-    }
-    
     /**
      * Similar to BlockingWorker. FIXME: replace both classes with SwingWorker for Java 6.
      */
@@ -171,7 +157,7 @@ public class ChangeSetWindow extends JFrame {
             
             public void finish() {
                 if (status != 0 || errors.size() > 0) {
-                    showToolError(fileList, errors, command, status);
+                    ScmUtilities.showToolError(fileList, errors, command, status);
                     return;
                 }
                 

@@ -415,7 +415,7 @@ public class RevisionView extends JComponent {
             public void finish() {
                 // CVS writes junk to standard error even on success.
                 if (status != 0) {
-                    showToolError(annotationView, errors, command, status);
+                    ScmUtilities.showToolError(annotationView, errors, command, status);
                     return;
                 }
                 
@@ -465,7 +465,7 @@ public class RevisionView extends JComponent {
             
             // CVS returns a non-zero exit status if there were any differences.
             if (errors.size() > 0) {
-                showToolError(revisionsList, errors);
+                ScmUtilities.showToolError(revisionsList, errors);
                 return;
             }
             
@@ -549,7 +549,7 @@ public class RevisionView extends JComponent {
             
             public void finish() {
                 if (wasSuccessful() == false) {
-                    showToolError(revisionsList, errors);
+                    ScmUtilities.showToolError(revisionsList, errors);
                     return;
                 }
                 
@@ -606,7 +606,7 @@ public class RevisionView extends JComponent {
             
             public void finish() {
                 if (status != 0 || errors.size() > 0) {
-                    showToolError(revisionsList, errors, command, status);
+                    ScmUtilities.showToolError(revisionsList, errors, command, status);
                     return;
                 }
                 
@@ -633,18 +633,6 @@ public class RevisionView extends JComponent {
         desiredLineNumber = lineNumber;
         revisionsList.setSelectedValue(revision, true);
         desiredLineNumber = 0;
-    }
-
-    private void showToolError(JList list, ArrayList<String> lines) {
-        list.setCellRenderer(new ToolErrorRenderer());
-        list.setModel(new ToolErrorListModel(lines));
-    }
-    
-    private void showToolError(JList list, ArrayList<String> lines, String[] command, int status) {
-        if (status != 0) {
-            lines.add("[Command '" + StringUtilities.join(command, " ") + "' returned status " + status + ".]");
-        }
-        showToolError(list, lines);
     }
     
     public void clearStatus() {

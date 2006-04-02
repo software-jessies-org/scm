@@ -5,6 +5,7 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -33,6 +34,18 @@ public class ScmUtilities {
     
     public static Border getFrameBorder() {
         return new EmptyBorder(10, 10, 10, 10);
+    }
+    
+    public static void showToolError(JList list, ArrayList<String> lines) {
+        list.setCellRenderer(new ToolErrorRenderer());
+        list.setModel(new ToolErrorListModel(lines));
+    }
+    
+    public static void showToolError(JList list, ArrayList<String> lines, String[] command, int status) {
+        if (status != 0) {
+            lines.add("[Command '" + StringUtilities.join(command, " ") + "' returned status " + status + ".]");
+        }
+        showToolError(list, lines);
     }
     
     private ScmUtilities() {
