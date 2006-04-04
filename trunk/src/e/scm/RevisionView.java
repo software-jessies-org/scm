@@ -460,12 +460,13 @@ public class RevisionView extends JComponent {
     }
 
     private void showDifferencesBetweenRevisions(final Revision olderRevision, final Revision newerRevision) {
-        new Thread(new BackEndWorker(new BackEndTask("Getting differences between revisions " + olderRevision.number + " and " + newerRevision.number + "...", statusReporter)) {
+        final BackEndTask backEndTask = new BackEndTask("Getting differences between revisions " + olderRevision.number + " and " + newerRevision.number + "...", statusReporter);
+        new Thread(new BackEndWorker(backEndTask) {
             public void work() {
                 command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
                 if (wasSuccessful()) {
-                    statusReporter.startTask("Annotating patch...");
+                    backEndTask.changeTitle("Annotating patch...");
                     lines = PatchView.annotatePatchUsingTags(backEnd, lines);
                 }
             }

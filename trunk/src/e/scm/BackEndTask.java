@@ -1,15 +1,15 @@
 package e.scm;
 
 public class BackEndTask {
-  private String message;
+  private String title;
   private StatusReporter statusReporter;
   private int taskHandle;
   private int workers;
   
-  public BackEndTask(String message, StatusReporter statusReporter) {
-    this.message = message;
+  public BackEndTask(String title, StatusReporter statusReporter) {
+    this.title = title;
     this.statusReporter = statusReporter;
-    taskHandle = statusReporter.startTask(message);
+    taskHandle = statusReporter.startTask(title);
     workers = 0;
   }
   
@@ -35,6 +35,11 @@ public class BackEndTask {
   }
   
   public void reportException(Exception ex) {
-    statusReporter.reportException(message, ex);
+    statusReporter.reportException(title, ex);
+  }
+  
+  public void changeTitle(String title) {
+    this.title = title;
+    statusReporter.setMessage(title);
   }
 }

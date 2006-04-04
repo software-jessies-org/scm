@@ -20,7 +20,7 @@ public class StatusReporter {
     statusPanel.add(statusLine, BorderLayout.CENTER);
   }
   
-  private void setMessage(String message) {
+  public void setMessage(String message) {
     if (message.length() == 0) {
       message = " ";
     }
