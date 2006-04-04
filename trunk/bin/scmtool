@@ -7,10 +7,8 @@ end
 
 tool_name=ARGV.shift()
 
-require 'fileutils.rb'
-require 'pathname.rb'
-
 # Cope with symbolic links to this script.
+require "pathname.rb"
 project_root = Pathname.new(__FILE__).realpath().dirname().dirname()
 salma_hayek = "#{project_root}/../salma-hayek"
 
