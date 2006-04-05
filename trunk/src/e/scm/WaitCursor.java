@@ -134,6 +134,7 @@ public class WaitCursor {
             size.height = 120;
         }
         sheet.setSize(size);
+        sheet.setLocationRelativeTo(frame);
         
         if (GuiUtilities.isMacOs()) {
             // Ensure we defer focus to our parent.
