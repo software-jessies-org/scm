@@ -305,10 +305,10 @@ public class CheckInWindow extends JFrame {
                 // Revert.
                 if (fileStatus.getState() == FileStatus.NEW) {
                     // If the file isn't under version control, we'll have to remove it ourselves...
-                    // FIXME: what if it's a non-empty directory?
                     boolean deleted = file.delete();
                     if (deleted == false) {
-                        SimpleDialog.showAlert(CheckInWindow.this, "Discard", "Couldn't delete file \"" + FileUtilities.getUserFriendlyName(file) + "\".");
+                        // FIXME: try to find out why we failed, and tell the user rather than guessing.
+                        SimpleDialog.showAlert(CheckInWindow.this, "Couldn't delete \"" + FileUtilities.getUserFriendlyName(file) + "\"", "Is it or its parent write-protected, or a non-empty directory?");
                     }
                 } else {
                     backEnd.revert(filename);
@@ -338,7 +338,7 @@ public class CheckInWindow extends JFrame {
     private void editFileAtLine(int lineNumber) {
         String editor = System.getenv("SCM_EDITOR");
         if (editor == null) {
-            SimpleDialog.showAlert(this, "Edit", "Set the environment variable $SCM_EDITOR to the command you want to be invoked.");
+            SimpleDialog.showAlert(this, "Couldn't start external editor", "Set the environment variable $SCM_EDITOR to the command you want to be invoked.");
             return;
         }
         

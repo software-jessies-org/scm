@@ -19,7 +19,7 @@ public class CheckInTool implements Launchable {
     }
     
     private void fail(String reason) {
-        SimpleDialog.showAlert(null, "CheckInTool", reason);
+        SimpleDialog.showAlert(null, "CheckInTool couldn't start", reason);
         System.exit(1);
     }
     
