@@ -155,7 +155,7 @@ public class WaitCursor {
     private void repositionSheet() {
         Frame owner = frameOf(glassPane);
         Point location = owner.getLocationOnScreen();
-        location.x += (owner.getWidth() - content.getWidth()) / 2;
+        location.x += (owner.getWidth() - sheet.getWidth()) / 2;
         location.y += owner.getInsets().top;
         sheet.setLocation(location);
     }
