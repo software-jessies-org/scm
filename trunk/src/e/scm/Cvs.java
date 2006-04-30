@@ -161,7 +161,7 @@ public class Cvs extends RevisionControlSystem {
     }
     
     public void commit(String comment, List<FileStatus> fileStatuses) {
-        scheduleNewFiles("cvs", false, fileStatuses);
+        scheduleNewFiles("cvs", null, fileStatuses);
         ArrayList<String> command = new ArrayList<String>();
         command.add("cvs");
         command.add("commit");

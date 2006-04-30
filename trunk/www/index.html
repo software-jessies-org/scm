@@ -8,19 +8,20 @@
 <h1>SCM</h1>
 
 <p><strong>SCM is a GPL front-end to revision control systems, able to work
-with BitKeeper, CVS, and Subversion repositories.</strong>
+with Bazaar, BitKeeper, CVS, and Subversion repositories.</strong>
 
 <h2>Don't GUIs for revision control systems suck?</h2>
 
 <p>Yes. That's why I had to write the first good one. Most revision control
-systems (CVS and
-Subversion being prominent examples) don't come with a standard GUI. There
+systems don't come with a standard GUI. There
 are a lot of third-party GUI tools, but they tend to be overly complicated
 to use, not particularly keen to fit in with how you were already working,
 only work with one revision control system, and don't offer anything over
 the command-line tools.
 
-<p>BitKeeper manages to come with GUI tools that are actually useful. Sadly,
+<p>CVS and Subversion, the two most widely-used systems, come with nothing.
+
+<p>BitKeeper has GUI tools that are actually useful. Sadly,
 they're limited to BitKeeper repositories, are somewhat idiosyncratic in
 design, look disgusting, and are missing little niceties like spelling
 checking for your comments.
@@ -39,7 +40,8 @@ your file system. If you don't like it, just stop using it.
 <h2>RevisionTool</h2>
 
 <p>RevisionTool is used to examine a file's revision history. It replaces
-<i>cvsweb</i> or <tt>bk revtool</tt>.
+<i>cvsweb</i> (and relatives) or <tt>bk revtool</tt>.
+Bazaar support is currently of limited use until <a href="https://launchpad.net/products/bzr/+bug/40986">Bazaar bug 40986</a> is fixed. (Currently, <a href="http://people.ubuntu.com/~scott/software/bzrk.png">bzrk</a> looks like a better choice. Implementing something similar in SCM for Bazaar and BitKeeper support is a clear goal. Patches welcome!)
 
 <p>I think a lot of people underestimate
 the usefulness of a file's revision history; for me it's the main use of
@@ -66,7 +68,7 @@ introduced.)
 <h2>CheckInTool</h2>
 
 <p>CheckInTool is used to check in modifications. It replaces
-<tt>cvs/svn commit</tt> or <tt>bk citool</tt>. Its main features
+<tt>bzr/cvs/svn commit</tt> or <tt>bk citool</tt>. Its main features
 are that it lets you check in an arbitrary subset of your modified/new
 files, it doesn't require a separate 'add' step, it checks spelling in
 your check-in comment, and&nbsp;&ndash; this is the killer feature&nbsp;&ndash;

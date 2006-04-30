@@ -48,7 +48,9 @@ public abstract class RevisionControlSystem {
         // Is there evidence of revision control in this directory?
         File directory = file.isDirectory() ? file : new File(file.getParent());
         for (String sibling : directory.list()) {
-            if (sibling.equals("CVS")) {
+            if (sibling.equals(".bzr")) {
+                return ascendUntilSubdirectoryDisappears(directory, ".bzr");
+            } else if (sibling.equals("CVS")) {
                 return ascendUntilSubdirectoryDisappears(directory, "CVS");
             } else if (sibling.equals("SCCS")) {
                 return ascendUntilSubdirectoryAppears(directory, "BitKeeper");
@@ -101,12 +103,14 @@ public abstract class RevisionControlSystem {
     /**
      * Attempts to guess which revision control system the file we're
      * interested in is managed by. We do this simply on the basis of
-     * whether there's a CVS, SCCS or .svn directory in the same directory
-     * as the file.
+     * whether there's a .bzr, CVS, SCCS, or .svn directory in the same
+     * directory as the file.
      */
     private static RevisionControlSystem selectRevisionControlSystem(File repositoryRoot) {
         for (String sibling : repositoryRoot.list()) {
-            if (sibling.equals("CVS")) {
+            if (sibling.equals(".bzr")) {
+                return new Bazaar();
+            } else if (sibling.equals("CVS")) {
                 return new Cvs();
             } else if (sibling.equals("SCCS")) {
                 return new BitKeeper();
@@ -283,7 +287,7 @@ public abstract class RevisionControlSystem {
     /**
      * Used by CVS and Subversion.
      */
-    public void scheduleNewFiles(String commandName, boolean useNonRecursiveSwitch, List<FileStatus> fileStatuses) {
+    public void scheduleNewFiles(String commandName, String nonRecursiveSwitch, List<FileStatus> fileStatuses) {
         List<FileStatus> newFiles = justNewFiles(fileStatuses);
         if (newFiles.isEmpty()) {
             return;
@@ -291,8 +295,8 @@ public abstract class RevisionControlSystem {
         ArrayList<String> command = new ArrayList<String>();
         command.add(commandName);
         command.add("add");
-        if (useNonRecursiveSwitch) {
-            command.add("--non-recursive");
+        if (nonRecursiveSwitch != null) {
+            command.add(nonRecursiveSwitch);
         }
         addFilenames(command, newFiles);
         execAndDump(command);

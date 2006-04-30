@@ -23,7 +23,7 @@ public class AnnotatedLine {
     public static AnnotatedLine fromLine(RevisionListModel revisions, String line, Pattern pattern, int revisionGroup, int sourceGroup) {
         Matcher matcher = pattern.matcher(line);
         if (matcher.matches() == false) {
-            return null;
+            throw new IllegalArgumentException("Line \"" + line + "\" doesn't match annotation pattern (" + pattern + ").");
         }
         
         String revisionId = matcher.group(revisionGroup);
