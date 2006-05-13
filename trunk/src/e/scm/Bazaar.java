@@ -11,9 +11,8 @@ public class Bazaar extends RevisionControlSystem {
         command.add("annotate");
         command.add("--all");
         if (revision != Revision.LOCAL_REVISION) {
-            // FIXME: blocked on https://launchpad.net/products/bzr/+bug/40986
-            //command.add("-r");
-            //command.add(revision.number);
+            command.add("-r");
+            command.add(revision.number);
         }
         command.add(filename);
         return command.toArray(new String[command.size()]);
