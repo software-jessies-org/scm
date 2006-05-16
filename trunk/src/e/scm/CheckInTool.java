@@ -9,18 +9,13 @@ public class CheckInTool implements Launchable {
     
     public void parseCommandLine(List<String> arguments) {
         if (arguments.size() > 0) {
-            fail("CheckInTool does not take any arguments.");
+            ScmUtilities.panic("CheckInTool", "CheckInTool does not take any arguments.");
         }
         
         backEnd = RevisionControlSystem.forPath(System.getProperty("user.dir"));
         if (backEnd == null) {
-            fail("CheckInTool must be started in a directory that's under revision control, or beneath a directory that's under revision control.");
+            ScmUtilities.panic("CheckInTool", "CheckInTool must be started in a directory that's under revision control, or beneath a directory that's under revision control.");
         }
-    }
-    
-    private void fail(String reason) {
-        SimpleDialog.showAlert(null, "CheckInTool couldn't start", reason);
-        System.exit(1);
     }
     
     public void startGui() {

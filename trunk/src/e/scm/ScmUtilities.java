@@ -48,6 +48,11 @@ public class ScmUtilities {
         showToolError(list, lines);
     }
     
+    public static void panic(String toolName, String reason) {
+        SimpleDialog.showAlert(null, toolName + " couldn't start", reason);
+        System.exit(1);
+    }
+    
     private ScmUtilities() {
     }
 }

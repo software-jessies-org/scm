@@ -36,9 +36,10 @@ public class RevisionTool implements Launchable {
                 }
             }
             final RevisionControlSystem backEnd = RevisionControlSystem.forPath(filename);
-            if (backEnd != null) {
-                jobs.add(new Job(filename, lineNumber));
+            if (backEnd == null) {
+                ScmUtilities.panic("RevisionTool", "RevisionTool must be started in a directory that's under revision control, or beneath a directory that's under revision control.");
             }
+            jobs.add(new Job(filename, lineNumber));
         }
     }
     
