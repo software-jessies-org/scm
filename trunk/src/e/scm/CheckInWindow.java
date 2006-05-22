@@ -124,11 +124,6 @@ public class CheckInWindow extends JFrame {
             }
         });
         
-        // Try to make JTable look a little less weird.
-        statusesTable.setIntercellSpacing(new Dimension());
-        statusesTable.setShowGrid(false);
-        statusesTable.getTableHeader().setReorderingAllowed(false);
-        
         // Work like Apple's Mail, where the arrow keys move through the headers/filenames,
         // and the page keys move through the current body/patch.
         statusesTable.getInputMap().put(KeyStroke.getKeyStroke("PAGE_UP"), "pagePatchUp");
