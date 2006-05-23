@@ -348,10 +348,12 @@ public class CheckInWindow extends JFrame {
         BugDatabaseHighlighter.highlightBugs(checkInCommentArea);
     }
     
-    private void fillCheckInCommentArea() {
+    private void configureCheckInCommentArea(boolean initially) {
         boolean haveFiles = statusesTableModel.isAtLeastOneFileIncluded();
         if (haveFiles) {
-            checkInCommentArea.setText(readSavedStateFile(getSavedCommentFile()));
+            // Only read the saved comment if we're configuring the comment area at start-up.
+            String text = (initially ? readSavedStateFile(getSavedCommentFile()) : "");
+            checkInCommentArea.setText(text);
             checkInCommentArea.setEnabled(true);
         } else {
             checkInCommentArea.setEnabled(false);
@@ -436,7 +438,7 @@ public class CheckInWindow extends JFrame {
                 statusesTableModel.addTableModelListener(new StatusesTableModelListener());
                 statusesTableModel.fireTableDataChanged();
                 readSavedFilenames();
-                fillCheckInCommentArea();
+                configureCheckInCommentArea(true);
                 
                 /* Give some feedback to demonstrate we're not broken if there's nothing to show. */
                 boolean nothingModified = (statusesTableModel.getRowCount() == 0);
@@ -474,7 +476,7 @@ public class CheckInWindow extends JFrame {
             updateStatusLine();
 
             if (checkInCommentArea.isEnabled() != haveFiles) {
-                fillCheckInCommentArea();
+                configureCheckInCommentArea(false);
             }
             
             if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 0) {
