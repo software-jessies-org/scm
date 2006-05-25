@@ -134,8 +134,9 @@ public class BitKeeper extends RevisionControlSystem {
     }
     
     private List<ChangeSetItem> extractChangeSetItems(List<String> changeSet) {
-        // The output consists of changes one per line, looking like this: "ChangeSet|1.4818..1.4818.1.1".
-        Pattern pattern = Pattern.compile("^(.*)\\|([\\d.]+)\\.\\.([\\d.]+)$");
+        // The output consists of changes one per line, looking like this: "ChangeSet|1.4818..1.4818.1.1"
+        // or like this for merge change sets "ChangeSet|1.4887.295.1+1.4887.281.1..1.4887.304.1".
+        Pattern pattern = Pattern.compile("^(.*)\\|([\\d.]+(?:\\+[\\d.]+)?)\\.\\.([\\d.]+)$");
         ArrayList<ChangeSetItem> result = new ArrayList<ChangeSetItem>();
         for (String change : changeSet) {
             Matcher matcher = pattern.matcher(change);
