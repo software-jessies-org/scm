@@ -65,7 +65,6 @@ public class RevisionView extends JComponent {
                 lineNumber = translateLineNumberInOneStep(previousRevision, revision, lineNumber);
                 previousRevision = revision;
             }
-            statusReporter.finishTask();
         } catch (Exception ex) {
             // Jumping to the same line number in the target revision isn't ideal, but it's better than not jumping to
             // the right revision and it's better than jumping to the top.
@@ -75,6 +74,8 @@ public class RevisionView extends JComponent {
             // the Patch class contains an isPatchReversed boolean to let us work around this.
             // Once we get round to using it.
             Log.warn("Couldn't translate line number", ex);
+        } finally {
+            statusReporter.finishTask();
         }
         return lineNumber;
     }
@@ -349,7 +350,6 @@ public class RevisionView extends JComponent {
                 
                 updateAnnotationModel(revision, lines);
                 showSpecificLineInAnnotations(lineNumber);
-                setAnnotatedRevision(revision);
             }
         }).start();
     }
@@ -491,7 +491,6 @@ public class RevisionView extends JComponent {
                 // We can't easily retain the context when switching to differences.
                 // As an extension, though, we could do this.
                 annotationView.ensureIndexIsVisible(0);
-                setAnnotatedRevision(null);
             }
         }).start();
     }
@@ -509,7 +508,6 @@ public class RevisionView extends JComponent {
     private void showSummaryOfAllRevisions() {
         showComment(summaryOfAllRevisions());
         annotationView.setModel(EMPTY_LIST_MODEL);
-        setAnnotatedRevision(null);
     }
 
     private void showLog() {
@@ -517,13 +515,7 @@ public class RevisionView extends JComponent {
     }
 
     public Revision getAnnotatedRevision() {
-        return annotatedRevision;
-    }
-    
-    private void setAnnotatedRevision(Revision revision) {
-        annotatedRevision = revision;
-        // FIXME: this should only be enabled if the particular revision touched more than one file. I think Revision needs to contain this information, so our initial "svn log" (or whatever) should be "svn log -v", and we can skip making effectively the same request again if/when the user asks to see the change set.
-        changeSetButton.setEnabled(backEnd.supportsChangeSets() && annotatedRevision != null);
+        return (Revision) revisionsList.getSelectedValue();
     }
     
     private void readListOfRevisions(final int initialLineNumber) {
@@ -569,6 +561,10 @@ public class RevisionView extends JComponent {
             
             JList list = (JList) e.getSource();
             Object[] values = list.getSelectedValues();
+            
+            // FIXME: this should only be enabled if the particular revision touched more than one file. I think Revision needs to contain this information, so our initial "svn log" (or whatever) should be "svn log -v", and we can skip making effectively the same request again if/when the user asks to see the change set.
+            changeSetButton.setEnabled(backEnd.supportsChangeSets() && values.length == 1);
+            
             if (values.length == 0) {
                 showSummaryOfAllRevisions();
             } else if (values.length == 1) {
