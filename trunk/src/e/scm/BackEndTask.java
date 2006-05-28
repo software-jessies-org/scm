@@ -9,11 +9,13 @@ public class BackEndTask {
   public BackEndTask(String title, StatusReporter statusReporter) {
     this.title = title;
     this.statusReporter = statusReporter;
-    taskHandle = statusReporter.startTask(title);
     workers = 0;
   }
   
   public synchronized void attachWorker() {
+    if (workers == 0) {
+      taskHandle = statusReporter.startTask(title);
+    }
     ++workers;
   }
   
