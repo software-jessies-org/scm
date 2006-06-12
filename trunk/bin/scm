@@ -1,18 +1,23 @@
 #!/usr/bin/ruby -w
 
-if ARGV.length() == 0
-    $stderr.puts("Use the 'checkintool' or 'revisiontool' scripts instead.")
-    exit(1)
-end
-
-tool_name=ARGV.shift()
-
 # Cope with symbolic links to this script.
 require "pathname.rb"
 project_root = Pathname.new(__FILE__).realpath().dirname().dirname()
 salma_hayek = "#{project_root}/../salma-hayek"
 
 require "#{salma_hayek}/bin/invoke-java.rb"
+require "#{salma_hayek}/bin/show-alert.rb"
+
+if ARGV.length() == 0
+    installation_directory = Pathname.new(__FILE__).dirname()
+    # We don't want to follow symbolic links, but we do want to avoid encouraging people to paste relative paths into their $PATH.
+    if installation_directory.to_s().include?(".")
+        installation_directory = installation_directory.realpath()
+    end
+    show_alert("Welcome to SCM!", "SCM consists of two programs, 'checkintool' and 'revisiontool', which you should run directly from the command-line or from your editor/IDE.\n\nThe directory #{installation_directory} needs to be on your path.")
+    exit(1)
+end
+tool_name=ARGV.shift()
 
 invoker = Java.new(tool_name, "e/util/Launcher")
 invoker.set_icons("scm")
