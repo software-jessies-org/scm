@@ -1,3 +1,3 @@
 #!/bin/bash
 dir=`dirname "$0"`
-exec "$dir"/scmtool RevisionTool "$@"
+exec "$dir"/scm RevisionTool "$@"
