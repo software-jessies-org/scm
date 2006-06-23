@@ -188,6 +188,7 @@ public class Subversion extends RevisionControlSystem {
         command.add("svn");
         command.add("commit");
         command.add("--non-interactive");
+        command.add("--non-recursive");
         command.add("-F");
         command.add(createCommentFile(comment));
         command.add("--targets");
