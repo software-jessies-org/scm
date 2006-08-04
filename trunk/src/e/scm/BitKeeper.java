@@ -33,7 +33,7 @@ public class BitKeeper extends RevisionControlSystem {
     }
 
     public String[] getLogCommand(String filename) {
-        return new String[] { "bk", "prs", "-d:DSUMMARY:\n:COMMENTS:" + LOG_SEPARATOR + "\n", filename };
+        return new String[] { "bk", "prs", "-n", "-d:DSUMMARY:\n:COMMENTS:" + LOG_SEPARATOR, filename };
     }
 
     private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^([^\t]+)\t([^\t]+)\t(.*)$");
@@ -44,7 +44,8 @@ public class BitKeeper extends RevisionControlSystem {
 
     //D 1.2 04/02/15 13:02:22+00:00 elliotth@mercury.local 3 2 4/0/356
     //D 1.144 01/03/28 11:56:53-00:00 hughc 145 144 0/3/3528
-    private static final Pattern LOG_PATTERN = Pattern.compile("^D ([0-9.]+) (\\d\\d)/(\\d\\d)/(\\d\\d) (\\d{2}:\\d{2}:\\d{2}[-+]\\d{2}:\\d{2}) ([^@ ]+).*");
+    //D 1.1 2002/11/11 11:11:11+11:11 11@eleven.com 1 1 1/1/1
+    private static final Pattern LOG_PATTERN = Pattern.compile("^D ([0-9.]+) (\\d\\d|\\d{4})/(\\d\\d)/(\\d\\d) (\\d{2}:\\d{2}:\\d{2}[-+]\\d{2}:\\d{2}) ([^@ ]+).*");
     private static final String LOG_SEPARATOR = "------------------------------------------------";
     
     public RevisionListModel parseLog(List<String> linesList) {
@@ -61,7 +62,8 @@ public class BitKeeper extends RevisionControlSystem {
                 String number = matcher.group(1);
                 String time = matcher.group(5);
                 String author = matcher.group(6);
-                String date = "20" + matcher.group(2) + "-" + matcher.group(3) + "-" + matcher.group(4);
+                String year = matcher.group(2).length() == 2 ? "20" + matcher.group(2) : matcher.group(2);
+                String date = year + "-" + matcher.group(3) + "-" + matcher.group(4);
                 StringBuilder comment = new StringBuilder();
                 while (++i < lines.length && lines[i].equals(LOG_SEPARATOR) == false) {
                     comment.append(lines[i].substring(2));
@@ -75,13 +77,13 @@ public class BitKeeper extends RevisionControlSystem {
 
     public boolean isLocallyModified(String filename) {
         String[] command = new String[] {
-            "bk", "sfiles", "-v", "-ct", "-g", filename
+            "bk", "sfiles", "-v", "-c", "-g", filename
         };
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (String line : lines) {
-            if (line.indexOf("lc") == 0) {
+            if (line.indexOf("lc") == 0 || line.matches("slc....")) {
                 return true;
             }
         }
@@ -192,7 +194,7 @@ public class BitKeeper extends RevisionControlSystem {
             throw new RuntimeException(ex);
         }
         
-        String[] command = new String[] { "bk", "sfiles", "-ct", "-g", "-x", "-v", "-p", "-o" + temporaryFile.toString() };
+        String[] command = new String[] { "bk", "sfiles", "-c", "-g", "-x", "-v", "-p", "-o" + temporaryFile.toString() };
         ProcessUtilities.LineListener outputListener = new ProcessUtilities.LineListener() {
             public void processLine(String line) {
                 // Update the progress bar based on BitKeeper's progress feedback.
@@ -212,7 +214,7 @@ public class BitKeeper extends RevisionControlSystem {
         List<String> lines = Arrays.asList(StringUtilities.readLinesFromFile(temporaryFile.toString()));
         
         ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
-        Pattern pattern = Pattern.compile("^(.{4})\\s+(.+)(@[0-9.]+)?$");
+        Pattern pattern = Pattern.compile("^(.{4}|.{7})\\s+(.+)(@[0-9.]+)?$");
         for (String line : lines) {
             int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
             String name = null;
@@ -224,14 +226,14 @@ public class BitKeeper extends RevisionControlSystem {
                     // There seems to be a BitKeeper implementation detail that means
                     // that sometimes ChangeSet is included, though it shouldn't be.
                     canonicalState = FileStatus.IGNORED;
-                } else if (state.equals("jjjj")) {
+                } else if (state.equals("jjjj") || state.matches("j......")) {
                     // Junk. Ignore.
                     canonicalState = FileStatus.IGNORED;
-                } else if (state.equals("xxxx")) {
+                } else if (state.equals("xxxx") || state.matches("x......")) {
                     canonicalState = FileStatus.NEW;
-                } else if (state.matches(".c..")) {
+                } else if (state.matches(".c..") || state.matches("s.c....")) {
                     canonicalState = FileStatus.MODIFIED;
-                } else if (state.matches("..p.")) {
+                } else if (state.matches("..p.") || state.matches("s..p...")) {
                     if (name.startsWith("BitKeeper/deleted/.del-")) {
                         canonicalState = FileStatus.REMOVED;
                     } else {
