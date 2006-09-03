@@ -135,14 +135,4 @@ public class PatchView extends JList {
         }
         return lineNumber;
     }
-    
-    public void scroll(int direction) {
-        JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
-        JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
-        int increment = scrollBar.getBlockIncrement(direction);
-        int newValue = scrollBar.getValue() + direction * increment;
-        newValue = Math.min(newValue, scrollBar.getMaximum());
-        newValue = Math.max(newValue, scrollBar.getMinimum());
-        scrollBar.setValue(newValue);
-    }
 }

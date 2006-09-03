@@ -130,12 +130,12 @@ public class CheckInWindow extends JFrame {
         statusesTable.getInputMap().put(KeyStroke.getKeyStroke("PAGE_DOWN"), "pagePatchDown");
         statusesTable.getActionMap().put("pagePatchUp", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                patchView.scroll(-1);
+                ComponentUtilities.scroll(patchView, true, -1);
             }
         });
         statusesTable.getActionMap().put("pagePatchDown", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                patchView.scroll(1);
+                ComponentUtilities.scroll(patchView, true, 1);
             }
         });
     }
