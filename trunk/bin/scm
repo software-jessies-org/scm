@@ -19,9 +19,11 @@ if ARGV.length() == 0
 end
 tool_name=ARGV.shift()
 
-# Since we're often started from the command line or from other programs, set up startup notification.
-id=`gnome-startup start Starting #{tool_name}`.chomp()
-ENV['DESKTOP_STARTUP_ID'] = id
+if ENV['DESKTOP_STARTUP_ID'] == nil
+    # Since we're often started from the command line or from other programs, set up startup notification.
+    id=`gnome-startup start Starting #{tool_name}`.chomp()
+    ENV['DESKTOP_STARTUP_ID'] = id
+end
 
 invoker = Java.new(tool_name, "e/util/Launcher")
 invoker.set_icons("scm")
