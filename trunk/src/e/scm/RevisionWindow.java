@@ -20,5 +20,6 @@ public class RevisionWindow extends JFrame {
         JFrameUtilities.setFrameIcon(this);
         JFrameUtilities.constrainToScreen(this);
         setVisible(true);
+        GuiUtilities.finishGnomeStartup();
     }
 }

@@ -109,6 +109,7 @@ public class CheckInWindow extends JFrame {
         setLocationRelativeTo(null);
         JFrameUtilities.constrainToScreen(this);
         setVisible(true);
+        GuiUtilities.finishGnomeStartup();
     }
 
     private void initStatusesList() {
