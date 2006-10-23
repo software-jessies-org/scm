@@ -19,7 +19,7 @@ if ARGV.length() == 0
 end
 tool_name=ARGV.shift()
 
-if ENV['DESKTOP_STARTUP_ID'] == nil
+if ENV['DISPLAY'] != nil && ENV['DESKTOP_STARTUP_ID'] == nil
     # Since we're often started from the command line or from other programs, set up startup notification.
     id=`gnome-startup start Starting #{tool_name}`.chomp()
     ENV['DESKTOP_STARTUP_ID'] = id
