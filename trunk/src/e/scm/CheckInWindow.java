@@ -90,11 +90,6 @@ public class CheckInWindow extends JFrame {
         topUi.setBorder(null);
         
         patchView = new PatchView();
-        patchView.addFocusListener(new FocusAdapter() {
-            public void focusGained(FocusEvent e) {
-                updatePatchView();
-            }
-        });
         patchView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() != 2) {
@@ -103,6 +98,14 @@ public class CheckInWindow extends JFrame {
                 int index = patchView.locationToIndex(e.getPoint());
                 int lineNumber = patchView.lineNumberInNewerRevisionAtIndex(index);
                 editFileAtLine(lineNumber);
+            }
+        });
+        
+        // Whenever our window regains focus, make sure we're showing up-to-date information.
+        addWindowFocusListener(new WindowAdapter() {
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+                updatePatchView();
             }
         });
         
