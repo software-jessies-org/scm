@@ -118,7 +118,10 @@ public class CheckInWindow extends JFrame {
                 commit();
             }
         });
-
+        // Ubuntu's "Update Manager" uses this icon, which seems appropriate for "do the right -- yet not default -- thing".
+        // FIXME: there seems to be a bug with the GTK LAF that means when the button is disabled, we see the icon and "...", and only when it's enabled do we see "Commit". (Plus the icon isn't correctly grayed out when the button is disabled.)
+        //GnomeStockIcon.useStockIcon(commitButton, "gtk-yes");
+        
         JPanel statusPanel = new JPanel(new BorderLayout());
         statusPanel.add(statusLine, BorderLayout.CENTER);
         statusPanel.add(commitButton, BorderLayout.EAST);
@@ -265,23 +268,34 @@ public class CheckInWindow extends JFrame {
         });
     }
     
+    private String getCommentWithNewline() {
+        String comment = checkInCommentArea.getText();
+        if (comment.endsWith("\n") == false) {
+            comment += "\n";
+        }
+        return comment;
+    }
+    
     private void commit() {
         commitButton.setEnabled(false);
         patchView.setModel(new DefaultListModel());
+        
+        final String comment = getCommentWithNewline();
+        final List<FileStatus> filenames = statusesTableModel.getIncludedFiles();
+        
         new Thread(new BlockingWorker(statusesTable, "Committing changes...") {
             public void work() {
-                String comment = checkInCommentArea.getText();
-                if (comment.endsWith("\n") == false) {
-                    comment += "\n";
-                }
-                List<FileStatus> filenames = statusesTableModel.getIncludedFiles();
                 try {
                     backEnd.commit(comment, filenames);
                 } catch (RuntimeException ex) {
                     // We know the button must have been enabled, or we couldn't
                     // have got here. If the commit failed, the user is likely
                     // to want to try again.
-                    commitButton.setEnabled(true);
+                    EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                            commitButton.setEnabled(true);
+                        }
+                    });
                     // Re-throw so that "finish()" isn't run, and the user can
                     // see that something went wrong. (Though obviously, the
                     // console isn't the best place to report that.)
@@ -298,7 +312,6 @@ public class CheckInWindow extends JFrame {
     
     private void discardSavedState() {
         checkInCommentArea.setText("");
-        statusesTableModel = new StatusesTableModel(new ArrayList<FileStatus>());
         updateSavedState();
     }
     
@@ -456,10 +469,10 @@ public class CheckInWindow extends JFrame {
                 }
                 statuses = removeScmDotFiles(statuses);
                 Collections.sort(statuses);
-                statusesTableModel = new StatusesTableModel(statuses);
             }
             
             public void finish() {
+                statusesTableModel = new StatusesTableModel(statuses);
                 statusesTable.setModel(statusesTableModel);
                 statusesTableModel.initColumnWidths(statusesTable);
                 statusesTableModel.addTableModelListener(new StatusesTableModelListener());
