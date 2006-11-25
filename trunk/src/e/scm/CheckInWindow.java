@@ -118,9 +118,13 @@ public class CheckInWindow extends JFrame {
                 commit();
             }
         });
-        // Ubuntu's "Update Manager" uses this icon, which seems appropriate for "do the right -- yet not default -- thing".
-        // FIXME: there seems to be a bug with the GTK LAF that means when the button is disabled, we see the icon and "...", and only when it's enabled do we see "Commit". (Plus the icon isn't correctly grayed out when the button is disabled.)
-        //GnomeStockIcon.useStockIcon(commitButton, "gtk-yes");
+        if (GuiUtilities.isGtk()) {
+            // Ubuntu's "Update Manager" uses this icon, which seems appropriate for "do the right -- yet not default -- thing".
+            GnomeStockIcon.useStockIcon(commitButton, "gtk-yes");
+            // FIXME: there seems to be a bug with the GTK LAF that means when the button is disabled, we see the icon and "...", and only when it's enabled do we see "Commit". This is a work-around:
+            commitButton.setPreferredSize(commitButton.getPreferredSize());
+            // FIXME: the icon isn't correctly grayed out when the button is disabled.
+        }
         
         JPanel statusPanel = new JPanel(new BorderLayout());
         statusPanel.add(statusLine, BorderLayout.CENTER);
@@ -460,7 +464,11 @@ public class CheckInWindow extends JFrame {
                 if (statusesTableModel != null) {
                     updateSavedState();
                 }
-                commitButton.setEnabled(false);
+                EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        commitButton.setEnabled(false);
+                    }
+                });
                 try {
                     statuses = backEnd.getStatuses(getWaitCursor());
                 } catch (Exception ex) {
