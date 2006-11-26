@@ -11,7 +11,6 @@ public class Mercurial extends RevisionControlSystem {
         ArrayList<String> command = new ArrayList<String>();
         command.add("hg");
         command.add("annotate");
-        command.add("-u");
         command.add("-n");
         if (revision != Revision.LOCAL_REVISION) {
             command.add("-r");
@@ -41,8 +40,10 @@ public class Mercurial extends RevisionControlSystem {
         return new String[] { "hg", "log", "-v", filename };
     }
     
-    //         mpm  969: For more info:
-    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*\\S+\\s+(\\d+): (.*)$");
+    // 544: #!/bin/sh
+    // 186: #
+    //1599: # This is an example of using HGEDITOR to create of diff to review the
+    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+): (.*)$");
     
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
         return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2);
