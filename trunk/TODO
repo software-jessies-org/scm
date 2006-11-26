@@ -41,19 +41,9 @@
   we shouldn't display comments which aren't on the same branch. How do
   we decide whether they are or not?
 
-* Use a JTextPane for the checkin comments, and allow some kind of filter
-  to be specified by the user to rewrite references to bugs as links to
-  bug database entries or whatever; be able to launch a browser when these
-  are clicked on. It would also be nice to recognize other filenames in
-  GNU-style checkin comments, and have links that caused a RevisionTool
-  window to open for that file.
+* Use PTextArea to show patches. Then we can trivially add the usual search functionality.
 
-* Add search functionality. Usual C-D, C-F, C-G trio. I don't know how we
-  can do Edit-like alpha highlighting, which is a shame.
-
-* Add go to line functionality. This is not usually useful because you'd do
-  it on the command line, or have your editor do it for you. It's probably
-  only useful if you know you want a given line in a given revision.
+* Make RevisionTool's "go to line" functionality more obvious. Probably by adding it to a menu, when we have one.
 
 * For a given line, make it possible (and easy) to find out automatically
   when that line was removed. Search forward through revisions until we
