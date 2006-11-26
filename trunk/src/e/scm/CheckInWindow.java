@@ -102,6 +102,7 @@ public class CheckInWindow extends JFrame {
             // Ubuntu's "Update Manager" uses this icon, which seems appropriate for "do the right -- yet not default -- thing".
             GnomeStockIcon.useStockIcon(commitButton, "gtk-yes");
         }
+        commitButton.setEnabled(false);
         
         this.statusReporter = new StatusReporter(this);
         
