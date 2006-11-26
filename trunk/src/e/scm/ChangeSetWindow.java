@@ -116,7 +116,7 @@ public class ChangeSetWindow extends JFrame {
             previousComment = comment;
             
             // FIXME: we shouldn't do this on the EDT.
-            ArrayList<String> lines = patchView.getPatchLines(backEnd, oldRevision, newRevision, changeSetItem.filename);
+            ArrayList<String> lines = patchView.getPatchLines(backEnd, oldRevision, newRevision, changeSetItem.filename, statusReporter);
             for (String line : lines) {
                 patch.append(line + "\n");
             }
@@ -173,7 +173,7 @@ public class ChangeSetWindow extends JFrame {
                     Revision oldRevision = new Revision(changeSetItem.oldRevision, null, null, null, null);
                     Revision newRevision = new Revision(changeSetItem.newRevision, null, null, null, null);
                     // FIXME: we shouldn't do this on the EDT.
-                    patchView.showPatch(backEnd, oldRevision, newRevision, changeSetItem.filename);
+                    patchView.showPatch(backEnd, oldRevision, newRevision, changeSetItem.filename, statusReporter);
                     // FIXME: PatchView.showPatch produces an empty patch for a new file. (And for a deleted file?) If we got more information from the back-end we'd at least know that we were dealing with an 'A' (or 'D') file rather than an 'M' file.
                 }
             });

@@ -181,7 +181,7 @@ public class BitKeeper extends RevisionControlSystem {
         return Integer.parseInt(line);
     }
     
-    public List<FileStatus> getStatuses(final WaitCursor waitCursor) {
+    public List<FileStatus> getStatuses(final StatusReporter statusReporter) {
         // Switch to a determinate progress bar as soon as possible...
         final int fileCount = getRepositoryFileCount();
         
@@ -199,7 +199,7 @@ public class BitKeeper extends RevisionControlSystem {
             public void processLine(String line) {
                 // Update the progress bar based on BitKeeper's progress feedback.
                 int value = Integer.parseInt(line.substring(0, line.indexOf(' ')));
-                waitCursor.setProgressValue(value, fileCount);
+                statusReporter.setProgressValue(value, fileCount);
             }
         };
         ArrayList<String> notReallyTheOutput = new ArrayList<String>();

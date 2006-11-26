@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import e.forms.*;
 import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
@@ -283,13 +284,16 @@ public class RevisionView extends JComponent {
             }
         });
         
-        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
         buttonPanel.add(changeSetButton);
+        buttonPanel.add(Box.createHorizontalStrut(FormDialog.getComponentSpacing()));
         buttonPanel.add(showLogButton);
+        buttonPanel.add(Box.createHorizontalStrut(FormDialog.getComponentSpacing()));
         buttonPanel.add(searchField);
         
-        JPanel statusPanel = new JPanel(new BorderLayout(4, 0));
-        statusPanel.setBorder(new javax.swing.border.EmptyBorder(10, 0, 10, 0));
+        JPanel statusPanel = new JPanel(new BorderLayout());
+        statusPanel.setBorder(new javax.swing.border.EmptyBorder(6, 0, 0, 0));
         statusReporter.addToPanel(statusPanel);
         statusPanel.add(buttonPanel, BorderLayout.EAST);
         
@@ -382,7 +386,7 @@ public class RevisionView extends JComponent {
             ArrayList<String> errors = new ArrayList<String>();
             int status = 0;
             /* FIXME: do this in separate thread. */
-            WaitCursor waitCursor = new WaitCursor(this, "Getting local modifications...");
+            WaitCursor waitCursor = new WaitCursor(this, "Getting local modifications...", statusReporter);
             try {
                 waitCursor.start();
                 String[] command = backEnd.getDifferencesCommand(null, Revision.LOCAL_REVISION, filePath);

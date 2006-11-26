@@ -35,16 +35,16 @@ public class PatchView extends JList {
         setVisibleRowCount(34);
     }
     
-    public void showPatch(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename) {
-        ArrayList<String> lines = getPatchLines(backEnd, olderRevision, newerRevision, filename);
+    public void showPatch(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename, StatusReporter statusReporter) {
+        ArrayList<String> lines = getPatchLines(backEnd, olderRevision, newerRevision, filename, statusReporter);
         showPatch(lines);
     }
     
-    public ArrayList<String> getPatchLines(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename) {
+    public ArrayList<String> getPatchLines(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename, StatusReporter statusReporter) {
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = 0;
-        WaitCursor waitCursor = new WaitCursor(this, "Getting patch...");
+        WaitCursor waitCursor = new WaitCursor(this, "Getting patch...", statusReporter);
         try {
             waitCursor.start();
             String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename);

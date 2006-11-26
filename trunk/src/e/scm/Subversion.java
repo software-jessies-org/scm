@@ -148,7 +148,7 @@ public class Subversion extends RevisionControlSystem {
         execAndDump(command);
     }
 
-    public List<FileStatus> getStatuses(WaitCursor waitCursor) {
+    public List<FileStatus> getStatuses(StatusReporter statusReporter) {
         String[] command = new String[] { "svn", "status" };
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();

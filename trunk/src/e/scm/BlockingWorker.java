@@ -10,10 +10,10 @@ public abstract class BlockingWorker implements Runnable {
     private Exception caughtException;
     private WaitCursor waitCursor;
     
-    public BlockingWorker(Component component, String message) {
+    public BlockingWorker(Component component, String message, StatusReporter statusReporter) {
         this.component = component;
         this.message = message;
-        waitCursor = new WaitCursor(component, message);
+        waitCursor = new WaitCursor(component, message, statusReporter);
         waitCursor.start();
     }
     

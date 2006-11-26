@@ -166,7 +166,7 @@ public class Bazaar extends RevisionControlSystem {
         execAndDump(command);
     }
     
-    public List<FileStatus> getStatuses(WaitCursor waitCursor) {
+    public List<FileStatus> getStatuses(StatusReporter statusReporter) {
         String[] command = new String[] { "bzr", "status" };
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();

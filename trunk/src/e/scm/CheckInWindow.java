@@ -20,7 +20,7 @@ public class CheckInWindow extends JFrame {
     private StatusesTableModel statusesTableModel;
     private PTextArea checkInCommentArea;
     private PatchView patchView;
-    private JLabel statusLine = new JLabel(" ");
+    private StatusReporter statusReporter;
     private JButton commitButton;
     
     public CheckInWindow(final RevisionControlSystem backEnd) {
@@ -53,27 +53,6 @@ public class CheckInWindow extends JFrame {
         if (statusesTableModel != null) {
                 updateSavedState();
         }
-    }
-    
-    private static double getSplitPaneComponentLength(JSplitPane splitPane, Component component) {
-        // The actual size may already have been messed up, so we use the preferred size.
-        Dimension size = component.getPreferredSize();
-        return (splitPane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) ? size.getWidth() : size.getHeight();
-    }
-    
-    public static void sanitizeDivider(JSplitPane splitPane) {
-        // I think that, if JSplitPane can't fit both components' preferred sizes, it persecutes the left/top component,
-        // depriving it of any space, even if that means granting the bottom/right component more than its preferred size.
-        // This is the, somewhat poorly, documented behavior of the default resizeWeight, which is zero.
-        // Getting and setting the divider location doesn't work reliably until long after the UI has been constructed.
-        // BasicSplitPaneUI.java suggests this is true until we've been painted.
-        Component firstComponent = splitPane.getLeftComponent();
-        Component secondComponent = splitPane.getRightComponent();
-        double firstLength = getSplitPaneComponentLength(splitPane, firstComponent);
-        double secondLength = getSplitPaneComponentLength(splitPane, secondComponent);
-        // If both components were equally sized, we'd want to pass 0.5.
-        double preferredWeight = firstLength / (firstLength + secondLength);
-        splitPane.setResizeWeight(preferredWeight);
     }
     
     private void makeUserInterface() {
@@ -127,8 +106,10 @@ public class CheckInWindow extends JFrame {
             // FIXME: the icon isn't correctly grayed out when the button is disabled.
         }
         
+        this.statusReporter = new StatusReporter(this);
+        
         JPanel statusPanel = new JPanel(new BorderLayout());
-        statusPanel.add(statusLine, BorderLayout.CENTER);
+        statusReporter.addToPanel(statusPanel);
         statusPanel.add(commitButton, BorderLayout.EAST);
         if (GuiUtilities.isMacOs() == false) {
             // On Mac OS, there's already a big enough gap between the top of the "Commit" button and the bottom of the patch view.
@@ -142,8 +123,8 @@ public class CheckInWindow extends JFrame {
         contentPane.add(statusPanel, BorderLayout.SOUTH);
         setContentPane(contentPane);
         pack();
-        sanitizeDivider(ui);
-        sanitizeDivider(topUi);
+        ScmUtilities.sanitizeSplitPaneDivider(ui);
+        ScmUtilities.sanitizeSplitPaneDivider(topUi);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         JFrameUtilities.constrainToScreen(this);
@@ -202,7 +183,7 @@ public class CheckInWindow extends JFrame {
         if (status.getState() == FileStatus.NEW) {
             patchView.showNewFile(backEnd, status);
         } else {
-            patchView.showPatch(backEnd, null, null, status.getName());
+            patchView.showPatch(backEnd, null, null, status.getName(), statusReporter);
         }
     }
     
@@ -293,7 +274,7 @@ public class CheckInWindow extends JFrame {
         final String comment = getCommentWithNewline();
         final List<FileStatus> filenames = statusesTableModel.getIncludedFiles();
         
-        new Thread(new BlockingWorker(statusesTable, "Committing changes...") {
+        new Thread(new BlockingWorker(statusesTable, "Committing changes...", statusReporter) {
             public void work() {
                 try {
                     backEnd.commit(comment, filenames);
@@ -330,7 +311,7 @@ public class CheckInWindow extends JFrame {
      */
     private void discardChanges() {
         patchView.setModel(new DefaultListModel());
-        new Thread(new BlockingWorker(statusesTable, "Discarding changes...") {
+        new Thread(new BlockingWorker(statusesTable, "Discarding changes...", statusReporter) {
             public void work() {
                 // Which file?
                 FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
@@ -462,7 +443,7 @@ public class CheckInWindow extends JFrame {
     }
     
     private void updateFileStatuses() {
-        new Thread(new BlockingWorker(statusesTable, "Getting file statuses...") {
+        new Thread(new BlockingWorker(statusesTable, "Getting file statuses...", statusReporter) {
             List<FileStatus> statuses;
             Exception failure;
             
@@ -476,7 +457,7 @@ public class CheckInWindow extends JFrame {
                     }
                 });
                 try {
-                    statuses = backEnd.getStatuses(getWaitCursor());
+                    statuses = backEnd.getStatuses(statusReporter);
                 } catch (Exception ex) {
                     statuses = new ArrayList<FileStatus>();
                     failure = ex;
@@ -598,21 +579,11 @@ public class CheckInWindow extends JFrame {
     }
     
     private void updateStatusLine() {
-        clearStatus();
+        String message = "";
         int rowCount = statusesTableModel.getRowCount();
         if (rowCount > 1) {
-            setStatus(statusesTableModel.getIncludedFileCount() + " of " + StringUtilities.pluralize(rowCount, "file", "files") + " will be committed.");
+            message = statusesTableModel.getIncludedFileCount() + " of " + StringUtilities.pluralize(rowCount, "file", "files") + " will be committed.";
         }
-    }
-    
-    public void clearStatus() {
-        setStatus("");
-    }
-
-    public void setStatus(String message) {
-        if (message.length() == 0) {
-            message = " ";
-        }
-        statusLine.setText(message);
+        statusReporter.setMessage(message);
     }
 }

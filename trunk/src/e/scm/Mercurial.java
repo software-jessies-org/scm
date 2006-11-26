@@ -194,7 +194,7 @@ public class Mercurial extends RevisionControlSystem {
         execAndDump(command);
     }
     
-    public List<FileStatus> getStatuses(WaitCursor waitCursor) {
+    public List<FileStatus> getStatuses(StatusReporter statusReporter) {
         String[] command = new String[] { "hg", "status" };
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();

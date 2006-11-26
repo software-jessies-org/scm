@@ -7,16 +7,25 @@ import javax.swing.*;
 public class StatusReporter {
   private Component owner;
   private JAsynchronousProgressIndicator progressIndicator = new JAsynchronousProgressIndicator();
+  private JPanel progressPanel;
   private JLabel statusLine = new JLabel();
   private int currentTaskHandle = 0;
   
   public StatusReporter(Component owner) {
     this.owner = owner;
     setMessage("");
+    
+    JPanel spacer = new JPanel();
+    spacer.setSize(new Dimension(8, 1));
+    progressPanel = new JPanel(new BorderLayout());
+    progressPanel.add(progressIndicator, BorderLayout.CENTER);
+    progressPanel.add(spacer, BorderLayout.EAST);
+    
+    progressPanel.setVisible(false);
   }
   
   public void addToPanel(JPanel statusPanel) {
-    statusPanel.add(progressIndicator, BorderLayout.WEST);
+    statusPanel.add(progressPanel, BorderLayout.WEST);
     statusPanel.add(statusLine, BorderLayout.CENTER);
   }
   
@@ -29,17 +38,26 @@ public class StatusReporter {
   
   public void finishTask() {
     progressIndicator.stopAnimation();
-    setMessage ("");
+    progressPanel.setVisible(false);
+    setMessage("");
   }
   
   public int startTask(String message) {
-    setMessage (message);
+    setMessage(message);
+    progressPanel.setVisible(true);
     progressIndicator.startAnimation();
     return ++currentTaskHandle;
   }
   
   public boolean isTaskOutdated(int taskHandle) {
     return taskHandle != currentTaskHandle;
+  }
+  
+  public void setProgressValue(final int value, final int maximum) {
+    // FIXME!
+    //progressBar.setValue(value);
+    //progressBar.setMaximum(maximum);
+    //progressBar.setIndeterminate(false);
   }
   
   /**

@@ -53,6 +53,28 @@ public class ScmUtilities {
         System.exit(1);
     }
     
+    public static void sanitizeSplitPaneDivider(JSplitPane splitPane) {
+        // I think that, if JSplitPane can't fit both components' preferred sizes, it persecutes the left/top component,
+        // depriving it of any space, even if that means granting the bottom/right component more than its preferred size.
+        // This is the, somewhat poorly, documented behavior of the default resizeWeight, which is zero.
+        // Getting and setting the divider location doesn't work reliably until long after the UI has been constructed.
+        // BasicSplitPaneUI.java suggests this is true until we've been painted.
+        Component firstComponent = splitPane.getLeftComponent();
+        Component secondComponent = splitPane.getRightComponent();
+        double firstLength = getSplitPaneComponentLength(splitPane, firstComponent);
+        double secondLength = getSplitPaneComponentLength(splitPane, secondComponent);
+        // If both components were equally sized, we'd want to pass 0.5.
+        double preferredWeight = firstLength / (firstLength + secondLength);
+        splitPane.setResizeWeight(preferredWeight);
+    }
+    
+    // Helper method for sanitizeSplitPaneDivider.
+    private static double getSplitPaneComponentLength(JSplitPane splitPane, Component component) {
+        // The actual size may already have been messed up, so we use the preferred size.
+        Dimension size = component.getPreferredSize();
+        return (splitPane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) ? size.getWidth() : size.getHeight();
+    }
+    
     private ScmUtilities() {
     }
 }
