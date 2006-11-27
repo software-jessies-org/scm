@@ -232,10 +232,11 @@ public class RevisionView extends JComponent {
 
         revisionsUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ScmUtilities.makeScrollable(revisionsList), ScmUtilities.makeScrollable(revisionCommentArea));
         revisionsUi.setBorder(null);
+        ScmUtilities.sanitizeSplitPaneDivider(revisionsUi);
         
         JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT, revisionsUi, ScmUtilities.makeScrollable(annotationView));
         ui.setBorder(null);
-        ui.setDividerLocation(revisionsUi.getPreferredSize().height);
+        ScmUtilities.sanitizeSplitPaneDivider(ui);
 
         changeSetButton = new JButton("Show Change Set");;
         changeSetButton.addActionListener(new ActionListener() {
@@ -604,10 +605,5 @@ public class RevisionView extends JComponent {
                 showDifferencesBetweenRevisions(olderRevision, newerRevision);
             }
         }
-    }
-    
-    // Used to set the split pane divider locations, which are impossibly difficult to get right before the components are realized.
-    public void postPack() {
-        revisionsUi.setDividerLocation(revisionsUi.getWidth() - revisionCommentArea.getPreferredSize().width);
     }
 }
