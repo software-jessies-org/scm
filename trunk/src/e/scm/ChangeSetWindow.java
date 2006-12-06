@@ -78,7 +78,13 @@ public class ChangeSetWindow extends JFrame {
     }
     
     void reassessShowPatchAvailability() {
-        showPatchButton.setEnabled(filePathToRevisionsMap.size() == fileList.getModel().getSize());
+        if (filePathToRevisionsMap.size() != fileList.getModel().getSize()) {
+            return;
+        }
+        showPatchButton.setEnabled(true);
+        // Guess the user's most likely initial action.
+        fileList.setSelectedIndex(0);
+        fileList.requestFocus();
     }
     
     private void readListOfRevisions(final String filePath, BackEndTask revisionListTask) {
@@ -186,11 +192,6 @@ public class ChangeSetWindow extends JFrame {
                 fileList.setEnabled(true);
                 readListOfRevisions(changeSetItem.filename, revisionListTask);
             }
-            
-            reassessShowPatchAvailability();
-            // Guess the user's most likely initial action.
-            fileList.setSelectedIndex(0);
-            fileList.requestFocus();
         }
     }
     
