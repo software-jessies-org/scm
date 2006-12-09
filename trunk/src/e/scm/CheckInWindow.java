@@ -267,6 +267,7 @@ public class CheckInWindow extends JFrame {
     
     private void commit() {
         commitButton.setEnabled(false);
+        checkInCommentArea.setEnabled(false);
         patchView.setModel(new DefaultListModel());
         
         final String comment = getCommentWithNewline();
@@ -283,6 +284,7 @@ public class CheckInWindow extends JFrame {
                     EventQueue.invokeLater(new Runnable() {
                         public void run() {
                             commitButton.setEnabled(true);
+                            checkInCommentArea.setEnabled(true);
                         }
                     });
                     // Re-throw so that "finish()" isn't run, and the user can
