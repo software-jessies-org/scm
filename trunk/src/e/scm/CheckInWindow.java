@@ -266,9 +266,10 @@ public class CheckInWindow extends JFrame {
     }
     
     private void commit() {
-        commitButton.setEnabled(false);
         checkInCommentArea.setEnabled(false);
-        patchView.setModel(new DefaultListModel());
+        commitButton.setEnabled(false);
+        patchView.setEnabled(false);
+        statusesTable.setEnabled(false);
         
         final String comment = getCommentWithNewline();
         final List<FileStatus> filenames = statusesTableModel.getIncludedFiles();
@@ -283,8 +284,10 @@ public class CheckInWindow extends JFrame {
                     // to want to try again.
                     EventQueue.invokeLater(new Runnable() {
                         public void run() {
-                            commitButton.setEnabled(true);
                             checkInCommentArea.setEnabled(true);
+                            commitButton.setEnabled(true);
+                            patchView.setEnabled(true);
+                            statusesTable.setEnabled(true);
                         }
                     });
                     // Re-throw so that "finish()" isn't run, and the user can
@@ -297,6 +300,8 @@ public class CheckInWindow extends JFrame {
             public void finish() {
                 discardSavedState();
                 updateFileStatuses();
+                patchView.setEnabled(true);
+                statusesTable.setEnabled(true);
             }
         }).start();
     }
@@ -405,7 +410,7 @@ public class CheckInWindow extends JFrame {
     }
     
     private void updateSavedState() {
-        String comment = checkInCommentArea.isEnabled() ? checkInCommentArea.getText() : "";
+        String comment = statusesTableModel.isAtLeastOneFileIncluded() ? checkInCommentArea.getText() : "";
         updateSavedStateFile(getSavedCommentFile(), comment);
         updateSavedStateFile(getSavedFilenamesFile(), StringUtilities.join(statusesTableModel.getIncludedFilenames(), "\n"));
     }
