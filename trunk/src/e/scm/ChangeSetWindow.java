@@ -89,6 +89,7 @@ public class ChangeSetWindow extends JFrame {
     
     private void readListOfRevisions(final String filePath, BackEndTask revisionListTask) {
         if (filePathToRevisionsMap.containsKey(filePath)) {
+            reassessShowPatchAvailability();
             return;
         }
         new Thread(new RevisionListWorker(backEnd, revisionListTask, filePath, fileList) {
