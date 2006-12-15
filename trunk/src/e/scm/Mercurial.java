@@ -190,7 +190,8 @@ public class Mercurial extends RevisionControlSystem {
         ArrayList<String> command = new ArrayList<String>();
         command.add("hg");
         command.add("revert");
-        command.add("--nonrecursive");
+        // We keep our own backups (though we should should make this clear in the UI).
+        command.add("--no-backup");
         command.add(filename);
         execAndDump(command);
     }
