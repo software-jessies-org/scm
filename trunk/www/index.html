@@ -21,29 +21,27 @@ to use, not particularly keen to fit in with how you were already working,
 only work with one revision control system, and don't offer anything over
 the command-line tools.
 
-<p>CVS and Subversion, the two most widely-used systems, come with nothing.
+<p>CVS and Subversion, two of the most widely-used systems, come with nothing.
 
-<p>BitKeeper has GUI tools that are actually useful. Sadly,
-they're limited to BitKeeper repositories, are somewhat idiosyncratic in
-design, look disgusting, and are missing little niceties like spelling
-checking for your comments.
+<p>Bazaar, Git, and Mercurial have a really nice history viewers, but nothing much for checking in changes.
 
-<p>SCM, on the other hand, is attractive, simple, useful, and portable across
-operating systems as well as revision control systems. I use
-it on Linux and Mac OS, and I use it with BitKeeper, CVS and Subversion.
+<p>BitKeeper has a decent history viewer and a good tool for checking in changes, but they're both idiosyncratic in design, look disgusting, and are missing little niceties like spelling checking for your comments.
 
-<P>Another important thing to realize is that SCM never asks for commitment
+<p>SCM, on the other hand, is attractive, simple, useful, and portable across operating systems as well as revision control systems.
+I use it on both Linux and Mac OS, and I use it with most of the back-ends.
+
+<p>Another important thing to realize is that SCM never asks for commitment
 from you: it doesn't have any kind of set-up process (you can install it
 anywhere you like), doesn't need to be taught about your repositories,
-won't make any changes to your repositories other than the ones you ask
-it to make when using CheckInTool, and it won't splatter junk all over
+won't make any changes to your repositories other than the ones you explicitly ask
+it to make, and it won't splatter junk all over
 your file system. If you don't like it, just stop using it.
 
 <h2>RevisionTool</h2>
 
-<p>RevisionTool is used to examine a file's revision history. It replaces
-<i>cvsweb</i> (and relatives) or <tt>bk revtool</tt>.
-<a href="https://launchpad.net/products/bzr/+bug/40986">Bazaar bug 40986</a> limits the usefulness of RevisionTool unless you're on bzr-0.8 or later. (Even then, the representation offered by bzr-gtk is a better choice for non-linear histories. Implementing something similar in SCM for Bazaar and BitKeeper support is a clear goal. Patches welcome!)
+<p>RevisionTool is used to examine a file's revision history.
+It's a local alternative to <i>cvsweb</i> and its relatives, similar to <tt>bk revtool</tt>.
+(Tools like <tt>bzr-gtk</tt>, <tt>gitk</tt>, and <tt>hgk</tt> are best choice for the non-linear histories of distributed systems. Implementing something similar in SCM for better support of the distributed systems is a clear goal. Patches welcome!)
 
 <p>I think a lot of people underestimate
 the usefulness of a file's revision history; for me it's the main use of
@@ -69,39 +67,11 @@ introduced.)
 
 <h2>CheckInTool</h2>
 
-<p>CheckInTool is used to check in modifications. It replaces
-<tt>bzr/cvs/svn commit</tt> or <tt>bk citool</tt>. Its main features
-are that it lets you check in an arbitrary subset of your modified/new
-files, it doesn't require a separate 'add' step, it checks spelling in
-your check-in comment, and&nbsp;&ndash; this is the killer feature&nbsp;&ndash;
-it shows you colored diffs of what you're about to commit. This is a great
-way to avoid accidentally checking in stuff you didn't mean to.
+<p>CheckInTool is used to check in modifications.
+It replaces <tt>bzr/cvs/hg/svn commit</tt> or <tt>bk citool</tt>.
+Its main features are that it lets you check in an arbitrary subset of your modified/new files, it doesn't require a separate 'add' step for new files, it checks spelling in your check-in comments, and it shows you what you're about to commit.
+This is a great way to avoid accidentally checking in stuff you didn't mean to.
 <div align="center"><img src="CheckInTool.png" width="1007" height="486"></div>
-
-<h2>I'm a BitKeeper user; what's in this for me?</h2>
-
-<p>BitKeeper already has some pretty good tools. Here's where I think SCM
-beats them:
-<ul>
-<li>More traditional (non-tk) interfaces. No purple or green in sight!
-<li>More traditional copy &amp; paste. In particular, you can easily copy
-comments to and from, and patches from RevisionTool.
-<li>Looks and works great on Mac OS.
-<li>CheckInTool checks spelling in your check-in comments, and understands
-CamelCase, making this feature more useful to programmers than it would
-otherwise be.
-<li>CheckInTool lets you comment newly-added files; <tt>citool</tt> adds
-its own content-free comment to new files.
-</ul>
-
-<p>Of course, everything comes at a price. Here's where I think BitKeeper's
-own tools beat SCM: 
-<ul>
-<li><tt>revtool</tt> understands BitKeeper's non-linear revisions; SCM
-implicitly assumes a model more like Subversion's. It can be a lot harder
-to follow forked histories in SCM, a decision made to make it easier to
-navigate straight-line histories.
-</ul>
 
 <h2>Writing check-in comments</h2>
 
@@ -113,12 +83,11 @@ change set.
 <p>It turns out to often be convenient to group files. Rather than repeating
 a comment, just group the affected files together. The GNU style allows you to
 repeat a filename if you have more than one thing to say about it, but
-CheckInTool doesn't really help you with that: you'll have to copy and paste
+SCM doesn't really help you with that: you'll have to copy and paste
 the name yourself. Another common practice is to show related sub-changes and
 their relation by writing ellipses between chunks of the story.
 
-<p>Here's an example of the kind of comment CheckInTool will naturally help you
-write:
+<p>Here's an example of the kind of comment SCM will naturally help you write:
 <blockquote><pre>
 src/e/scm/WaitCursor.java: making this a class full of static data and methods
 was stupid. To cope with nested tasks, change it to something you instantiate...
@@ -129,12 +98,13 @@ src/e/scm/RevisionWindow.java: ...and change all the callers.
 </pre></blockquote>
 <p>You can write anything you like, of course, but you'll get less help.
 
-<p>The text area is 80 columns wide, but the text is only soft-wrapped. If you
-want line breaks, you'll have to type them yourself.
+<p>The text area is 80 columns wide, but the text is only soft-wrapped.
+If you want line breaks, you'll have to type them yourself.
+Anywhere SCM shows you a comment, it will word-wrap for you, so hard line breaks shouldn't be necessary.
 
 <p>BitKeeper supports giving a different comment to each file in a change set,
 and yet another comment to the set as a whole. SCM doesn't support this. One
-reason is that CVS and Subversion don't. But more than that, experience
+reason is that other back ends don't. But more than that, experience
 suggests that this freedom isn't useful, and does cause problems. One common
 case is that people accidentally hide important details by pasting the same
 comment for most of the files, but editing one or more of the copies. This is
@@ -146,8 +116,7 @@ could argue that this is a weakness of BitMover's tools, but I think it's a
 weakness of the idea itself. The dialog style of commenting works better, and
 fits the idea of a change set as a coherent group of changes.
 
-<p>In effect, CheckInTool forces you to write only a change set comment, which
-it then applies to each file, and to the change set.
+<p>In effect, SCM forces you to write only a change set comment, which it then applies to each file, and to the change set.
 
 <h2>Writing <i>good</i> check-in comments</h2>
 
