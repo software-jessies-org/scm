@@ -39,14 +39,17 @@ public class RevisionListCellRenderer extends JPanel implements ListCellRenderer
         topLabel.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
         bottomLabel.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
         
-        if (isSelected) {
+        if (GuiUtilities.isMacOs() && isSelected) {
             // FIXME: this isn't the right color, but there doesn't seem to be an appropriate ui default, even on Mac OS.
+            // FIXME: iTunes (which I think I was copying here) seems to behave differently to everything else, so I'm not even sure what color I'm looking for.
+            // FIXME: is this actually supposed to be a single-pixel line of the particular table cell's non-selected background color? I think it might be.
             matteBorder.setColor(UIManager.getColor("Table.focusCellForeground"));
         } else {
             matteBorder.setColor(UIManager.getColor("List.background"));
         }
-        if (isSelected == false && (index % 2 == 0)) {
-            setBackground(GuiUtilities.ALTERNATE_ROW_COLOR);
+        
+        if (isSelected == false) {
+            setBackground(GuiUtilities.backgroundColorForRow(index));
         }
         
         return this;
