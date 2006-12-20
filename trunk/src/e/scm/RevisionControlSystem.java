@@ -42,10 +42,13 @@ public abstract class RevisionControlSystem {
         File file = new File(canonicalPath);
         if (file.exists() == false) {
             System.err.println(file + " does not exist");
-            return null;
+            // We can still usefully run when the target file doesn't exist.
+            // BitKeeper often doesn't check-out files in BitKeeper/deleted/ but will happily allow you to look at the history.
+            // I've seen similar behavior in other systems too.
         }
         
         // Is there evidence of revision control in this directory?
+        // This is carefully crafted such that, if "file" doesn't exist, we look at its parent directory.
         File directory = file.isDirectory() ? file : new File(file.getParent());
         for (String sibling : directory.list()) {
             if (sibling.equals(".bzr")) {
