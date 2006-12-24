@@ -300,8 +300,6 @@ public class CheckInWindow extends JFrame {
             public void finish() {
                 discardSavedState();
                 updateFileStatuses();
-                patchView.setEnabled(true);
-                statusesTable.setEnabled(true);
             }
         }).start();
     }
@@ -474,6 +472,7 @@ public class CheckInWindow extends JFrame {
             public void finish() {
                 statusesTableModel = new StatusesTableModel(statuses);
                 statusesTable.setModel(statusesTableModel);
+                statusesTable.setEnabled(true);
                 statusesTableModel.initColumnWidths(statusesTable);
                 statusesTableModel.addTableModelListener(new StatusesTableModelListener());
                 statusesTableModel.fireTableDataChanged();
@@ -487,6 +486,7 @@ public class CheckInWindow extends JFrame {
                     model.addElement("(Nothing to check in.)");
                     patchView.setModel(model);
                 }
+                patchView.setEnabled(true);
                 
                 if (failure != null) {
                     SimpleDialog.showDetails(CheckInWindow.this, "Back-End Problem", failure);
