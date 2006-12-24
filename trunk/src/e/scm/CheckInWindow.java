@@ -265,11 +265,15 @@ public class CheckInWindow extends JFrame {
         return comment;
     }
     
+    private void setEntireUiEnabled(boolean newState) {
+        checkInCommentArea.setEnabled(newState);
+        commitButton.setEnabled(newState);
+        patchView.setEnabled(newState);
+        statusesTable.setEnabled(newState);
+    }
+    
     private void commit() {
-        checkInCommentArea.setEnabled(false);
-        commitButton.setEnabled(false);
-        patchView.setEnabled(false);
-        statusesTable.setEnabled(false);
+        setEntireUiEnabled(false);
         
         final String comment = getCommentWithNewline();
         final List<FileStatus> filenames = statusesTableModel.getIncludedFiles();
@@ -284,10 +288,7 @@ public class CheckInWindow extends JFrame {
                     // to want to try again.
                     EventQueue.invokeLater(new Runnable() {
                         public void run() {
-                            checkInCommentArea.setEnabled(true);
-                            commitButton.setEnabled(true);
-                            patchView.setEnabled(true);
-                            statusesTable.setEnabled(true);
+                            setEntireUiEnabled(true);
                         }
                     });
                     // Re-throw so that "finish()" isn't run, and the user can
@@ -313,7 +314,7 @@ public class CheckInWindow extends JFrame {
      * Invoked when the user chooses "Discard Changes" from the pop-up menu.
      */
     private void discardChanges() {
-        patchView.setModel(new DefaultListModel());
+        setEntireUiEnabled(false);
         new Thread(new BlockingWorker(statusesTable, "Discarding changes...", statusReporter) {
             public void work() {
                 // Which file?
@@ -446,6 +447,7 @@ public class CheckInWindow extends JFrame {
     }
     
     private void updateFileStatuses() {
+        setEntireUiEnabled(false);
         new Thread(new BlockingWorker(statusesTable, "Getting file statuses...", statusReporter) {
             List<FileStatus> statuses;
             Exception failure;
