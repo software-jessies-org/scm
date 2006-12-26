@@ -54,10 +54,7 @@ public class StatusReporter {
     }
     
     public void setProgressValue(final int value, final int maximum) {
-        // FIXME!
-        //progressBar.setValue(value);
-        //progressBar.setMaximum(maximum);
-        //progressBar.setIndeterminate(false);
+        progressIndicator.setProgress(value, maximum);
     }
     
     /**
