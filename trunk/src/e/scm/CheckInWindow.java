@@ -316,6 +316,7 @@ public class CheckInWindow extends JFrame {
     private void discardChanges() {
         setEntireUiEnabled(false);
         new Thread(new BlockingWorker(statusesTable, "Discarding changes...", statusReporter) {
+            @Override
             public void work() {
                 // Which file?
                 FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
@@ -345,8 +346,15 @@ public class CheckInWindow extends JFrame {
                 }
             }
             
+            @Override
             public void finish() {
                 updateFileStatuses();
+            }
+            
+            @Override
+            public void reportException(Exception ex) {
+                super.reportException(ex);
+                setEntireUiEnabled(true);
             }
         }).start();
     }
