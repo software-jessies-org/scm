@@ -327,9 +327,8 @@ public class CheckInWindow extends JFrame {
                 // is a local "rm".
                 // FIXME: Recognize that case ('!' status in svn), and change the UI to something like "restore"?
                 if (file.exists() && file.isFile()) {
-                    String oldContent = StringUtilities.readFile(file);
                     File backupFile = FileUtilities.fileFromParentAndString(System.getProperty("java.io.tmpdir"), StringUtilities.urlEncode(filename));
-                    StringUtilities.writeFile(backupFile, oldContent);
+                    FileUtilities.copyFile(file, backupFile);
                 }
                 // FIXME: offer an "Undo Discard Changes" menu option?
                 
