@@ -27,7 +27,10 @@ public class PatchView extends JList {
         });
         setFont(ScmUtilities.CODE_FONT);
         
-        setCellRenderer(new EListCellRenderer(false));
+        EListCellRenderer renderer = new EListCellRenderer(false);
+        // Disable HTML so we can render HTML files as source!
+        renderer.putClientProperty("html.disable", Boolean.TRUE);
+        setCellRenderer(renderer);
         this.defaultCellRenderer = getCellRenderer();
         
         JListCopyAction.fixCopyFor(this);
