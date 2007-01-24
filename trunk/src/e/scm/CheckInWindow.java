@@ -80,6 +80,7 @@ public class CheckInWindow extends JFrame {
                 editFileAtLine(lineNumber);
             }
         });
+        ComponentUtilities.divertPageScrollingFromTo(statusesTable, patchView);
         
         // Whenever our window regains focus, make sure we're showing up-to-date information.
         addWindowFocusListener(new WindowAdapter() {
@@ -140,21 +141,6 @@ public class CheckInWindow extends JFrame {
                 if (e.getValueIsAdjusting() == false) {
                     updatePatchView();
                 }
-            }
-        });
-        
-        // Work like Apple's Mail, where the arrow keys move through the headers/filenames,
-        // and the page keys move through the current body/patch.
-        statusesTable.getInputMap().put(KeyStroke.getKeyStroke("PAGE_UP"), "pagePatchUp");
-        statusesTable.getInputMap().put(KeyStroke.getKeyStroke("PAGE_DOWN"), "pagePatchDown");
-        statusesTable.getActionMap().put("pagePatchUp", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                ComponentUtilities.scroll(patchView, true, -1);
-            }
-        });
-        statusesTable.getActionMap().put("pagePatchDown", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                ComponentUtilities.scroll(patchView, true, 1);
             }
         });
     }

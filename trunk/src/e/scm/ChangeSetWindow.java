@@ -40,6 +40,7 @@ public class ChangeSetWindow extends JFrame {
         
         this.patchView = new PatchView();
         JScrollPane scrollablePatchView = ScmUtilities.makeScrollable(patchView);
+        ComponentUtilities.divertPageScrollingFromTo(fileList, patchView);
         
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollableFileList, scrollablePatchView);
         splitPane.setBorder(null);
