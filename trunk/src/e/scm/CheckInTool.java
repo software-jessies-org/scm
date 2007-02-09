@@ -19,6 +19,7 @@ public class CheckInTool implements Launchable {
     }
     
     public void startGui() {
+        ScmUtilities.initAboutBox();
         new CheckInWindow(backEnd);
     }
 }

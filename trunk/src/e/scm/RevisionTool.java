@@ -44,6 +44,7 @@ public class RevisionTool implements Launchable {
     }
     
     public void startGui() {
+        ScmUtilities.initAboutBox();
         for (Job job : jobs) {
             new RevisionWindow(job.filename, job.lineNumber);
         }

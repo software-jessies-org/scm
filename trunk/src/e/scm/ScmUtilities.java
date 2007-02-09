@@ -13,6 +13,14 @@ import javax.swing.event.*;
 public class ScmUtilities {
     public static final Font CODE_FONT = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
     
+    public static void initAboutBox() {
+        AboutBox aboutBox = AboutBox.getSharedInstance();
+        aboutBox.setApplicationName("SCM");
+        aboutBox.setWebSiteAddress("http://software.jessies.org/scm/");
+        aboutBox.addCopyright("Copyright (C) 2003-2007 Free Software Foundation, Inc.");
+        aboutBox.addCopyright("All Rights Reserved.");
+    }
+    
     public static JList makeList() {
         JList list = new JList();
         list.setFont(ScmUtilities.CODE_FONT);
