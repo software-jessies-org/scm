@@ -83,7 +83,7 @@ public class PatchView extends JList {
         ArrayList<String> newErrors = new ArrayList<String>();
         String patch = StringUtilities.join(lines, "\n") + "\n";
         String patchFilename = FileUtilities.createTemporaryFile("e.scm.PatchView-patch", "patch file", patch);
-        String[] command = new String[] { "annotate-patch.rb",  patchFilename };
+        String[] command = new String[] { "ruby", "annotate-patch.rb", patchFilename };
         int status = ProcessUtilities.backQuote(backEnd.getRoot(), command, newLines, newErrors);
         if (status != 0) {
             return lines;
