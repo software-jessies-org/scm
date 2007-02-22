@@ -176,7 +176,7 @@ public class Subversion extends RevisionControlSystem {
                 }
                 statuses.add(new FileStatus(canonicalState, name));
             } else {
-                System.err.println("Subversion back end didn't understand '" + line + "'.");
+                Log.warn("Subversion back end didn't understand '" + line + "'.");
             }
         }
         return statuses;

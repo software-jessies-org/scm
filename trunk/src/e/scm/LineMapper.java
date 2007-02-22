@@ -1,5 +1,6 @@
 package e.scm;
 
+import e.util.*;
 import java.util.*;
 
 public class LineMapper {
@@ -10,7 +11,9 @@ public class LineMapper {
   }
   
   private void printVerboseDiagnostics(String line) {
-    //System.err.println(line);
+    if (false) {
+      System.err.println(line);
+    }
   }
   
   public int translate(int fromLine) {
@@ -51,9 +54,9 @@ public class LineMapper {
     int averageToLine = (toLineAccordingToPreviousContext + toLineAccordingToNextContext) / 2;
     if (toLineAccordingToPreviousContext != toLineAccordingToNextContext) {
       // Step-by-step patching will *hopefully* avoid this but, if it happens, I want to know.
-      System.err.println("Patch is ambiguous!");
-      System.err.println("To line is somewhere between " + toLineAccordingToPreviousContext + " and " + toLineAccordingToNextContext);
-      System.err.println("Splitting the difference to give an answer of " + averageToLine);
+      Log.warn("Patch is ambiguous!");
+      Log.warn("To line is somewhere between " + toLineAccordingToPreviousContext + " and " + toLineAccordingToNextContext);
+      Log.warn("Splitting the difference to give an answer of " + averageToLine);
     }
     return new Integer(averageToLine);
   }

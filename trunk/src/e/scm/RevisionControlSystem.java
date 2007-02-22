@@ -41,7 +41,7 @@ public abstract class RevisionControlSystem {
         }
         File file = new File(canonicalPath);
         if (file.exists() == false) {
-            System.err.println(file + " does not exist");
+            System.err.println("\"" + file + "\" does not exist");
             // We can still usefully run when the target file doesn't exist.
             // BitKeeper often doesn't check-out files in BitKeeper/deleted/ but will happily allow you to look at the history.
             // I've seen similar behavior in other systems too.
@@ -231,7 +231,7 @@ public abstract class RevisionControlSystem {
         String[] command = commandAsList.toArray(new String[commandAsList.size()]);
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        System.err.println("Running " + ProcessUtilities.shellQuotedFormOf(commandAsList));
+        Log.warn("Running " + ProcessUtilities.shellQuotedFormOf(commandAsList));
         int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             System.out.println(lines.get(i));

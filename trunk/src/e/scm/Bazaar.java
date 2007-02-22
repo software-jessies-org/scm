@@ -195,7 +195,7 @@ public class Bazaar extends RevisionControlSystem {
                 String name = line.substring(2);
                 statuses.add(new FileStatus(canonicalState, name));
             } else {
-                System.err.println("Bazaar back end didn't understand '" + line + "'.");
+                Log.warn("Bazaar back end didn't understand '" + line + "'.");
             }
         }
         return statuses;

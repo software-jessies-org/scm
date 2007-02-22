@@ -181,14 +181,6 @@ public class RevisionView extends JComponent {
                 int startLine = ((desiredRevision == olderRevision) ? olderStartLine : newerStartLine);
                 int desiredLineNumber = startLine + linesIntoHunk;
                 
-                if (false) {
-                    // Remove this when I'm confident this code is right.
-                    System.err.println("going to " + ((desiredRevision == olderRevision) ? "older" : "newer") + " revision");
-                    System.err.println("old=" + olderStartLine + " new=" + newerStartLine);
-                    System.err.println("linesIntoHunk=" + linesIntoHunk);
-                    System.err.println("startLine=" + startLine + "  desiredLineNumber=" + desiredLineNumber);
-                }
-                
                 selectRevision(desiredRevision, desiredLineNumber);
             }
         }

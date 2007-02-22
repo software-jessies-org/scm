@@ -155,7 +155,7 @@ public class Cvs extends RevisionControlSystem {
             } else if (line.startsWith("retrieving revision ") || line.startsWith("RCS file: ") || line.startsWith("Merging differences between ")) {
                 // Ignore.
             } else {
-                System.err.println("CVS back end didn't understand '" + line + "'.");
+                Log.warn("CVS back end didn't understand '" + line + "'.");
             }
         }
         return statuses;

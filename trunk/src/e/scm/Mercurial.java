@@ -222,7 +222,7 @@ public class Mercurial extends RevisionControlSystem {
                 canonicalState = (state != null) ? state.intValue() : FileStatus.NOT_RECOGNIZED_BY_BACK_END;
                 statuses.add(new FileStatus(canonicalState, path));
             } else {
-                System.err.println("Mercurial back end didn't understand '" + line + "'.");
+                Log.warn("Mercurial back end didn't understand '" + line + "'.");
             }
         }
         return statuses;

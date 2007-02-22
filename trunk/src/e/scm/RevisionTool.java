@@ -10,8 +10,7 @@ public class RevisionTool implements Launchable {
     
     public void parseCommandLine(List<String> arguments) {
         if (arguments.size() == 0) {
-            System.err.println("No file specified.");
-            System.exit(1);
+            ScmUtilities.panic("RevisionTool", "RevisionTool lets you browse the revision history of files. Please supply at least one filename.");
         }
         
         for (int i = 0; i < arguments.size(); ++i) {
