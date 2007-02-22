@@ -104,7 +104,7 @@ public class Patch {
         int status = ProcessUtilities.backQuote(directory, command, lines, errors);
         // CVS returns the number of differences as the status or some such idiocy.
         if (errors.size() > 0) {
-            Log.warn("Differences command failed - TODO: provide feedback");
+            lines.addAll(errors);
         }
         parsePatch(isPatchReversed, lines, new LineCounter());
     }
