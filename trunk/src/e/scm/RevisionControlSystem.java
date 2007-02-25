@@ -37,11 +37,11 @@ public abstract class RevisionControlSystem {
         try {
             canonicalPath = new File(path).getCanonicalPath();
         } catch (IOException ex) {
-            Log.warn("Couldn't canonicalize path", ex);
+            Log.warn("Couldn't canonicalize path.", ex);
         }
         File file = new File(canonicalPath);
         if (file.exists() == false) {
-            System.err.println("\"" + file + "\" does not exist");
+            Log.warn("\"" + file + "\" does not exist.");
             // We can still usefully run when the target file doesn't exist.
             // BitKeeper often doesn't check-out files in BitKeeper/deleted/ but will happily allow you to look at the history.
             // I've seen similar behavior in other systems too.
@@ -229,17 +229,19 @@ public abstract class RevisionControlSystem {
      */
     public void execAndDump(List<String> commandAsList) {
         String[] command = commandAsList.toArray(new String[commandAsList.size()]);
+        String tool = command[0];
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        Log.warn("Running " + ProcessUtilities.shellQuotedFormOf(commandAsList));
+        Log.warn(tool + ": running \"" + ProcessUtilities.shellQuotedFormOf(commandAsList) + "\"...");
         int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
-            System.out.println(lines.get(i));
+            Log.warn(tool + ": stdout: " + lines.get(i));
         }
         for (int i = 0; i < errors.size(); ++i) {
-            System.err.println(errors.get(i));
+            Log.warn(tool + ": stderr: " + errors.get(i));
         }
         if (status != 0) {
+            Log.warn(tool + ": exited with status " + status + ".");
             throwError(status, command, lines, errors);
         }
     }
