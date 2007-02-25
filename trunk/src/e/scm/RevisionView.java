@@ -43,7 +43,7 @@ public class RevisionView extends JComponent {
     private int translateLineNumberInOneStep(Revision fromRevision, Revision toRevision, int fromLineNumber) {
         Patch patch = new Patch(backEnd, filePath, fromRevision, toRevision);
         int toLineNumber = patch.translateLineNumberInFromRevision(fromLineNumber);
-        //System.err.println("(" + fromRevision + ") => (" + toRevision + ") maps (" + fromLineNumber + " => " + toLineNumber + ")");
+        //Log.warn("translateLineNumberInOneStep: (" + fromRevision + ") => (" + toRevision + ") maps (" + fromLineNumber + " => " + toLineNumber + ")");
         return toLineNumber;
     }
     

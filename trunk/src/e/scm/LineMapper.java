@@ -11,9 +11,7 @@ public class LineMapper {
   }
   
   private void printVerboseDiagnostics(String line) {
-    if (false) {
-      System.err.println(line);
-    }
+    //Log.warn("LineMapper: " + line);
   }
   
   public int translate(int fromLine) {
