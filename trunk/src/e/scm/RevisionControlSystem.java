@@ -258,7 +258,6 @@ public abstract class RevisionControlSystem {
             message += StringUtilities.join(output, "\n") + "\n";
         }
         message += "]";
-        SimpleDialog.showDetails(null, "Back-end Error", message);
         throw new RuntimeException(message);
     }
     
