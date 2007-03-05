@@ -43,13 +43,13 @@ public class AnnotatedLineRenderer extends e.gui.EListCellRenderer {
         return this;
     }
 
-    public void paint(Graphics g) {
+    public void paint(Graphics oldGraphics) {
+        Graphics2D g = (Graphics2D) oldGraphics;
         super.paint(g);
         if (shouldDrawLine) {
-            Graphics2D g2 = (Graphics2D) g;
-            g2.setColor(Color.LIGHT_GRAY);
-            g2.setStroke(DASHED_STROKE);
-            g2.drawLine(0, 0, getWidth(), 0);
+            g.setColor(Color.LIGHT_GRAY);
+            g.setStroke(DASHED_STROKE);
+            g.drawLine(0, 0, getWidth(), 0);
         }
     }
 }
