@@ -6,7 +6,6 @@ import java.util.regex.*;
 public class AnnotatedLine {
     private static final SimpleDateFormat INPUT_DATE_FORMAT = new SimpleDateFormat("dd-MMM-yy");
     private static final SimpleDateFormat OUTPUT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private static final long NOW = System.currentTimeMillis();
 
     /** The revision number this line belongs to. */
     public Revision revision;
