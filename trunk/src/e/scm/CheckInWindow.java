@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.event.*;
 import e.gui.*;
 import e.ptextarea.*;
@@ -113,7 +112,7 @@ public class CheckInWindow extends JFrame {
         if (GuiUtilities.isMacOs() == false) {
             // On Mac OS, there's already a big enough gap between the top of the "Commit" button and the bottom of the patch view.
             // On other systems, the layout is too tight.
-            statusPanel.setBorder(new EmptyBorder(6, 0, 0, 0));
+            statusPanel.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
         }
         
         JPanel contentPane = new JPanel(new BorderLayout());

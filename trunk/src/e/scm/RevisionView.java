@@ -286,12 +286,11 @@ public class RevisionView extends JComponent {
         buttonPanel.add(searchField);
         
         JPanel statusPanel = new JPanel(new BorderLayout());
-        statusPanel.setBorder(new javax.swing.border.EmptyBorder(6, 0, 0, 0));
+        statusPanel.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
         statusReporter.addToPanel(statusPanel);
         statusPanel.add(buttonPanel, BorderLayout.EAST);
         
         setLayout(new BorderLayout());
-        setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
         add(ui, BorderLayout.CENTER);
         add(statusPanel, BorderLayout.SOUTH);
     }

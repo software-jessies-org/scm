@@ -73,7 +73,8 @@ public class ChangeSetWindow extends JFrame {
             }
         });
         
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         buttonPanel.add(showPatchButton);
         return buttonPanel;
     }

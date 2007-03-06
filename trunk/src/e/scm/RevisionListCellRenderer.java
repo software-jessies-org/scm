@@ -15,8 +15,8 @@ public class RevisionListCellRenderer extends JPanel implements ListCellRenderer
         setBackground(UIManager.getColor("List.background"));
         
         matteBorder = new MutableMatteBorder(0, 0, 1, 0, Color.RED);
-        Border margin = new EmptyBorder(2, 2, 4, 8);
-        setBorder(new CompoundBorder(matteBorder, margin));
+        Border margin = BorderFactory.createEmptyBorder(2, 2, 4, 8);
+        setBorder(BorderFactory.createCompoundBorder(matteBorder, margin));
         
         setOpaque(true);
         add(topLabel, BorderLayout.NORTH);

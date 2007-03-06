@@ -12,6 +12,7 @@ public class RevisionWindow extends JFrame {
         this.backEnd = RevisionControlSystem.forPath(filename);
         setTitle(FileUtilities.getUserFriendlyName(filename));
         RevisionView revisionView = new RevisionView(filename, initialLineNumber);
+        revisionView.setBorder(ScmUtilities.getFrameBorder());
         setContentPane(revisionView);
         pack();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

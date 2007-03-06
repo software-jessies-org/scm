@@ -7,7 +7,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.event.*;
 
 public class ScmUtilities {
@@ -40,8 +39,8 @@ public class ScmUtilities {
         return new JScrollPane(c, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     }
     
-    public static Border getFrameBorder() {
-        return new EmptyBorder(10, 10, 10, 10);
+    public static javax.swing.border.Border getFrameBorder() {
+        return BorderFactory.createEmptyBorder(10, 10, 10, 10);
     }
     
     public static void showToolError(JList list, ArrayList<String> lines) {
