@@ -83,7 +83,7 @@ public class BitKeeper extends RevisionControlSystem {
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (String line : lines) {
-            if (line.indexOf("lc") == 0 || line.indexOf("slc") == 0) {
+            if (line.startsWith("lc") || line.startsWith("slc")) {
                 return true;
             }
         }
