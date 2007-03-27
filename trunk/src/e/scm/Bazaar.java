@@ -38,7 +38,7 @@ public class Bazaar extends RevisionControlSystem {
         return new String[] { "bzr", "log", filename };
     }
     
-    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s+(\\d+)\\s+(?:\\S+) \\| (.*)$");
+    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+)\\s+(?:\\S+) \\| (.*)$");
     
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
         return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2);
