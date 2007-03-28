@@ -10,6 +10,7 @@ public class Bazaar extends RevisionControlSystem {
         command.add("bzr");
         command.add("annotate");
         command.add("--all");
+        command.add("--long");
         if (revision != Revision.LOCAL_REVISION) {
             command.add("-r");
             command.add(revision.number);
@@ -38,7 +39,8 @@ public class Bazaar extends RevisionControlSystem {
         return new String[] { "bzr", "log", filename };
     }
     
-    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+)\\s+(?:\\S+) \\| (.*)$");
+    //   10 enh@jessies.org 20060429 | monkeys!
+    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+)\\s+(?:\\S+) (?:\\d{8}) \\| (.*)$");
     
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
         return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2);
