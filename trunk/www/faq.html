@@ -1,0 +1,22 @@
+<!--#set var="PAGE_TITLE" value="SCM FAQ" -->
+<!--#include virtual="/salma-hayek/header.html" -->
+
+<h1>SCM FAQ</h1>
+
+<!-- ---------------------------------------------------- -->
+
+<h2>I've installed SCM. Now what?</h2>
+
+<p>If you use <a href="/evergreen/">Evergreen</a>, SCM is automatically integrated into the SCM menu.
+
+<p>Cygwin users should already have "checkintool" and "revisiontool" on their path, because our installer modifies their path.
+
+<p>Linux users should already have "checkintool" and "revisiontool" on their path, because we install links in /usr/bin.
+
+<p>Mac OS users will need to ensure that the Contents/Resources/scm/bin/ directory in SCM.app is on their path. You can use salma-hayek's "LSFindApplicationForInfo org.jessies.scm" to find the application at run time, but we have yet to write a relocatable script/binary to do this for you.
+
+<p>Solaris users should already have "checkintool" and "revisiontool" on their path, because we install links in /usr/bin.
+
+<!-- ---------------------------------------------------- -->
+
+<!--#include virtual="/salma-hayek/footer.html" -->
