@@ -36,8 +36,9 @@ public class Subversion extends RevisionControlSystem {
     public String[] getLogCommand(String filename) {
         return new String[] { "svn", "log", filename };
     }
-
-    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s+(\\d+)\\s+(?:\\S+) (.*)$");
+    
+    // There's no whitespace at the start of the line if the revision number is larger than 99999, according to Scott "muppet" Arrington.
+    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+)\\s+(?:\\S+) (.*)$");
 
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
         return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2);
