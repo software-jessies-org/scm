@@ -263,7 +263,7 @@ public class RevisionView extends JComponent {
             }
             
             public void findText(String searchTerm) {
-                Pattern pattern = Pattern.compile(searchTerm);
+                Pattern pattern = PatternUtilities.smartCaseCompile(searchTerm);
                 int currentIndex = annotationView.getSelectedIndex();
                 ListModel model = annotationView.getModel();
                 for (int i = currentIndex + 1; i < model.getSize(); ++i) {
