@@ -12,7 +12,7 @@ import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 
-public class CheckInWindow extends JFrame {
+public class CheckInWindow extends MainFrame {
     private RevisionControlSystem backEnd;
     
     private JTable statusesTable;
@@ -25,7 +25,6 @@ public class CheckInWindow extends JFrame {
     public CheckInWindow(final RevisionControlSystem backEnd) {
         this.backEnd = backEnd;
         setTitle(FileUtilities.getUserFriendlyName(backEnd.getRoot().toString()));
-        JFrameUtilities.setFrameIcon(this);
         makeUserInterface();
         updateFileStatuses();
         initQuitMonitoring();
@@ -123,13 +122,9 @@ public class CheckInWindow extends JFrame {
         pack();
         ScmUtilities.sanitizeSplitPaneDivider(ui);
         ScmUtilities.sanitizeSplitPaneDivider(topUi);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
-        JFrameUtilities.constrainToScreen(this);
         setVisible(true);
-        GuiUtilities.finishGnomeStartup();
     }
-
+    
     private void initStatusesList() {
         statusesTable = new ETable();
         statusesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

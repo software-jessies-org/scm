@@ -12,7 +12,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import org.jdesktop.swingworker.SwingWorker;
 
-public class ChangeSetWindow extends JFrame {
+public class ChangeSetWindow extends MainFrame {
     private RevisionControlSystem backEnd;
     private StatusReporter statusReporter;
     private Map<String, RevisionListModel> filePathToRevisionsMap;
@@ -51,11 +51,6 @@ public class ChangeSetWindow extends JFrame {
         contentPane.add(splitPane, BorderLayout.CENTER);
         setContentPane(contentPane);
         pack();
-        
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
-        JFrameUtilities.setFrameIcon(this);
-        JFrameUtilities.constrainToScreen(this);
         
         setVisible(true);
         splitPane.setDividerLocation(fileList.getPreferredScrollableViewportSize().height);
