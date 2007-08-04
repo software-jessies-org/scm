@@ -159,7 +159,7 @@ public abstract class RevisionControlSystem {
      * used by CheckInTool to ask for the differences between a locally-modified
      * file and the repository.
      */
-    public abstract String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename);
+    public abstract String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename, boolean ignoreWhiteSpace);
 
     /** Returns a command that gets the revision log for the given file. */
     public abstract String[] getLogCommand(String filename);

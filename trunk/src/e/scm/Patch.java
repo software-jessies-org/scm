@@ -93,12 +93,12 @@ public class Patch {
         }
     }
 
-    public Patch(RevisionControlSystem backEnd, String filePath, Revision fromRevision, Revision toRevision) {
+    public Patch(RevisionControlSystem backEnd, String filePath, Revision fromRevision, Revision toRevision, boolean ignoreWhiteSpace) {
         File directory = backEnd.getRoot();
         // Elliott reckons that the back-end insists on the arguments being olderRevision, newerRevision.
         // At the moment, we know that we're always called with fromRevision newer than toRevision.
         boolean isPatchReversed = true;
-        String[] command = backEnd.getDifferencesCommand(toRevision, fromRevision, filePath);
+        String[] command = backEnd.getDifferencesCommand(toRevision, fromRevision, filePath, ignoreWhiteSpace);
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(directory, command, lines, errors);

@@ -12,6 +12,13 @@ import e.util.*;
 
 public class PatchView extends JList {
     private ListCellRenderer defaultCellRenderer;
+    private boolean ignoreWhiteSpace;
+    
+    private RevisionControlSystem backEnd;
+    private Revision olderRevision;
+    private Revision newerRevision;
+    private String filename;
+    private StatusReporter statusReporter;
     
     public PatchView() {
         // JList calculates its preferred size based on the first row of its model, so provide a fake model so that our initial preferred size is 80 columns.
@@ -36,11 +43,40 @@ public class PatchView extends JList {
         JListCopyAction.fixCopyFor(this);
         
         setVisibleRowCount(34);
+        
+        EPopupMenu menu = new EPopupMenu(this);
+        menu.addMenuItemProvider(new MenuItemProvider() {
+            public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+                actions.add(new IgnoreWhiteSpaceAction());
+            }
+        });
+        
+        ignoreWhiteSpace = false;
+    }
+    
+    private class IgnoreWhiteSpaceAction extends AbstractAction {
+        IgnoreWhiteSpaceAction() {
+            super(ignoreWhiteSpace ? "Stop Ignoring White Space" : "Ignore White Space");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            ignoreWhiteSpace = !ignoreWhiteSpace;
+            updatePatch();
+        }
+    }
+    
+    private void updatePatch() {
+        ArrayList<String> lines = getPatchLines(backEnd, olderRevision, newerRevision, filename, statusReporter);
+        showPatch(lines);
     }
     
     public void showPatch(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename, StatusReporter statusReporter) {
-        ArrayList<String> lines = getPatchLines(backEnd, olderRevision, newerRevision, filename, statusReporter);
-        showPatch(lines);
+        this.backEnd = backEnd;
+        this.olderRevision = olderRevision;
+        this.newerRevision = newerRevision;
+        this.filename = filename;
+        this.statusReporter = statusReporter;
+        updatePatch();
     }
     
     public ArrayList<String> getPatchLines(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename, StatusReporter statusReporter) {
@@ -50,7 +86,7 @@ public class PatchView extends JList {
         WaitCursor waitCursor = new WaitCursor(this, "Getting patch...", statusReporter);
         try {
             waitCursor.start();
-            String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename);
+            String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename, ignoreWhiteSpace);
             status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
         } finally {
             waitCursor.stop();
@@ -65,7 +101,7 @@ public class PatchView extends JList {
         return lines;
     }
     
-    public void showPatch(ArrayList<String> lines) {
+    private void showPatch(ArrayList<String> lines) {
         DefaultListModel differences = new DefaultListModel();
         for (String line : lines) {
             differences.addElement(line);

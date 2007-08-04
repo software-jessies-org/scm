@@ -18,11 +18,14 @@ public class Cvs extends RevisionControlSystem {
         return command.toArray(new String[command.size()]);
     }
 
-    public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename) {
+    public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename, boolean ignoreWhiteSpace) {
         ArrayList<String> result = new ArrayList<String>();
         result.add("cvs");
         result.add("diff");
         result.add("-u");
+        if (ignoreWhiteSpace) {
+            result.add("-w");
+        }
         result.add("-kk");
         if (olderRevision != null) {
             result.add("-r");

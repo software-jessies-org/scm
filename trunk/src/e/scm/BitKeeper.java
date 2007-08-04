@@ -17,11 +17,14 @@ public class BitKeeper extends RevisionControlSystem {
         return command.toArray(new String[command.size()]);
     }
 
-    public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename) {
+    public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename, boolean ignoreWhiteSpace) {
         ArrayList<String> result = new ArrayList<String>();
         result.add("bk");
         result.add("diffs");
         result.add("-u");
+        if (ignoreWhiteSpace) {
+            result.add("-w");
+        }
         if (olderRevision != null) {
             result.add("-r" + olderRevision.number);
             if (newerRevision != Revision.LOCAL_REVISION) {

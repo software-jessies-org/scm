@@ -19,7 +19,7 @@ public class Bazaar extends RevisionControlSystem {
         return command.toArray(new String[command.size()]);
     }
     
-    public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename) {
+    public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename, boolean ignoreWhiteSpace) {
         ArrayList<String> result = new ArrayList<String>();
         result.add("bzr");
         result.add("diff");
@@ -30,6 +30,9 @@ public class Bazaar extends RevisionControlSystem {
                 revisionArgument += ".." + newerRevision.number;
             }
             result.add(revisionArgument);
+        }
+        if (ignoreWhiteSpace) {
+            result.add("--diff-options=-w");
         }
         result.add(filename);
         return result.toArray(new String[result.size()]);

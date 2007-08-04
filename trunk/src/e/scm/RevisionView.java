@@ -41,7 +41,7 @@ public class RevisionView extends JComponent {
     }
             
     private int translateLineNumberInOneStep(Revision fromRevision, Revision toRevision, int fromLineNumber) {
-        Patch patch = new Patch(backEnd, filePath, fromRevision, toRevision);
+        Patch patch = new Patch(backEnd, filePath, fromRevision, toRevision, false);
         int toLineNumber = patch.translateLineNumberInFromRevision(fromLineNumber);
         //Log.warn("translateLineNumberInOneStep: (" + fromRevision + ") => (" + toRevision + ") maps (" + fromLineNumber + " => " + toLineNumber + ")");
         return toLineNumber;
@@ -381,7 +381,7 @@ public class RevisionView extends JComponent {
             WaitCursor waitCursor = new WaitCursor(this, "Getting local modifications...", statusReporter);
             try {
                 waitCursor.start();
-                String[] command = backEnd.getDifferencesCommand(null, Revision.LOCAL_REVISION, filePath);
+                String[] command = backEnd.getDifferencesCommand(null, Revision.LOCAL_REVISION, filePath, false);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, patchLines, errors);
             } finally {
                 waitCursor.stop();
@@ -459,7 +459,7 @@ public class RevisionView extends JComponent {
         final BackEndTask backEndTask = new BackEndTask("Getting differences between revisions " + olderRevision.number + " and " + newerRevision.number + "...", statusReporter);
         new Thread(new BackEndWorker(backEndTask) {
             public void work() {
-                command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath);
+                command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath, false);
                 status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
                 if (wasSuccessful()) {
                     backEndTask.changeTitle("Annotating patch...");

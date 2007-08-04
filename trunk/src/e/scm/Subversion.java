@@ -17,10 +17,14 @@ public class Subversion extends RevisionControlSystem {
         return command.toArray(new String[command.size()]);
     }
 
-    public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename) {
+    public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename, boolean ignoreWhiteSpace) {
         ArrayList<String> result = new ArrayList<String>();
         result.add("svn");
         result.add("diff");
+        if (ignoreWhiteSpace) {
+            result.add("-x");
+            result.add("-w");
+        }
         if (olderRevision != null) {
             result.add("-r");
             String revisionArgument = olderRevision.number;
