@@ -33,6 +33,8 @@ Patch View
 
 * martind points out that we might be better off making our own patches by getting the relevant revisions and working out the differences ourselves. If we call out to GNU Diff, we at least have a standardized tool and standardized options (so we could offer arbitrary amounts of context regardless of back-end, for example), but potentially we could implement our own "diff" that shows differences within lines, which would be quite a leap forward.
 
+* Better patches for HTML or plain text. GNU Diff (and its imitations in those back-ends that reinvent the wheel) is okay for source (though I've often felt that it should pay more attention to indentation and -- for the hugely important C family -- braces), but it's pretty terrible for natural languages. It certainly is possible to do a better job: Aaron Swartz's HTML Diff (http://www.aaronsw.com/2002/diff/) as used by NetNewsWire is pretty good, and another reason why a Java port of Python's difflib would be useful. (Note that switching to PTextArea to gain wrapping and adding the ability to highlight within-line changes might be necessary prerequisites for this.)
+
 Dealing with upstream changes
 -----------------------------
 
