@@ -45,7 +45,7 @@ public class AnnotatedLine {
     }
     
     private void prepareFormattedLine(RevisionListModel revisions) {
-        formattedLine = justify(revision.author, revisions.getMaxAuthorNameLength()) + " " +
+        formattedLine = justify(revision.shortAuthor, revisions.getMaxAuthorNameLength()) + " " +
                         justify(revision.number, revisions.getMaxRevisionNumberLength()) + ":" +
                         expandTabs(source);
     }

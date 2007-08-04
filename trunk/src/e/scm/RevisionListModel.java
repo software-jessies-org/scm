@@ -41,7 +41,7 @@ public class RevisionListModel extends AbstractListModel {
 
     private void updateCaches(Revision revision) {
         numberToRevisionMap.put(revision.number, revision);
-        maxAuthorNameLength = Math.max(maxAuthorNameLength, revision.author.length());
+        maxAuthorNameLength = Math.max(maxAuthorNameLength, revision.shortAuthor.length());
         maxRevisionNumberLength = Math.max(maxRevisionNumberLength, revision.number.length());
     }
 
