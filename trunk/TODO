@@ -33,6 +33,34 @@ Patch View
 
 * martind points out that we might be better off making our own patches by getting the relevant revisions and working out the differences ourselves. If we call out to GNU Diff, we at least have a standardized tool and standardized options (so we could offer arbitrary amounts of context regardless of back-end, for example), but potentially we could implement our own "diff" that shows differences within lines, which would be quite a leap forward.
 
+Dealing with upstream changes
+-----------------------------
+
+* When we "cvs update" to find out what local changes we've got, we should (a) ignore successfully merged remote changes and (b) warn about merge conflicts. Not only conflicts; if you've pulled and are unaware, you probably want to quit and rebuild before committing.
+
+* Should we force an "svn update"? Or does saving/restoring the comment field cover the remote-changes scenario well enough? More generally, should we have an explicit option (or separate tool) for dealing with "update" (and/or "push", "pull", "merge"). There's perhaps not a huge amount of value we can add there, but there are two special cases that are probably relatively common for users of distributed systems. Firstly, there's the case where someone's only really using a distributed system so they can commit while not connected to their server's network (or, in future, maybe even just because it's the best-supported/best-known tool; Git or Mercurial may become as ubiquitous as CVS was). Those people will often not value the distinction between "commit" and "push", and might want us to stop them having to go to the command line for the latter. Secondly, there are users with huge projects who want to push without integrating. Yes, it's "naughty", but if your build takes long enough, it becomes impractical to integrate locally (not least because other people are pushing while you're still testing the last integration). Such people may have a "merge clone" which is never built and is only used to insulate the clone they work in from the main repository. It would be nice if we let these people declare that that's how they work (maybe just by convention; if <root>/../merge-<root> exists, say) and offered them assistance with the tedious process. There's an added complication if you have multiple "main" repositories (one for each public release branch, say) with a relationship between them, so maybe this is too complicated to do anything about. (Especially because the hard case involves some kind of support for merging, which we currently consider Evergreen and the back-end's problem.)
+
+Reverting
+---------
+
+* I'd like to be able to tell CheckInTool to revert a hunk (rather than a whole patch).
+
+Check-in comment editing
+------------------------
+
+* Emulate Mail's "Paste as Quotation" (C-S V). Indent each pasted line two spaces?
+
+File management
+---------------
+
+* We need a way to remove files. ("rm x; cvs rm x".) Ed points out that there's "cvs rm -f x", which doesn't require the file to have been removed from the local file system first. Do we really need anything here? Can we actually provide a better interface than just doing this on the command line? I'm not sure I can think of one.
+
+* Anything useful we can do for renaming?
+
+* When you create a new directory, most revision control systems don't seem to consider the files below that point until you add the directory. I guess we'll have to manually go look inside new directories for potentially interesting files.
+
+* The reason I keep this section, even though I don't have any convincing ideas, is that I definitely find the way each back-end behaves slightly differently when it comes to removing/renaming, and especially when it comes to dealing with directories. I do think there would be great value to smoothing that out, though I wonder if that's possible without making for a very bumpy abstraction that creates more problems than it solves (our current directory handling has gotchas for users of a couple of the back-ends).
+
 Tracing
 -------
 
