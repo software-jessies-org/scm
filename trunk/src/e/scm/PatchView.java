@@ -80,25 +80,14 @@ public class PatchView extends JList {
     }
     
     public ArrayList<String> getPatchLines(RevisionControlSystem backEnd, Revision olderRevision, Revision newerRevision, String filename, StatusReporter statusReporter) {
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
-        int status = 0;
         WaitCursor waitCursor = new WaitCursor(this, "Getting patch...", statusReporter);
+        waitCursor.start();
         try {
-            waitCursor.start();
-            String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filename, ignoreWhiteSpace);
-            status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
+            Patch patch = new Patch(backEnd, filename, olderRevision, newerRevision, false, ignoreWhiteSpace);
+            return annotatePatchUsingTags(backEnd, patch.getPatchLines());
         } finally {
             waitCursor.stop();
         }
-        
-        // CVS returns a non-zero exit status if there were any differences.
-        if (errors.size() > 0) {
-            lines.addAll(errors);
-        }
-        
-        lines = annotatePatchUsingTags(backEnd, lines);
-        return lines;
     }
     
     private void showPatch(ArrayList<String> lines) {

@@ -8,6 +8,8 @@ import java.util.regex.*;
 import e.util.*;
 
 public class Patch {
+    private ArrayList<String> lines;
+    private ArrayList<String> errors;
     private LineMapper lineMapper;
     
     public abstract class PatchLineParser {
@@ -24,7 +26,7 @@ public class Patch {
      */
     public static final Pattern AT_AT_PATTERN = Pattern.compile("^@@ -(\\d+),(\\d+) \\+(\\d+),(\\d+) @@(.*)$");
     
-    private void parsePatch(boolean isPatchReversed, List<String> lines, PatchLineParser patchLineParser) {
+    private void parsePatch(boolean isPatchReversed, PatchLineParser patchLineParser) {
         String fromPrefix = isPatchReversed ? "+" : "-";
         String toPrefix = isPatchReversed ? "-" : "+";
         for (int lineNumberWithinPatch = 0; lineNumberWithinPatch < lines.size(); ++lineNumberWithinPatch) {
@@ -93,23 +95,26 @@ public class Patch {
         }
     }
 
-    public Patch(RevisionControlSystem backEnd, String filePath, Revision fromRevision, Revision toRevision, boolean ignoreWhiteSpace) {
+    public Patch(RevisionControlSystem backEnd, String filePath, Revision olderRevision, Revision newerRevision, boolean isPatchReversed, boolean ignoreWhiteSpace) {
         File directory = backEnd.getRoot();
-        // Elliott reckons that the back-end insists on the arguments being olderRevision, newerRevision.
-        // At the moment, we know that we're always called with fromRevision newer than toRevision.
-        boolean isPatchReversed = true;
-        String[] command = backEnd.getDifferencesCommand(toRevision, fromRevision, filePath, ignoreWhiteSpace);
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(directory, command, lines, errors);
+        String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath, ignoreWhiteSpace);
+        this.lines = new ArrayList<String>();
+        this.errors = new ArrayList<String>();
+        ProcessUtilities.backQuote(directory, command, lines, errors);
         // CVS returns the number of differences as the status or some such idiocy.
         if (errors.size() > 0) {
             lines.addAll(errors);
         }
-        parsePatch(isPatchReversed, lines, new LineCounter());
+        parsePatch(isPatchReversed, new LineCounter());
     }
 
     public int translateLineNumberInFromRevision(int fromLineNumber) {
         return lineMapper.translate(fromLineNumber);
+    }
+    
+    public ArrayList<String> getPatchLines() {
+        ArrayList<String> result = new ArrayList<String>();
+        result.addAll(lines);
+        return result;
     }
 }

@@ -15,8 +15,7 @@ import e.util.*;
 
 public class RevisionView extends JComponent {
     private static final String COMMENT_SEPARATOR = "---------------------------------------------------\n";
-    
-    private final AnnotatedLineRenderer annotatedLineRenderer = new AnnotatedLineRenderer(this);
+    private static final ListModel EMPTY_LIST_MODEL = new DefaultListModel();
     
     public List<Revision> getRevisionRange(Revision fromRevision, Revision toRevision) {
         ArrayList<Revision> range = new ArrayList<Revision>();
@@ -41,7 +40,7 @@ public class RevisionView extends JComponent {
     }
             
     private int translateLineNumberInOneStep(Revision fromRevision, Revision toRevision, int fromLineNumber) {
-        Patch patch = new Patch(backEnd, filePath, fromRevision, toRevision, false);
+        Patch patch = new Patch(backEnd, filePath, fromRevision, toRevision, true, false);
         int toLineNumber = patch.translateLineNumberInFromRevision(fromLineNumber);
         //Log.warn("translateLineNumberInOneStep: (" + fromRevision + ") => (" + toRevision + ") maps (" + fromLineNumber + " => " + toLineNumber + ")");
         return toLineNumber;
@@ -125,15 +124,16 @@ public class RevisionView extends JComponent {
         }
     };
     
-    private final MouseListener differencesDoubleClickListener = new MouseAdapter() {
+    private class DifferencesDoubleClickListener extends MouseAdapter {
+        @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2) {
                 Object[] values = revisionsList.getSelectedValues();
                 Revision newerRevision = (Revision) values[0];
                 Revision olderRevision = (Revision) values[values.length - 1];
                 
-                ListModel model = annotationView.getModel();
-                final int index = annotationView.locationToIndex(e.getPoint());
+                ListModel model = patchView.getModel();
+                final int index = patchView.locationToIndex(e.getPoint());
                 String lineOfInterest = (String) model.getElementAt(index);
                 
                 // Only lines removed or added can be jumped to.
@@ -202,7 +202,9 @@ public class RevisionView extends JComponent {
     private JList revisionsList;
     private PTextArea revisionCommentArea;
     
+    private JTabbedPane mainView;
     private JList annotationView;
+    private PatchView patchView;
     
     private StatusReporter statusReporter;
     private JButton changeSetButton;
@@ -221,12 +223,17 @@ public class RevisionView extends JComponent {
         initRevisionsList();
         initRevisionCommentArea();
         initAnnotationView();
-
+        initPatchView();
+        
+        mainView = new JTabbedPane();
+        mainView.addTab("Annotations", ScmUtilities.makeScrollable(annotationView));
+        mainView.addTab("Differences", ScmUtilities.makeScrollable(patchView));
+        
         revisionsUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ScmUtilities.makeScrollable(revisionsList), ScmUtilities.makeScrollable(revisionCommentArea));
         revisionsUi.setBorder(null);
         ScmUtilities.sanitizeSplitPaneDivider(revisionsUi);
         
-        JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT, revisionsUi, ScmUtilities.makeScrollable(annotationView));
+        JSplitPane ui = new JSplitPane(JSplitPane.VERTICAL_SPLIT, revisionsUi, mainView);
         ui.setBorder(null);
         ScmUtilities.sanitizeSplitPaneDivider(ui);
 
@@ -304,10 +311,16 @@ public class RevisionView extends JComponent {
 
     private void initAnnotationView() {
         annotationView = ScmUtilities.makeList();
+        annotationView.setCellRenderer(new AnnotatedLineRenderer(this));
         annotationView.setModel(new AnnotationModel());
         annotationView.setVisibleRowCount(34);
     }
-
+    
+    private void initPatchView() {
+        patchView = new PatchView();
+        patchView.addMouseListener(new DifferencesDoubleClickListener());
+    }
+    
     private void initRevisionCommentArea() {
         revisionCommentArea = ScmUtilities.makeTextArea(8);
         revisionCommentArea.setEditable(false);
@@ -370,32 +383,15 @@ public class RevisionView extends JComponent {
     private void updateAnnotationModel(Revision revision, List<String> lines) {
         annotationModel = parseAnnotations(lines);
         if (revision == Revision.LOCAL_REVISION) {
-            // The annotations are wrong. They're actually for the head
-            // revision, not the locally modified file. So we have to fake
-            // it by getting a patch and 'applying' it to the annotations.
-            
-            ArrayList<String> patchLines = new ArrayList<String>();
-            ArrayList<String> errors = new ArrayList<String>();
-            int status = 0;
-            /* FIXME: do this in separate thread. */
-            WaitCursor waitCursor = new WaitCursor(this, "Getting local modifications...", statusReporter);
-            try {
-                waitCursor.start();
-                String[] command = backEnd.getDifferencesCommand(null, Revision.LOCAL_REVISION, filePath, false);
-                status = ProcessUtilities.backQuote(backEnd.getRoot(), command, patchLines, errors);
-            } finally {
-                waitCursor.stop();
-            }
-            
-            // CVS returns a non-zero exit status if there were any differences.
-            if (errors.size() > 0) {
-                ScmUtilities.showToolError(revisionsList, errors);
-                return;
-            }
-            
-            annotationModel.applyPatch(patchLines, revisions);
+            // The annotations are wrong.
+            // They're actually for the head revision, not the locally modified file.
+            // We have to fake it by getting a patch and 'applying' it to the annotations.
+            Patch patch = new Patch(backEnd, filePath, null, Revision.LOCAL_REVISION, false, false);
+            annotationModel.applyPatch(patch.getPatchLines(), revisions);
         }
-        switchAnnotationView(annotationModel, annotatedLineRenderer, annotationsDoubleClickListener);
+        annotationView.setModel(annotationModel);
+        annotationView.addMouseListener(annotationsDoubleClickListener);
+        mainView.setSelectedIndex(0);
     }
     
     public AnnotationModel parseAnnotations(List<String> lines) {
@@ -436,59 +432,9 @@ public class RevisionView extends JComponent {
         });
     }
 
-    private static final ListModel EMPTY_LIST_MODEL = new DefaultListModel();
-
-    /**
-     * Switches the annotation view's list model and cell renderer. This
-     * is slightly more involved than it first seems, because the renderer
-     * may make assumptions about its associated list model. So we put in
-     * an empty list model, switch to a renderer suitable for the incoming
-     * list model, and only then set the new model.
-     */
-    private void switchAnnotationView(ListModel listModel, ListCellRenderer renderer, MouseListener doubleClickListener) {
-        annotationView.setModel(EMPTY_LIST_MODEL);
-        annotationView.setCellRenderer(renderer);
-        annotationView.setModel(listModel);
-        //FIXME: maybe we should have two JLists on a CardLayout?
-        annotationView.removeMouseListener(annotationsDoubleClickListener);
-        annotationView.removeMouseListener(differencesDoubleClickListener);
-        annotationView.addMouseListener(doubleClickListener);
-    }
-
     private void showDifferencesBetweenRevisions(final Revision olderRevision, final Revision newerRevision) {
-        final BackEndTask backEndTask = new BackEndTask("Getting differences between revisions " + olderRevision.number + " and " + newerRevision.number + "...", statusReporter);
-        new Thread(new BackEndWorker(backEndTask) {
-            public void work() {
-                command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath, false);
-                status = ProcessUtilities.backQuote(backEnd.getRoot(), command, lines, errors);
-                if (wasSuccessful()) {
-                    backEndTask.changeTitle("Annotating patch...");
-                    lines = PatchView.annotatePatchUsingTags(backEnd, lines);
-                }
-            }
-            
-            private boolean wasSuccessful() {
-                // CVS returns a non-zero exit status if there were any differences, so we can't trust 'status'.
-                return (errors.size() == 0);
-            }
-            
-            public void finish() {
-                if (wasSuccessful() == false) {
-                    ScmUtilities.showToolError(revisionsList, errors);
-                    return;
-                }
-                
-                DefaultListModel differences = new DefaultListModel();
-                for (String line : lines) {
-                    differences.addElement(line);
-                }
-                switchAnnotationView(differences, PatchListCellRenderer.INSTANCE, differencesDoubleClickListener);
-                
-                // We can't easily retain the context when switching to differences.
-                // As an extension, though, we could do this.
-                annotationView.ensureIndexIsVisible(0);
-            }
-        }).start();
+        patchView.showPatch(backEnd, olderRevision, newerRevision, filePath, statusReporter);
+        mainView.setSelectedIndex(1);
     }
 
     private String summaryOfAllRevisions() {
@@ -500,7 +446,7 @@ public class RevisionView extends JComponent {
         }
         return summary.toString();
     }
-
+    
     private void showSummaryOfAllRevisions() {
         showComment(summaryOfAllRevisions());
         annotationView.setModel(EMPTY_LIST_MODEL);
