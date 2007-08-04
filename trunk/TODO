@@ -1,51 +1,47 @@
-* BitKeeper and CVS both support arbitrary amounts of context with their "diff"
-  commands. Subversion doesn't, but we could use:
+Centralized systems
+-------------------
+
+* Implement some kind of cache of annotated revisions, so we don't have to keep going back to the server for them. Similarly diffs.
+
+Distributed systems
+-------------------
+
+* Sort the revisions properly (cvs lists revisions with lots of dots in them out of order).
+
+* When displaying all the check-in comments between two selected revisions, we shouldn't display comments which aren't on the same branch. How do we decide whether they are or not?
+
+Annotated View
+--------------
+
+* The annotated view might be clearer if we didn't repeat duplicate authors and revision numbers. It also might not.
+
+* Some way to move to the previous/next line in the selected revision (i.e. the blue lines).
+
+Patch View
+----------
+
+* How about showing "+x -y" in the status line when showing a diff? I quite like that as an overview of the patch. Maybe the revision numbers involved too, because they're not necessarily visible elsewhere. (If we're going to waste screen space on a status line, we may as well try to use it.)
+
+* Ability to export either a whole patch or just selected hunks to a valid patch file; possibly also with the ability to apply the patch.
+
+* BitKeeper and CVS both support arbitrary amounts of context with their "diff" commands. Subversion doesn't, but we could use:
 
     svn diff --diff-cmd "/usr/bin/diff" -x "-U12"
 
-* Some way of asking for the patch containing the most recent change to
-  the current line. And a catchy enough name that we can put it on a
-  sensibly-sized menu item or button!
-
-* Tracing the history of a line: how much quicker would this be if we
-  could see an annotated clickable list of all the versions of the line?
-  (But how do we get that list?)
-
-* Ability to export either a whole patch or just selected hunks to
-  a valid patch file; possibly also with the ability to apply the patch.
-
-* The annotated view might be clearer if we didn't repeat duplicate
-  authors and revision numbers. It also might not.
-
-* Some way to move to the previous/next line in the selected
-  revision (i.e. the blue lines).
-
-* How about showing "+x -y" in the status line when showing a diff? I
-  quite like that as an overview of the patch. Maybe the revision numbers
-  involved too, because they're not necessarily visible elsewhere. (If
-  we're going to waste screen space on a status line, we may as well try
-  to use it.)
-
-* martind: I'm wanting to see the change that this line was part of. When
-  I've been looking at a diff and I go back to looking at the latest
-  version, it would be much more useful to show me the part of the
-  latest version that the diff referred to.
-
-* Implement some kind of cache of annotated revisions, so we don't have to
-  keep going back to the server for them. Similarly diffs.
-
-* Sort the revisions properly (cvs lists revisions with lots of dots in them
-  out of order).
-
-* When displaying all the checkin comments between two selected revisions,
-  we shouldn't display comments which aren't on the same branch. How do
-  we decide whether they are or not?
-
 * Use PTextArea to show patches. Then we can trivially add the usual search functionality.
+  The hard part is "what do we do about the current double-click functionality?".
+
+* martind points out that we might be better off making our own patches by getting the relevant revisions and working out the differences ourselves. If we call out to GNU Diff, we at least have a standardized tool and standardized options (so we could offer arbitrary amounts of context regardless of back-end, for example), but potentially we could implement our own "diff" that shows differences within lines, which would be quite a leap forward.
+
+Tracing
+-------
 
 * Make RevisionTool's "go to line" functionality more obvious. Probably by adding it to a menu, when we have one.
 
-* For a given line, make it possible (and easy) to find out automatically
-  when that line was removed. Search forward through revisions until we
-  can't find the line. Relatedly: for a given line, make it easy to find
-  out automatically when that line was introduced.
+* Some way of asking for the patch containing the most recent change to the current line. And a catchy enough name that we can put it on a sensibly-sized menu item or button!
+
+* For a given line, make it possible (and easy) to find out automatically when that line was removed. Search forward through revisions until we can't find the line. Relatedly: for a given line, make it easy to find out automatically when that line was introduced.
+
+* Tracing the history of a line: how much quicker would this be if we could see an annotated clickable list of all the versions of the line? (But how do we get that list?)
+
+* martind: I'm wanting to see the change that this line was part of. When I've been looking at a diff and I go back to looking at the latest version, it would be much more useful to show me the part of the latest version that the diff referred to.
