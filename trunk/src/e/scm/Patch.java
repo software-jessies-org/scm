@@ -13,10 +13,10 @@ public class Patch {
     private LineMapper lineMapper;
     
     public abstract class PatchLineParser {
-        public abstract void parseHunkHeader(int fromBegin, int fromEnd, int toBegin, int toEnd);
+        public abstract void parseHunkHeader(int fromBegin, int toBegin);
         public abstract void parseFromLine(String sourceLine);
         public abstract void parseToLine(String sourceLine);
-        public abstract void parseContextLine(String sourceLine);        
+        public abstract void parseContextLine(String sourceLine);
     }
     
     public static final class HunkRange {
@@ -66,16 +66,8 @@ public class Patch {
             return fromBegin;
         }
         
-        public int fromEnd() {
-            return fromEnd;
-        }
-        
         public int toBegin() {
             return toBegin;
-        }
-        
-        public int toEnd() {
-            return toEnd;
         }
     }
     
@@ -87,9 +79,9 @@ public class Patch {
             if (patchLine.startsWith("@@")) {
                 HunkRange hunkRange = new HunkRange(patchLine);
                 if (isPatchReversed) {
-                    patchLineParser.parseHunkHeader(hunkRange.toBegin(), hunkRange.toEnd(), hunkRange.fromBegin(), hunkRange.fromEnd());
+                    patchLineParser.parseHunkHeader(hunkRange.toBegin(), hunkRange.fromBegin());
                 } else {
-                    patchLineParser.parseHunkHeader(hunkRange.fromBegin(), hunkRange.fromEnd(), hunkRange.toBegin(), hunkRange.toEnd());
+                    patchLineParser.parseHunkHeader(hunkRange.fromBegin(), hunkRange.toBegin());
                 }
             } else {
                 String sourceLine = patchLine.substring(1);
@@ -116,34 +108,7 @@ public class Patch {
             }
         }
     }
-        
-    public class LineCounter extends PatchLineParser {
-        private int fromLine = 0;
-        private int toLine = 0;
-        
-        public LineCounter() {
-            lineMapper = new LineMapper();
-        }
-        
-        public void parseHunkHeader(int fromBegin, int fromEnd, int toBegin, int toEnd) {
-            fromLine = fromBegin;
-            toLine = toBegin;
-        }
-        
-        public void parseFromLine(String sourceLine) {
-            ++fromLine;
-        }
-        public void parseToLine(String sourceLine) {
-            ++toLine;
-        }
-        public void parseContextLine(String sourceLine) {
-            lineMapper.addMapping(fromLine, toLine);
-            // Context lines count for both revisions.
-            ++fromLine;
-            ++toLine;
-        }
-    }
-
+    
     public Patch(RevisionControlSystem backEnd, String filePath, Revision olderRevision, Revision newerRevision, boolean isPatchReversed, boolean ignoreWhiteSpace) {
         File directory = backEnd.getRoot();
         String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath, ignoreWhiteSpace);
@@ -154,9 +119,37 @@ public class Patch {
         if (errors.size() > 0) {
             lines.addAll(errors);
         }
-        parsePatch(isPatchReversed, new LineCounter());
+        initLineMapper(isPatchReversed);
     }
-
+    
+    private void initLineMapper(boolean isPatchReversed) {
+        lineMapper = new LineMapper();
+        parsePatch(isPatchReversed, new PatchLineParser() {
+            private int fromLine = 0;
+            private int toLine = 0;
+            
+            public void parseHunkHeader(int fromBegin, int toBegin) {
+                fromLine = fromBegin;
+                toLine = toBegin;
+            }
+            
+            public void parseFromLine(String sourceLine) {
+                ++fromLine;
+            }
+            
+            public void parseToLine(String sourceLine) {
+                ++toLine;
+            }
+            
+            public void parseContextLine(String sourceLine) {
+                lineMapper.addMapping(fromLine, toLine);
+                // Context lines count for both revisions.
+                ++fromLine;
+                ++toLine;
+            }
+        });
+    }
+    
     public int translateLineNumberInFromRevision(int fromLineNumber) {
         return lineMapper.translate(fromLineNumber);
     }
