@@ -154,10 +154,10 @@ public class RevisionView extends JComponent {
                 int linesIntoHunk = 0;
                 for (int i = index; i >= 0; --i) {
                     String line = (String) model.getElementAt(i);
-                    Matcher matcher = Patch.AT_AT_PATTERN.matcher(line);
-                    if (matcher.matches()) {
-                        olderStartLine = Integer.parseInt(matcher.group(1));
-                        newerStartLine = Integer.parseInt(matcher.group(3));
+                    Patch.HunkRange hunkRange = new Patch.HunkRange(line);
+                    if (hunkRange.matches()) {
+                        olderStartLine = hunkRange.fromBegin();
+                        newerStartLine = hunkRange.toBegin();
                         break;
                     } else if (line.startsWith("+")) {
                         if (desiredRevision == newerRevision) {

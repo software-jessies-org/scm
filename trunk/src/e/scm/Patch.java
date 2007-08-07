@@ -18,29 +18,78 @@ public class Patch {
         public abstract void parseToLine(String sourceLine);
         public abstract void parseContextLine(String sourceLine);        
     }
-
-    /**
-     * Matches the "@@ -111,41 +113,41 @@" lines at the start of a hunk.
-     * We allow anything after the trailing "@@" because that gap is used
-     * for annotations, both by our annotate-patch.rb script and by "diff -p".
-     */
-    public static final Pattern AT_AT_PATTERN = Pattern.compile("^@@ -(\\d+),(\\d+) \\+(\\d+),(\\d+) @@(.*)$");
+    
+    public static final class HunkRange {
+        /**
+         * Matches the "@@ -111,41 +113,41 @@" lines at the start of a hunk.
+         * We allow anything after the trailing "@@" because that gap is used for annotations, both by our annotate-patch.rb script and by "diff -p".
+         * GNU Diff's "print_unidiff_number_range" has a special case when outputting a,b where if a and b are equal, only a is output.
+         */
+        private static final Pattern AT_AT_PATTERN = Pattern.compile("^@@ -(\\d+)(,\\d+)? \\+(\\d+)(,\\d+)? @@(.*)$");
+        
+        private boolean matches;
+        
+        // "from" is the first comma-separated pair. "to" is the second comma-separated pair.
+        // "begin" is the first number in each pair. "end" is the second number in each pair.
+        private int fromBegin;
+        private int fromEnd;
+        private int toBegin;
+        private int toEnd;
+        
+        public HunkRange(String atAtLine) {
+            Matcher matcher = AT_AT_PATTERN.matcher(atAtLine);
+            matches = matcher.matches();
+            if (matches) {
+                fromBegin = parseInt(matcher.group(1), 0);
+                fromEnd = parseInt(matcher.group(2), fromBegin);
+                toBegin = parseInt(matcher.group(3), 0);
+                toEnd = parseInt(matcher.group(4), toBegin);
+            }
+        }
+        
+        private int parseInt(String value, int fallback) {
+            if (value == null) {
+                return fallback;
+            }
+            if (value.startsWith(",")) {
+                value = value.substring(1);
+            }
+            int result = Integer.parseInt(value);
+            return result;
+        }
+        
+        public boolean matches() {
+            return matches;
+        }
+        
+        public int fromBegin() {
+            return fromBegin;
+        }
+        
+        public int fromEnd() {
+            return fromEnd;
+        }
+        
+        public int toBegin() {
+            return toBegin;
+        }
+        
+        public int toEnd() {
+            return toEnd;
+        }
+    }
     
     private void parsePatch(boolean isPatchReversed, PatchLineParser patchLineParser) {
         String fromPrefix = isPatchReversed ? "+" : "-";
         String toPrefix = isPatchReversed ? "-" : "+";
         for (int lineNumberWithinPatch = 0; lineNumberWithinPatch < lines.size(); ++lineNumberWithinPatch) {
             String patchLine = lines.get(lineNumberWithinPatch);
-            Matcher matcher = AT_AT_PATTERN.matcher(patchLine);
-            if (matcher.matches()) {
-                int fromBegin = Integer.parseInt(matcher.group(1));
-                int fromEnd = Integer.parseInt(matcher.group(2));
-                int toBegin = Integer.parseInt(matcher.group(3));
-                int toEnd = Integer.parseInt(matcher.group(3));
+            if (patchLine.startsWith("@@")) {
+                HunkRange hunkRange = new HunkRange(patchLine);
                 if (isPatchReversed) {
-                    patchLineParser.parseHunkHeader(toBegin, toEnd, fromBegin, fromEnd);
+                    patchLineParser.parseHunkHeader(hunkRange.toBegin(), hunkRange.toEnd(), hunkRange.fromBegin(), hunkRange.fromEnd());
                 } else {
-                    patchLineParser.parseHunkHeader(fromBegin, fromEnd, toBegin, toEnd);
+                    patchLineParser.parseHunkHeader(hunkRange.fromBegin(), hunkRange.fromEnd(), hunkRange.toBegin(), hunkRange.toEnd());
                 }
             } else {
                 String sourceLine = patchLine.substring(1);

@@ -33,10 +33,9 @@ public class AnnotationModel extends AbstractListModel {
     public void applyPatch(List<String> patchLines, RevisionListModel revisions) {
         int lineNumber = -1;
         for (String line : patchLines) {
-            Matcher matcher = Patch.AT_AT_PATTERN.matcher(line);
-            if (matcher.find()) {
-                String location = matcher.group(3);
-                lineNumber = Integer.parseInt(location);
+            Patch.HunkRange hunkRange = new Patch.HunkRange(line);
+            if (hunkRange.matches()) {
+                lineNumber = hunkRange.toBegin();
             } else if (lineNumber > 0) {
                 if (line.startsWith("-")) {
                     removeLine(lineNumber);

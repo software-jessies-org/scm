@@ -159,9 +159,9 @@ public class PatchView extends JList {
         int lineNumber = 0;
         for (int i = 0; i <= index; ++i) {
             String line = (String) getModel().getElementAt(i);
-            Matcher matcher = Patch.AT_AT_PATTERN.matcher(line);
-            if (matcher.matches()) {
-                lineNumber = Integer.parseInt(matcher.group(3)) - 1;
+            Patch.HunkRange hunkRange = new Patch.HunkRange(line);
+            if (hunkRange.matches()) {
+                lineNumber = hunkRange.toBegin() - 1;
             } else if (line.startsWith("-") == false) {
                 ++lineNumber;
             }
