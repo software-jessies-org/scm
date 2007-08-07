@@ -107,7 +107,7 @@ public class ChangeSetWindow extends MainFrame {
             
             RevisionListModel revisions = filePathToRevisionsMap.get(changeSetItem.filename);
             // The Subversion back-end gives us old revision numbers which aren't necessarily in the file's history.
-            Revision oldRevision = new Revision(changeSetItem.oldRevision, null, null, null, null);
+            Revision oldRevision = new Revision(changeSetItem.oldRevision, "pseudo revision");
             Revision newRevision = revisions.fromNumber(changeSetItem.newRevision);
             
             // FIXME: we should display the comments for all of the revisions between oldRevision and newRevision.
@@ -174,8 +174,8 @@ public class ChangeSetWindow extends MainFrame {
                 public void valueChanged(ListSelectionEvent e) {
                     ChangeSetItem changeSetItem = (ChangeSetItem) fileList.getSelectedValue();
                     // For systems like BitKeeper, the newRevision of this file isn't necessarily the same as the Revision of the file we're showing the change set for.
-                    Revision oldRevision = new Revision(changeSetItem.oldRevision, null, null, null, null);
-                    Revision newRevision = new Revision(changeSetItem.newRevision, null, null, null, null);
+                    Revision oldRevision = new Revision(changeSetItem.oldRevision, "pseudo revision");
+                    Revision newRevision = new Revision(changeSetItem.newRevision, "pseudo revision");
                     // FIXME: we shouldn't do this on the EDT.
                     patchView.showPatch(backEnd, oldRevision, newRevision, changeSetItem.filename, statusReporter);
                     // FIXME: PatchView.showPatch produces an empty patch for a new file. (And for a deleted file?) If we got more information from the back-end we'd at least know that we were dealing with an 'A' (or 'D') file rather than an 'M' file.

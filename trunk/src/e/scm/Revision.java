@@ -6,7 +6,7 @@ public class Revision {
     private static final Pattern AUTHOR_PATTERN = Pattern.compile(".* <(.+)@.*>$");
     
     /** A revision corresponding to changes not yet committed. */
-    public static final Revision LOCAL_REVISION = new Revision("local", "xxxx-xx-xx", "xx:xx:xx -xxxx", "unknown", "Changes not yet committed.");
+    public static final Revision LOCAL_REVISION = new Revision("local", "Changes not yet committed.");
 
     public String number;
     public String date;
@@ -22,6 +22,10 @@ public class Revision {
         this.author = author;
         this.shortAuthor = makeShortAuthor(author);
         this.comment = comment;
+    }
+    
+    public Revision(String number, String comment) {
+        this(number, "xxxx-xx-xx", "xx:xx:xx -xxxx", "unknown", comment);
     }
     
     private static String makeShortAuthor(String author) {
