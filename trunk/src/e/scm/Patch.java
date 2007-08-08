@@ -12,13 +12,6 @@ public class Patch {
     private ArrayList<String> errors;
     private LineMapper lineMapper;
     
-    public abstract class PatchLineParser {
-        public abstract void parseHunkHeader(int fromBegin, int toBegin);
-        public abstract void parseFromLine(String sourceLine);
-        public abstract void parseToLine(String sourceLine);
-        public abstract void parseContextLine(String sourceLine);
-    }
-    
     public static final class HunkRange {
         /**
          * Matches the "@@ -111,41 +113,41 @@" lines at the start of a hunk.
@@ -69,6 +62,13 @@ public class Patch {
         public int toBegin() {
             return toBegin;
         }
+    }
+    
+    private interface PatchLineParser {
+        public void parseHunkHeader(int fromBegin, int toBegin);
+        public void parseFromLine(String sourceLine);
+        public void parseToLine(String sourceLine);
+        public void parseContextLine(String sourceLine);
     }
     
     private void parsePatch(boolean isPatchReversed, PatchLineParser patchLineParser) {
