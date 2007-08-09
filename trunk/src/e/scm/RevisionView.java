@@ -264,23 +264,28 @@ public class RevisionView extends JComponent {
                 }
             }
             
-            public void goToLine(String number) {
+            private void goToLine(String number) {
                 int lineNumber = Integer.parseInt(number);
-                showSpecificLineInAnnotations(lineNumber);
+                showSpecificLineInList(lineNumber, getVisibleList());
             }
             
-            public void findText(String searchTerm) {
+            private void findText(String searchTerm) {
+                JList list = getVisibleList();
                 Pattern pattern = PatternUtilities.smartCaseCompile(searchTerm);
-                int currentIndex = annotationView.getSelectedIndex();
-                ListModel model = annotationView.getModel();
+                int currentIndex = list.getSelectedIndex();
+                ListModel model = list.getModel();
                 for (int i = currentIndex + 1; i < model.getSize(); ++i) {
                     String line = model.getElementAt(i).toString();
                     if (pattern.matcher(line).find()) {
                         int lineNumber = i + 1; // Indexes are zero-based.
-                        showSpecificLineInAnnotations(lineNumber);
+                        showSpecificLineInList(lineNumber, list);
                         return;
                     }
                 }
+            }
+            
+            private JList getVisibleList() {
+                return (mainView.getSelectedIndex() == 0) ? annotationView : patchView;
             }
         });
         
@@ -358,7 +363,7 @@ public class RevisionView extends JComponent {
                 }
                 
                 updateAnnotationModel(revision, lines);
-                showSpecificLineInAnnotations(lineNumber);
+                showSpecificLineInList(lineNumber, annotationView);
             }
         }).start();
     }
@@ -402,13 +407,13 @@ public class RevisionView extends JComponent {
         return result;
     }
 
-    private void showSpecificLineInAnnotations(int lineNumber) {
+    private void showSpecificLineInList(int lineNumber, final JList list) {
         // FIXME: this only works while the implementation is synchronous.
         final int index = lineNumber - 1;
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 // Select the appropriate index.
-                annotationView.setSelectedIndex(index);
+                list.setSelectedIndex(index);
                 
                 // Center the newly selected item by making an item
                 // near the bottom of the area we want visible and
@@ -417,17 +422,15 @@ public class RevisionView extends JComponent {
                 // move the least distance necessary, and the item will
                 // tend to be at the very top or very bottom of the visible
                 // area, which isn't as useful as being in the middle.
-                int visibleLineCount = annotationView.getLastVisibleIndex() -
-                     annotationView.getFirstVisibleIndex();
+                int visibleLineCount = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
                 
                 int desiredBottomIndex = index + (visibleLineCount / 2);
-                desiredBottomIndex = Math.min(desiredBottomIndex,
-                    annotationView.getModel().getSize() - 1);
-                annotationView.ensureIndexIsVisible(desiredBottomIndex);
+                desiredBottomIndex = Math.min(desiredBottomIndex, list.getModel().getSize() - 1);
+                list.ensureIndexIsVisible(desiredBottomIndex);
                 
                 int desiredTopIndex = index - (visibleLineCount / 2);
                 desiredTopIndex = Math.max(0, desiredTopIndex);
-                annotationView.ensureIndexIsVisible(desiredTopIndex);
+                list.ensureIndexIsVisible(desiredTopIndex);
             }
         });
     }
