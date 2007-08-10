@@ -35,6 +35,8 @@ Patch View
 
 * Better patches for HTML or plain text. GNU Diff (and its imitations in those back-ends that reinvent the wheel) is okay for source (though I've often felt that it should pay more attention to indentation and -- for the hugely important C family -- braces), but it's pretty terrible for natural languages. It certainly is possible to do a better job: Aaron Swartz's HTML Diff (http://www.aaronsw.com/2002/diff/) as used by NetNewsWire is pretty good, and another reason why a Java port of Python's difflib would be useful. (Note that switching to PTextArea to gain wrapping and adding the ability to highlight within-line changes might be necessary prerequisites for this.)
 
+* Should "going-to" line 123 from the search dialog go to line 123 of the patch, or line 123 of the resulting file (or line 123 of the original file)? Currently, we go to the relevant line in the patch. This is arguably wrong, but it's not a big thing, and I don't think there's an obvious right answer.
+
 Dealing with upstream changes
 -----------------------------
 
