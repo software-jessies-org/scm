@@ -292,9 +292,9 @@ public class RevisionView extends JComponent {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
         buttonPanel.add(changeSetButton);
-        buttonPanel.add(Box.createHorizontalStrut(FormDialog.getComponentSpacing()));
+        buttonPanel.add(Box.createHorizontalStrut(GuiUtilities.getComponentSpacing()));
         buttonPanel.add(showLogButton);
-        buttonPanel.add(Box.createHorizontalStrut(FormDialog.getComponentSpacing()));
+        buttonPanel.add(Box.createHorizontalStrut(GuiUtilities.getComponentSpacing()));
         buttonPanel.add(searchField);
         
         JPanel statusPanel = new JPanel(new BorderLayout());
