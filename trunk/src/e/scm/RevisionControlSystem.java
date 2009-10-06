@@ -270,7 +270,7 @@ public abstract class RevisionControlSystem {
     }
     
     protected static String createCommentFile(String comment) {
-        return FileUtilities.createTemporaryFile("e.scm.RevisionControlSystem-comment", "comment file", comment);
+        return FileUtilities.createTemporaryFile("e.scm.RevisionControlSystem-comment", ".txt", "comment file", comment).toString();
     }
     
     protected static String createFileListFile(List<FileStatus> fileStatuses) {
@@ -279,7 +279,7 @@ public abstract class RevisionControlSystem {
             content.append(fileStatuses.get(i).getName());
             content.append("\n");
         }
-        return FileUtilities.createTemporaryFile("e.scm.RevisionControlSystem-file-list", "list of files", content.toString());
+        return FileUtilities.createTemporaryFile("e.scm.RevisionControlSystem-file-list", ".tmp", "list of files", content.toString()).toString();
     }
     
     public static List<FileStatus> justNewFiles(List<FileStatus> fileStatuses) {

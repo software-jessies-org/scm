@@ -112,8 +112,8 @@ public class PatchView extends JList {
             return lines;
         }
         
-        String patchFilename = FileUtilities.createTemporaryFile("e.scm.PatchView-patch", "patch file", patch);
-        String[] command = new String[] { "ruby", patchAnnotationTool.toString(), patchFilename };
+        File patchFile = FileUtilities.createTemporaryFile("e.scm.PatchView-patch", ".tmp", "patch file", patch);
+        String[] command = new String[] { "ruby", patchAnnotationTool.toString(), patchFile.toString() };
         int status = ProcessUtilities.backQuote(backEnd.getRoot(), command, newLines, newErrors);
         if (status != 0) {
             return lines;
@@ -123,7 +123,7 @@ public class PatchView extends JList {
         // they change the selection in the file list. We only remove the
         // file if the script executed successfully; if it didn't, we might
         // want to debug the problem.
-        FileUtilities.fileFromString(patchFilename).delete();
+        patchFile.delete();
         return newLines;
     }
     
