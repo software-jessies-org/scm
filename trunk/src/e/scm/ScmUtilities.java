@@ -14,7 +14,7 @@ public class ScmUtilities {
     
     public static void initAboutBox() {
         AboutBox aboutBox = AboutBox.getSharedInstance();
-        aboutBox.setApplicationName("SCM");
+        Log.setApplicationName("SCM");
         aboutBox.setWebSiteAddress("http://software.jessies.org/scm/");
         aboutBox.addCopyright("Copyright (C) 2003-2007 Free Software Foundation, Inc.");
         aboutBox.addCopyright("All Rights Reserved.");
