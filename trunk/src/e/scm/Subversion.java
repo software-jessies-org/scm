@@ -95,7 +95,7 @@ public class Subversion extends RevisionControlSystem {
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (String line : lines) {
-            if (line.startsWith("M")) {
+            if (line.charAt(0) == 'M' || line.charAt(1) == 'M') {
                 return true;
             }
         }
@@ -163,14 +163,16 @@ public class Subversion extends RevisionControlSystem {
         }
         
         ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
-        Pattern pattern = Pattern.compile("^(.)....\\s+(.+)$");
+        Pattern pattern = Pattern.compile("^(.)(.)...\\s+(.+)$");
         for (String line : lines) {
             Matcher matcher = pattern.matcher(line);
             if (matcher.find()) {
-                char state = matcher.group(1).charAt(0);
-                String name = matcher.group(2);
+                char fileState = matcher.group(1).charAt(0);
+                char propsState = matcher.group(2).charAt(0);
+                String name = matcher.group(3);
                 int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
-                switch (state) {
+                switch (fileState) {
+                    case ' ': canonicalState = FileStatus.CONTENTS_UNCHANGED; break;
                     case 'A': canonicalState = FileStatus.ADDED; break;
                     case 'C': canonicalState = FileStatus.CONTAINS_CONFLICTS; break;
                     case 'D': canonicalState = FileStatus.REMOVED; break;
@@ -179,12 +181,44 @@ public class Subversion extends RevisionControlSystem {
                     case '!': canonicalState = FileStatus.MISSING; break;
                     case '~': canonicalState = FileStatus.WRONG_KIND; break;
                 }
-                statuses.add(new FileStatus(canonicalState, name));
+                int propertiesState = SvnFileStatus.PROPERTIES_UNCHANGED;
+                switch (propsState) {
+                    case 'M': propertiesState = SvnFileStatus.PROPERTIES_MODIFIED; break;
+                    case 'C': propertiesState = SvnFileStatus.PROPERTIES_CONFLICT; break;
+                }
+                statuses.add(new SvnFileStatus(canonicalState, name, propertiesState));
             } else {
                 Log.warn("Subversion back end didn't understand '" + line + "'.");
             }
         }
         return statuses;
+    }
+    
+    /**
+     * Extends FileStatus to also record the state of the file's properties.
+     */
+    private static class SvnFileStatus extends FileStatus {
+        
+        public static final int PROPERTIES_UNCHANGED = 0;
+        public static final int PROPERTIES_MODIFIED = 1;
+        public static final int PROPERTIES_CONFLICT = 2;
+        
+        private int propertiesState;
+        
+        public SvnFileStatus(int fileState, String name, int propertiesState) {
+            super(fileState, name);
+            this.propertiesState = propertiesState;
+        }
+        
+        @Override
+        public String getStateString() {
+            switch (propertiesState) {
+                case PROPERTIES_UNCHANGED: return super.getStateString();
+                case PROPERTIES_MODIFIED: return super.getStateString() + " M";
+                case PROPERTIES_CONFLICT: return super.getStateString() + " C";
+            }
+            return "(invalid Subversion properties state #" + propertiesState + ")";
+        }
     }
     
     public void commit(String comment, List<FileStatus> fileStatuses) {

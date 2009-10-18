@@ -26,6 +26,13 @@ public class FileStatus implements Comparable<FileStatus> {
      */
     public static final int IGNORED = 8;
     
+    /**
+     * Used internally by a back-end that can record file modifications and
+     * file metadata modifications separately, to indicate that the file
+     * contents are unchanged and only the metadata has changed.
+     */
+    public static final int CONTENTS_UNCHANGED = 9;
+    
     private int state;
     private String name;
     
@@ -54,6 +61,7 @@ public class FileStatus implements Comparable<FileStatus> {
             case MISSING: return "(missing)";
             case WRONG_KIND: return "(wrong kind)";
             case NOT_RECOGNIZED_BY_BACK_END: return "(unrecognized)";
+            case CONTENTS_UNCHANGED: return " ";
         }
         return "(invalid state #" + state + ")";
     }

@@ -83,7 +83,7 @@ public class Patch {
                 } else {
                     patchLineParser.parseHunkHeader(hunkRange.fromBegin(), hunkRange.toBegin());
                 }
-            } else {
+            } else if (patchLine.length() > 0) {
                 String sourceLine = patchLine.substring(1);
                 if (patchLine.startsWith(fromPrefix)) {
                     patchLineParser.parseFromLine(sourceLine);
@@ -103,7 +103,7 @@ public class Patch {
                     // retrieving revision 1.7
                     // diff -u -r1.7 -r1.9
                 } else {
-                    throw new RuntimeException("Malformed patch line \"" + patchLine + "\"");
+              //      throw new RuntimeException("Malformed patch line \"" + patchLine + "\"");
                 }
             }
         }
