@@ -340,9 +340,11 @@ public class RevisionView extends JComponent {
      */
     private void setFilename(String filename) {
         try {
-            File file = new File(filename);
+            File file = FileUtilities.fileFromString(filename);
             filename = file.getCanonicalPath();
             this.filePath = filename.substring(backEnd.getRoot().toString().length() + File.separator.length());
+            // Cygwin svn requires Unix slash sex.
+            this.filePath = FileUtilities.translateFilenameForShellUse(this.filePath);
         } catch (IOException ex) {
             Log.warn("Problem working out repository root", ex);
         }

@@ -35,7 +35,7 @@ public abstract class RevisionControlSystem {
     private static File findRepositoryRoot(final String path) {
         String canonicalPath = path;
         try {
-            canonicalPath = new File(path).getCanonicalPath();
+            canonicalPath = FileUtilities.fileFromString(path).getCanonicalPath();
         } catch (IOException ex) {
             Log.warn("Couldn't canonicalize path.", ex);
         }
