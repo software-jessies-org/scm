@@ -48,7 +48,9 @@ public class BitKeeper extends RevisionControlSystem {
     //D 1.2 04/02/15 13:02:22+00:00 elliotth@mercury.local 3 2 4/0/356
     //D 1.144 01/03/28 11:56:53-00:00 hughc 145 144 0/3/3528
     //D 1.1 2002/11/11 11:11:11+11:11 11@eleven.com 1 1 1/1/1
-    private static final Pattern LOG_PATTERN = Pattern.compile("^D ([0-9.]+) (\\d\\d|\\d{4})/(\\d\\d)/(\\d\\d) (\\d{2}:\\d{2}:\\d{2}[-+]\\d{2}:\\d{2}) ([^@ ]+).*");
+    // From backport-new-file.rb:
+    //D 1.1 2007/07/09 12:36:34 martind@duezer.us.dev.bluearc.com 2 1 9/0/0
+    private static final Pattern LOG_PATTERN = Pattern.compile("^D ([0-9.]+) (\\d\\d|\\d{4})/(\\d\\d)/(\\d\\d) (\\d{2}:\\d{2}:\\d{2}(?:[-+]\\d{2}:\\d{2})?) ([^@ ]+).*");
     private static final String LOG_SEPARATOR = "------------------------------------------------";
     
     public RevisionListModel parseLog(List<String> linesList) {
