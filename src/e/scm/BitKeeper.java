@@ -175,7 +175,7 @@ public class BitKeeper extends RevisionControlSystem {
      * Returns the number of files in the repository, so we can give determinate progress.
      */
     private int getRepositoryFileCount() {
-        String[] command = new String[] { "bk", "prs", "-hr+", "-d:HASHCOUNT:" };
+        String[] command = new String[] { "bk", "log", "-hr+", "-d:HASHCOUNT:" };
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
