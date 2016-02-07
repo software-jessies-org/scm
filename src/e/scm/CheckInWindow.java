@@ -360,8 +360,7 @@ public class CheckInWindow extends MainFrame {
         }
         
         FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
-        String command = editor + " +" + lineNumber + " " + fileStatus.getName();
-        ProcessUtilities.spawn(backEnd.getRoot(), new String[] { "bash", "-c", command });
+        ProcessUtilities.spawn(backEnd.getRoot(), new String[] { editor, "+" + lineNumber, fileStatus.getName() });
     }
     
     private void initCheckInCommentArea() {
