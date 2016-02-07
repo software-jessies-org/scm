@@ -91,7 +91,7 @@ public class Patch {
                     patchLineParser.parseToLine(sourceLine);
                 } else if (patchLine.startsWith(" ")) {
                     patchLineParser.parseContextLine(sourceLine);
-                } else if (patchLine.startsWith("=====") || patchLine.startsWith("Index: ") || patchLine.startsWith("RCS file: ") || patchLine.startsWith("retrieving revision ") || patchLine.startsWith("diff ")) {
+                } else if (patchLine.startsWith("=====") || patchLine.startsWith("Index: ") || patchLine.startsWith("RCS file: ") || patchLine.startsWith("retrieving revision ") || patchLine.startsWith("diff ") || patchLine.startsWith("\\ No newline at end of file")) {
                     // Ignore lines like this for the minute:
                     // bk:
                     // ===== makerules/vars-not-previously-included.make 1.33 vs 1.104 =====
