@@ -1,3 +1,4 @@
 #!/bin/bash
+export BK_GUI=YES
 dir=`dirname "$0"`
 exec "$dir"/scm CheckInTool "$@"
