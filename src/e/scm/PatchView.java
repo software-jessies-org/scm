@@ -103,17 +103,18 @@ public class PatchView extends JList {
         ensureIndexIsVisible(0);
     }
     
+    public static String getScriptFilename(String leafName) {
+        return System.getProperty("org.jessies.projectRoot") + File.separator + ".." + File.separator + "salma-hayek" + File.separator + "bin" + File.separator + leafName;
+    }
+    
     public static ArrayList<String> annotatePatchUsingTags(RevisionControlSystem backEnd, ArrayList<String> lines) {
         ArrayList<String> newLines = new ArrayList<String>();
         ArrayList<String> newErrors = new ArrayList<String>();
         String patch = StringUtilities.join(lines, "\n") + "\n";
-        File patchAnnotationTool = FileUtilities.findOnPath("annotate-patch.rb");
-        if (patchAnnotationTool == null) {
-            return lines;
-        }
+        String patchAnnotationTool = getScriptFilename("annotate-patch.rb");
         
         File patchFile = FileUtilities.createTemporaryFile("e.scm.PatchView-patch", ".tmp", "patch file", patch);
-        String[] command = new String[] { "ruby", patchAnnotationTool.toString(), patchFile.toString() };
+        String[] command = new String[] { patchAnnotationTool.toString(), patchFile.toString() };
         int status = ProcessUtilities.backQuote(backEnd.getRoot(), command, newLines, newErrors);
         if (status != 0) {
             return lines;
