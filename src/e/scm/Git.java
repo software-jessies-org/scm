@@ -30,6 +30,7 @@ public class Git extends RevisionControlSystem {
                 result.add(newerRevision.number);
             }
         }
+        result.add("--");
         result.add(filename);
         return result.toArray(new String[result.size()]);
     }
@@ -37,11 +38,11 @@ public class Git extends RevisionControlSystem {
     private static final String LOG_SEPARATOR = "------------------------------------------------";
 
     public String[] getLogCommand(String filename) {
-        return new String[] { "git", "log", "--pretty=tformat:commit=%H%ncommitter=%ce%ndate=%ai%ncomment=%n%s%n%b" + LOG_SEPARATOR, filename };
+        return new String[] { "git", "log", "--follow", "--pretty=tformat:commit=%H%ncommitter=%ce%ndate=%ai%ncomment=%n%s%n%b" + LOG_SEPARATOR, filename };
     }
     
     // The above git annotate produces lines like:
-    // 894ea547c603f080de46405d4ab678578c884d13        (foo@wombat.com   2007-02-28 12:52:09 +0000       14)# already started
+    // 894ea547c603f080de46405d4ab678578c884d13        (andyc@diesel.dev.bluearc.com   2007-02-28 12:52:09 +0000       14)# already started
 
     private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^([^ ]+)\t([^\t]+)\t([^ ]+) ([^ ]+) ([^\t]+)\t(\\d+)[)](.*)$");
     
@@ -50,7 +51,7 @@ public class Git extends RevisionControlSystem {
     }
     
     // commit=54e89b521ecaf392ad56a20f2034c838c2c966b9
-    // committer=foo@wombat.com
+    // committer=andyc@bluearc.com
     // date=2008-09-25 15:44:06 +0100
     // comment=
     // bin/bb:
@@ -148,31 +149,56 @@ public class Git extends RevisionControlSystem {
     }
     
     public List<FileStatus> getStatuses(StatusReporter statusReporter) {
-        String[] unknownFilesCommand = new String[] { "git", "ls-files", "--others" };
-        String[] modifiedFilesCommand = new String[] { "git", "ls-files", "--modified" };
+        String[] statusCommand = new String[] { "git", "status", "-z" };
         ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
 
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(getRoot(), unknownFilesCommand, lines, errors);
+        int status = ProcessUtilities.backQuote(getRoot(), statusCommand, lines, errors);
         if (status != 0) {
-            throwError(status, unknownFilesCommand, lines, errors);
+            throwError(status, statusCommand, lines, errors);
         }
         
-        for (String line : lines) {
-            statuses.add(new FileStatus(FileStatus.NEW, line));
-        }
-
-        lines = new ArrayList<String>();
-        errors = new ArrayList<String>();
-
-        status = ProcessUtilities.backQuote(getRoot(), modifiedFilesCommand, lines, errors);
-        if (status != 0) {
-            throwError(status, modifiedFilesCommand, lines, errors);
-        }
-        
-        for (String line : lines) {
-            statuses.add(new FileStatus(FileStatus.MODIFIED, line));
+        String output = StringUtilities.join(lines, "\n");
+        int size = output.length();
+        int ii = 0;
+        while (ii != size) {
+            char x = output.charAt(ii);
+            ++ ii;
+            char y = output.charAt(ii);
+            ++ ii;
+            if (output.charAt(ii) != ' ') {
+                throw new RuntimeException("lost synchronization with output of " + statusCommand + ": " + output);
+            }
+            ++ ii;
+            StringBuilder name = new StringBuilder();
+            while (output.charAt(ii) != 0) {
+                name.append(output.charAt(ii));
+                ++ ii;
+            }
+            ++ ii;
+            if (x == 'R') {
+                // The "to" name precedes the "from" name for renames.
+                while (output.charAt(ii) != 0) {
+                    ++ ii;
+                }
+                ++ ii;
+            }
+            int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
+            if (x == ' ' && y == 'M') {
+                canonicalState = FileStatus.MODIFIED;
+            } else if (x == 'D' && y == ' ') {
+                // git rm already done.
+                canonicalState = FileStatus.REMOVED;
+            } else if (x == '?' && y == '?') {
+                canonicalState = FileStatus.NEW;
+            } else if (x == 'R' && y == ' ') {
+                canonicalState = FileStatus.ADDED;
+            }
+            // FIXME: All the other combinations.
+            if (canonicalState != FileStatus.IGNORED) {
+                statuses.add(new FileStatus(canonicalState, name.toString()));
+            }
         }
 
         return statuses;
@@ -180,6 +206,9 @@ public class Git extends RevisionControlSystem {
     
     public void commit(String comment, List<FileStatus> fileStatuses) {
         for (FileStatus file : fileStatuses) {
+            if (file.getState() == FileStatus.REMOVED) {
+                continue;
+            }
             ArrayList<String> command = new ArrayList<String>();
             command.add("git");
             command.add("add");
