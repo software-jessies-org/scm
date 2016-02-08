@@ -127,7 +127,7 @@ public class CheckInWindow extends MainFrame {
     
     private void initStatusesList() {
         statusesTable = new ETable();
-        statusesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        statusesTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         statusesTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         initStatusesTableContextMenu();
         statusesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -227,11 +227,15 @@ public class CheckInWindow extends MainFrame {
             private String chooseDiscardActionName() {
                 String result = "Discard";
                 int row = statusesTable.getSelectedRow();
-                if (row != -1) {
-                    FileStatus fileStatus = statusesTableModel.getFileStatus(row);
-                    String quotedFilename = "'" + fileStatus.getName() + "'";
-                    result += ((fileStatus.getState() == FileStatus.MODIFIED) ? " Changes to " : " File ") + quotedFilename;
+                if (row == -1) {
+                    return result;
                 }
+                if (statusesTable.getSelectedRows().length > 1) {
+                    return "Discard multiple changes/files";
+                }
+                FileStatus fileStatus = statusesTableModel.getFileStatus(row);
+                String quotedFilename = "'" + fileStatus.getName() + "'";
+                result += ((fileStatus.getState() == FileStatus.MODIFIED) ? " Changes to " : " File ") + quotedFilename;
                 return result;
             }
         });
@@ -298,8 +302,13 @@ public class CheckInWindow extends MainFrame {
         new Thread(new BlockingWorker(statusesTable, "Discarding changes...", statusReporter) {
             @Override
             public void work() {
-                // Which file?
-                FileStatus fileStatus = statusesTableModel.getFileStatus(statusesTable.getSelectedRow());
+                for (int row : statusesTable.getSelectedRows()) {
+                    FileStatus fileStatus = statusesTableModel.getFileStatus(row);
+                    discardOneFile(fileStatus);
+                }
+            }
+            
+            private void discardOneFile(FileStatus fileStatus) {
                 String filename = fileStatus.getName();
                 File file = FileUtilities.fileFromParentAndString(backEnd.getRoot().toString(), filename);
                 
@@ -518,6 +527,11 @@ public class CheckInWindow extends MainFrame {
          */
         private void checkBoxUpdated(TableModelEvent e) {
             boolean addedFile = statusesTableModel.isIncluded(e.getFirstRow());
+            for (int row : statusesTable.getSelectedRows()) {
+                if (statusesTableModel.isIncluded(row) != addedFile) {
+                    statusesTableModel.setValueAt(addedFile, row, 0);
+                }
+            }
             
             FileStatus fileStatus = statusesTableModel.getFileStatus(e.getFirstRow());
             String name = fileStatus.getName();
