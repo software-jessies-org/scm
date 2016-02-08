@@ -57,7 +57,7 @@ public class StatusesTableModel extends AbstractTableModel {
         return "(no column " + column + ")";
     }
     
-    public Class getColumnClass(int column) {
+    public Class<?> getColumnClass(int column) {
         return (column == 0) ? Boolean.class : String.class;
     }
     

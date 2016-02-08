@@ -9,9 +9,9 @@ import javax.swing.*;
  * class instead of an array. This is 2004, after all.
  */
 public class ToolErrorListModel extends AbstractListModel {
-    private ArrayList lines;
+    private ArrayList<String> lines;
 
-    public ToolErrorListModel(ArrayList lines) {
+    public ToolErrorListModel(ArrayList<String> lines) {
         this.lines = lines;
     }
 

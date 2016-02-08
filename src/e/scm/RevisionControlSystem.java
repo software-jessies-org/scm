@@ -256,7 +256,7 @@ public abstract class RevisionControlSystem {
     /**
      * Reports an error in a dialog, and then throws a RuntimeException.
      */
-    public static void throwError(int status, String[] command, List output, List errors) {
+    public static void throwError(int status, String[] command, List<String> output, List<String> errors) {
         String message = "Command '" + ProcessUtilities.shellQuotedFormOf(Arrays.asList(command)) + "' returned status " + status + ".";
         message += "\n\nErrors were [\n";
         if (errors.size() > 0) {
