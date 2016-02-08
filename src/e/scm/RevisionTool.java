@@ -1,11 +1,12 @@
 package e.scm;
 
+import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 import e.util.*;
 
 public class RevisionTool implements Launchable {
-    private static final Pattern GREP_ADDRESS = Pattern.compile("(.*):([0-9]+):?.*");
+    private static final Pattern GREP_ADDRESS = Pattern.compile("(.*):([1-9][0-9]*):.*");
     private ArrayList<Job> jobs = new ArrayList<Job>();
     
     public void parseCommandLine(List<String> arguments) {
@@ -18,9 +19,11 @@ public class RevisionTool implements Launchable {
             int lineNumber = 0;
             Matcher matcher = GREP_ADDRESS.matcher(filename);
             if (matcher.matches()) {
-                // grep-style line number.
-                filename = matcher.group(1);
-                lineNumber = Integer.parseInt(matcher.group(2));
+                File file = new File(filename);
+                if (file.exists() == false) {
+                    filename = matcher.group(1);
+                    lineNumber = Integer.parseInt(matcher.group(2));
+                }
             }
             if (i < arguments.size() - 1) {
                 String nextArg = arguments.get(i + 1);
