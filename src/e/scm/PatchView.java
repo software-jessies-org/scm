@@ -131,7 +131,9 @@ public class PatchView extends JList {
     void showNewFile(RevisionControlSystem backEnd, final FileStatus status) {
         DefaultListModel model = new DefaultListModel();
         File file = new File(backEnd.getRoot(), status.getName());
-        if (file.isDirectory()) {
+        if (FileUtilities.isSymbolicLink(file)) {
+            model.addElement("(" + status.getName() + " is a symbolic link.)");
+        } else if (file.isDirectory()) {
             model.addElement("(" + status.getName() + " is a directory.)");
         } else if (FileUtilities.isTextFile(file) == false) {
             model.addElement("(" + status.getName() + " is a binary file.)");
