@@ -34,7 +34,7 @@ public class RevisionView extends JComponent {
             previousRevision = revision;
         }
         if (withinRange) {
-            throw new IllegalArgumentException("fromRevision must be newer than toRevision or this code needs fixing");
+            throw new IllegalArgumentException("fromRevision (" + fromRevision + ") must be newer than toRevision (" + toRevision + ") or this code needs fixing");
         }
         return range;
     }
@@ -53,6 +53,10 @@ public class RevisionView extends JComponent {
             // of meta-data access isn't binary. I can imagine sites where you
             // can't afford to trace back step-by-step, but you could afford a
             // single step. Why isn't programming with timeouts easier?
+            return lineNumber;
+        }
+        
+        if (fromRevision == toRevision) {
             return lineNumber;
         }
         
