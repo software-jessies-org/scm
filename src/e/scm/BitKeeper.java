@@ -214,7 +214,7 @@ public class BitKeeper extends RevisionControlSystem {
         ArrayList<String> notReallyTheOutput = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         ProcessUtilities.LineListener errorsListener = new ProcessUtilities.ArrayListLineListener(errors);
-        int status = ProcessUtilities.backQuote(getRoot(), command, outputListener, errorsListener);
+        int status = ProcessUtilities.backQuote(getRoot(), command, "", outputListener, errorsListener);
         if (status != 0) {
             throwError(status, command, notReallyTheOutput, errors);
         }
@@ -261,6 +261,19 @@ public class BitKeeper extends RevisionControlSystem {
         return statuses;
     }
     
+    private String getPendingDelta(String filename) {
+        String[] command = new String[] {
+            "bk", "sfiles", "-pC", filename
+        };
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
+        if (status != 0) {
+            throwError(status, command, lines, errors);
+        }
+        return lines.get(0);
+    }
+    
     public void commit(String comment, List<FileStatus> fileStatuses) {
         File resync = new File(getRoot(), "RESYNC");
         if (resync.isDirectory() || getRoot().getName().equals("RESYNC")) {
@@ -270,21 +283,28 @@ public class BitKeeper extends RevisionControlSystem {
         // We write the comment to a file once, because it doesn't change.
         String commentFilename = createCommentFile(comment);
         
+        StringBuilder input = new StringBuilder();
         // We run "bk delta" once per file, to avoid OS command-line limits.
         for (FileStatus file : fileStatuses) {
-            ArrayList<String> command = new ArrayList<String>();
-            command.add("bk");
-            command.add("delta");
-            command.add("-a"); // Allow new files to be added without a separate 'bk new <file>'.
-            command.add("-Y" + commentFilename);
-            command.add(file.getName());
-            execAndDump(command);
+            // The delta will fail if there's no modification, which is untidy.
+            if (file.getState() != FileStatus.ADDED && file.getState() != FileStatus.REMOVED) {
+                ArrayList<String> command = new ArrayList<String>();
+                command.add("bk");
+                command.add("delta");
+                command.add("-a"); // Allow new files to be added without a separate 'bk new <file>'.
+                command.add("-Y" + commentFilename);
+                command.add(file.getName());
+                execAndDump(command);
+            }
+            input.append(getPendingDelta(file.getName()));
+            input.append("\n");
         }
         
         ArrayList<String> command = new ArrayList<String>();
         command.add("bk");
         command.add("commit");
         command.add("-Y" + commentFilename);
-        execAndDump(command);
+        command.add("-");
+        execAndDumpWithInput(command, input.toString());
     }
 }

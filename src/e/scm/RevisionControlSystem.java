@@ -227,17 +227,20 @@ public abstract class RevisionControlSystem {
      */
     public abstract void commit(String comment, List<FileStatus> fileStatuses);
     
+    public void execAndDump(List<String> commandAsList) {
+        execAndDumpWithInput(commandAsList, "");
+    }
+    
     /**
      * Executes a command in the given directory, and dumps all the output from it.
-     * Useful until we do something funkier.
      */
-    public void execAndDump(List<String> commandAsList) {
+    public void execAndDumpWithInput(List<String> commandAsList, String input) {
         String[] command = commandAsList.toArray(new String[commandAsList.size()]);
         String tool = command[0];
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        Log.warn(tool + ": running \"" + ProcessUtilities.shellQuotedFormOf(commandAsList) + "\"...");
-        int status = ProcessUtilities.backQuote(repositoryRoot, command, lines, errors);
+        Log.warn(tool + ": running echo '" + input +"' | \"" + ProcessUtilities.shellQuotedFormOf(commandAsList) + "\"...");
+        int status = ProcessUtilities.backQuote(repositoryRoot, command, input, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
             Log.warn(tool + ": stdout: " + lines.get(i));
         }
