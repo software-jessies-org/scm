@@ -130,7 +130,8 @@ public class BitKeeper extends RevisionControlSystem {
      * Returns the contents of a change set given the change set number.
      */
     private List<String> getChangeSetByNumber(String changeSetNumber) {
-        String[] command = new String[] { "bk", "rset", "-r" + changeSetNumber };
+        // bk-4.6b's rset.
+        String[] command = new String[] { "bk", "changes", "-r" + changeSetNumber, "-v", "-n", "-d$if(:PARENT:){:GFILE:|:PARENT:..:REV:}" };
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
