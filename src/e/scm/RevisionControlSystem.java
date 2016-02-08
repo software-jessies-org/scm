@@ -57,7 +57,7 @@ public abstract class RevisionControlSystem {
                 return ascendUntilSubdirectoryDisappears(directory, "CVS");
             } else if (sibling.equals(".hg")) {
                 return ascendUntilSubdirectoryDisappears(directory, ".hg");
-            } else if (sibling.equals("SCCS")) {
+            } else if (sibling.equals("SCCS") || sibling.equals(".bk")) {
                 return ascendUntilSubdirectoryAppears(directory, "BitKeeper");
             } else if (sibling.equals(".svn")) {
                 return ascendUntilSubdirectoryDisappears(directory, ".svn");
@@ -110,7 +110,7 @@ public abstract class RevisionControlSystem {
     /**
      * Attempts to guess which revision control system the file we're
      * interested in is managed by. We do this simply on the basis of
-     * whether there's a .bzr, CVS, .hg, SCCS, .git or .svn directory
+     * whether there's a .bk, .bzr, CVS, .hg, SCCS, .git or .svn directory
      * in the same directory as the file.
      */
     private static RevisionControlSystem selectRevisionControlSystem(File repositoryRoot) {
@@ -121,7 +121,7 @@ public abstract class RevisionControlSystem {
                 return new Cvs();
             } else if (sibling.equals(".hg")) {
                 return new Mercurial();
-            } else if (sibling.equals("SCCS")) {
+            } else if (sibling.equals("SCCS") || sibling.equals(".bk")) {
                 return new BitKeeper();
             } else if (sibling.equals(".git")) {
                 return new Git();
