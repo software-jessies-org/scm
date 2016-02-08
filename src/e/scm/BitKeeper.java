@@ -143,7 +143,10 @@ public class BitKeeper extends RevisionControlSystem {
     private List<ChangeSetItem> extractChangeSetItems(List<String> changeSet) {
         // The output consists of changes one per line, looking like this: "ChangeSet|1.4818..1.4818.1.1"
         // or like this for merge change sets "ChangeSet|1.4887.295.1+1.4887.281.1..1.4887.304.1".
-        Pattern pattern = Pattern.compile("^(.*)\\|([\\d.]+(?:\\+[\\d.]+)?)\\.\\.([\\d.]+)$");
+        // bk 5.3 sometimes gives us md5keys in place of revision numbers in the per-file output of bk rset
+        // but still uses revision numbers for the ChangeSet.
+        String revisionSpecifier = "(?:1(?:\\.\\d+)+|[-_A-Za-z0-9]{30})";
+        Pattern pattern = Pattern.compile("^(.*)\\|(" + revisionSpecifier + "(?:\\+" + revisionSpecifier + ")?)\\.\\.(" + revisionSpecifier + ")$");
         ArrayList<ChangeSetItem> result = new ArrayList<ChangeSetItem>();
         for (String change : changeSet) {
             Matcher matcher = pattern.matcher(change);
