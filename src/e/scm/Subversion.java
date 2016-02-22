@@ -42,10 +42,11 @@ public class Subversion extends RevisionControlSystem {
     }
     
     // There's no whitespace at the start of the line if the revision number is larger than 99999, according to Scott "muppet" Arrington.
-    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+)\\s+(?:\\S+) (.*)$");
+    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(-|\\d+)\\s+(?:\\S+) (.*)$");
+    private static final Pattern LOCAL_REVISION_PATTERN = Pattern.compile("-");
 
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
-        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2);
+        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2, LOCAL_REVISION_PATTERN);
     }
     
     //r74 | elliotth | 2004-04-24 12:29:26 +0100 (Sat, 24 Apr 2004) | 3 lines

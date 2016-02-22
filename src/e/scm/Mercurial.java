@@ -46,10 +46,11 @@ public class Mercurial extends RevisionControlSystem {
     // 544: #!/bin/sh
     // 186: #
     //1599: # This is an example of using HGEDITOR to create of diff to review the
-    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+): (.*)$");
+    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+\\+?): (.*)$");
+    private static final Pattern LOCAL_REVISION_PATTERN = Pattern.compile("\\d+\\+");
     
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
-        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2);
+        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2, LOCAL_REVISION_PATTERN);
     }
     
     //changeset:   2242:12e36dedf668c483df6fe0fbfb3f0efdaded8b4c

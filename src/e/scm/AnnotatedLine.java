@@ -19,7 +19,7 @@ public class AnnotatedLine {
     private AnnotatedLine() {
     }
 
-    public static AnnotatedLine fromLine(RevisionListModel revisions, String line, Pattern pattern, int revisionGroup, int sourceGroup) {
+    public static AnnotatedLine fromLine(RevisionListModel revisions, String line, Pattern pattern, int revisionGroup, int sourceGroup, Pattern localRevisionPattern) {
         Matcher matcher = pattern.matcher(line);
         if (matcher.matches() == false) {
             throw new IllegalArgumentException("Line \"" + line + "\" doesn't match annotation pattern (" + pattern + ").");
@@ -27,9 +27,13 @@ public class AnnotatedLine {
         
         String revisionId = matcher.group(revisionGroup);
         AnnotatedLine result = new AnnotatedLine();
-        result.revision = revisions.fromNumber(revisionId);
-        if (result.revision == null) {
-            throw new IllegalArgumentException("No revision '" + revisionId + "'");
+        if (localRevisionPattern.matcher(revisionId).matches()) {
+            result.revision = Revision.LOCAL_REVISION;
+        } else {
+            result.revision = revisions.fromNumber(revisionId);
+            if (result.revision == null) {
+                throw new IllegalArgumentException("No revision '" + revisionId + "'");
+            }
         }
         result.source = matcher.group(sourceGroup);
         result.prepareFormattedLine(revisions);

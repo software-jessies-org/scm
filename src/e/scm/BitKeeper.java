@@ -40,9 +40,11 @@ public class BitKeeper extends RevisionControlSystem {
     }
 
     private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^([^\t]+)\t([^\t]+)\t(.*)$");
+    // bk doesn't annotate local changes.
+    private static final Pattern LOCAL_REVISION_PATTERN = Pattern.compile("\t");
 
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
-        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 2, 3);
+        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 2, 3, LOCAL_REVISION_PATTERN);
     }
 
     //D 1.2 04/02/15 13:02:22+00:00 elliotth@mercury.local 3 2 4/0/356

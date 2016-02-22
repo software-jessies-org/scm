@@ -44,9 +44,11 @@ public class Cvs extends RevisionControlSystem {
     }
 
     private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^([0-9.]+)\\s+\\((\\S+)\\s+(\\d\\d-\\S\\S\\S-\\d\\d)\\): (.*)$");
+    // CVS doesn't annotate local changes.
+    private static final Pattern LOCAL_REVISION_PATTERN = Pattern.compile("\\s");
 
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
-        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 4);
+        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 4, LOCAL_REVISION_PATTERN);
     }
     
     //date: 2002/11/25 14:41:42;  author: ericb;  state: Exp;  lines: +12 -1

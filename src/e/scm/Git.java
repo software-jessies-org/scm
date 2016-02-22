@@ -5,6 +5,31 @@ import java.util.regex.*;
 import e.util.*;
 
 public class Git extends RevisionControlSystem {
+    public String followRenames(Revision revision, String filename) {
+        if (revision == null) {
+            return filename;
+        }
+        if (revision == Revision.LOCAL_REVISION) {
+            return filename;
+        }
+        String[] command = new String[] { "git", "log", "--follow", "--name-status", revision.number.toString() + "..HEAD", "--", filename };
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
+        if (status != 0) {
+            throwError(status, command, lines, errors);
+        }
+        if (lines.size() == 0) {
+            return filename;
+        }
+        String lastLine = lines.get(lines.size() - 1);
+        // R100\told name\tnew name
+        // M\tname
+        String[] fields = lastLine.split("\t");
+        String oldName = fields[1];
+        return oldName;
+    }
+    
     public String[] getAnnotateCommand(Revision revision, String filename) {
         ArrayList<String> command = new ArrayList<String>();
         command.add("git");
@@ -13,7 +38,8 @@ public class Git extends RevisionControlSystem {
         if (revision != Revision.LOCAL_REVISION) {
             command.add(revision.number);
         }
-        command.add(filename);
+        command.add("--");
+        command.add(followRenames(revision, filename));
         return command.toArray(new String[command.size()]);
     }
     
@@ -21,6 +47,7 @@ public class Git extends RevisionControlSystem {
         ArrayList<String> result = new ArrayList<String>();
         result.add("git");
         result.add("diff");
+        result.add("--find-renames");
         if (ignoreWhiteSpace) {
             result.add("-w");
         }
@@ -31,7 +58,8 @@ public class Git extends RevisionControlSystem {
             }
         }
         result.add("--");
-        result.add(filename);
+        result.add(followRenames(olderRevision, filename));
+        result.add(followRenames(newerRevision, filename));
         return result.toArray(new String[result.size()]);
     }
     
@@ -45,9 +73,10 @@ public class Git extends RevisionControlSystem {
     // 894ea547c603f080de46405d4ab678578c884d13        (andyc@diesel.dev.bluearc.com   2007-02-28 12:52:09 +0000       14)# already started
 
     private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^([^ ]+)\t([^\t]+)\t([^ ]+) ([^ ]+) ([^\t]+)\t(\\d+)[)](.*)$");
+    private static final Pattern LOCAL_REVISION_PATTERN = Pattern.compile("0000000000000000000000000000000000000000");
     
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
-        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 7);
+        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 7, LOCAL_REVISION_PATTERN);
     }
     
     // commit=54e89b521ecaf392ad56a20f2034c838c2c966b9

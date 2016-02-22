@@ -43,10 +43,11 @@ public class Bazaar extends RevisionControlSystem {
     }
     
     //   10 enh@jessies.org 20060429 | monkeys!
-    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+)\\s+(?:\\S+) (?:\\d{8}) \\| (.*)$");
+    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+\\??)\\s+(?:\\S+) (?:\\d{8}) \\| (.*)$");
+    private static final Pattern LOCAL_REVISION_PATTERN = Pattern.compile("\\d+\\?");
     
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
-        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2);
+        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2, LOCAL_REVISION_PATTERN);
     }
     
     //------------------------------------------------------------
