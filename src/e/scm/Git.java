@@ -66,7 +66,7 @@ public class Git extends RevisionControlSystem {
     private static final String LOG_SEPARATOR = "------------------------------------------------";
 
     public String[] getLogCommand(String filename) {
-        return new String[] { "git", "log", "--follow", "--pretty=tformat:commit=%H%ncommitter=%ce%ndate=%ai%ncomment=%n%s%n%b" + LOG_SEPARATOR, filename };
+        return new String[] { "git", "log", "--follow", "--pretty=tformat:commit=%H%ncommitter=%ce%ndate=%ai%ncomment=%n%s%n%b" + LOG_SEPARATOR, "--", filename };
     }
     
     // The above git annotate produces lines like:
