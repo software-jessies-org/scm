@@ -305,6 +305,7 @@ public class BitKeeper extends RevisionControlSystem {
         ArrayList<String> command = new ArrayList<String>();
         command.add("bk");
         command.add("commit");
+        command.add("--standalone");
         command.add("-Y" + commentFilename);
         command.add("-");
         execAndDumpWithInput(command, input.toString());
