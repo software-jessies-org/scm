@@ -62,7 +62,7 @@ public abstract class RevisionControlSystem {
             } else if (sibling.equals(".svn")) {
                 return ascendUntilSubdirectoryDisappears(directory, ".svn");
             } else if (sibling.equals(".git")) {
-                return ascendUntilSubdirectoryDisappears(directory, ".git");
+                return directory;
             }
         }
         
