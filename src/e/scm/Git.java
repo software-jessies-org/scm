@@ -63,14 +63,17 @@ public class Git extends RevisionControlSystem {
         return result.toArray(new String[result.size()]);
     }
     
-    private static final String LOG_SEPARATOR = "------------------------------------------------";
+    private static final String LOG_SEPARATOR = "a string that must never appear in a check-in comment\f";
 
     public String[] getLogCommand(String filename) {
         return new String[] { "git", "log", "--follow", "--pretty=tformat:commit=%H%ncommitter=%ce%ndate=%ai%ncomment=%n%s%n%b" + LOG_SEPARATOR, "--", filename };
     }
     
-    // The above git annotate produces lines like:
-    // 894ea547c603f080de46405d4ab678578c884d13        (andyc@diesel.dev.bluearc.com   2007-02-28 12:52:09 +0000       14)# already started
+    // The above git annotate produces the like of the following fields, separated by tabs:
+    // 894ea547c603f080de46405d4ab678578c884d13
+    // (andyc@diesel.dev.bluearc.com
+    // 2007-02-28 12:52:09 +0000
+    // 14)# already started
 
     private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^([^ ]+)\t([^\t]+)\t([^ ]+) ([^ ]+) ([^\t]+)\t(\\d+)[)](.*)$");
     private static final Pattern LOCAL_REVISION_PATTERN = Pattern.compile("0000000000000000000000000000000000000000");

@@ -53,7 +53,7 @@ public class BitKeeper extends RevisionControlSystem {
     // From backport-new-file.rb:
     //D 1.1 2007/07/09 12:36:34 martind@duezer.us.dev.bluearc.com 2 1 9/0/0
     private static final Pattern LOG_PATTERN = Pattern.compile("^D ([0-9.]+) (\\d\\d|\\d{4})/(\\d\\d)/(\\d\\d) (\\d{2}:\\d{2}:\\d{2}(?:[-+]\\d{2}:\\d{2})?) ([^@ ]+).*");
-    private static final String LOG_SEPARATOR = "------------------------------------------------";
+    private static final String LOG_SEPARATOR = "a string that must never appear in a check-in comment\f";
     
     public RevisionListModel parseLog(List<String> linesList) {
         String[] lines = linesList.toArray(new String[linesList.size()]);
