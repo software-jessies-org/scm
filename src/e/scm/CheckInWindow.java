@@ -267,6 +267,8 @@ public class CheckInWindow extends MainFrame {
                 try {
                     backEnd.commit(comment, filenames);
                 } catch (RuntimeException ex) {
+                    // If the commit partly succeeded, then a retry won't do the right thing unless we've updated our state.
+                    updateFileStatuses();
                     // We know the button must have been enabled, or we couldn't
                     // have got here. If the commit failed, the user is likely
                     // to want to try again.

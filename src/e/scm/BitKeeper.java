@@ -297,6 +297,15 @@ public class BitKeeper extends RevisionControlSystem {
                 command.add("-Y" + commentFilename);
                 command.add(file.getName());
                 execAndDump(command);
+            } else {
+                // If a pre-commit trigger fails, then the comment might have changed.
+                // This overwrites the default file comments on eg bk cp.
+                ArrayList<String> command = new ArrayList<String>();
+                command.add("bk");
+                command.add("comments");
+                command.add("-Y" + commentFilename);
+                command.add(file.getName());
+                execAndDump(command);
             }
             input.append(getPendingDelta(file.getName()));
             input.append("\n");
