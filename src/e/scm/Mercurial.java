@@ -110,6 +110,8 @@ public class Mercurial extends RevisionControlSystem {
                 // FIXME: this is potentially useful for the "bzrk"-style view.
             } else if (lines[i].startsWith("tag:         ")) {
                 // Ignore.
+            } else if (lines[i].startsWith("branch:      ")) {
+                // Ignore.
             } else if (lines[i].startsWith("date:        ")) {
                 Matcher matcher = TIMESTAMP_PATTERN.matcher(lines[i]);
                 if (matcher.matches()) {
@@ -128,7 +130,7 @@ public class Mercurial extends RevisionControlSystem {
                 comment = new StringBuilder();
                 ++i;
                 while (i < lines.length) {
-                    if (lines[i].length() + lines[i+1].length() == 0) {
+                    if (lines[i].length() + lines[i+1].length() == 0 && (i+2 == lines.length || lines[i+2].startsWith("changeset:   "))) {
                         ++i;
                         break;
                     }
