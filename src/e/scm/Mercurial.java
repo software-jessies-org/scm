@@ -7,16 +7,46 @@ import e.util.*;
 // FIXME: sometimes we see 123:deadbeef, sometimes just 123, sometimes just deadbeef. "123" is the "revision number", "deadbeef" the "changeset number". We should learn about these and decide what to do. For the moment, we just use the revision number.
 // FIXME: Mercurial seems to include empty merges as changesets. Perhaps we want to elide these, or somehow make them less in your face.
 public class Mercurial extends RevisionControlSystem {
+    public String followRenames(Revision revision, String filename) {
+        if (revision == null) {
+            return filename;
+        }
+        if (revision == Revision.LOCAL_REVISION) {
+            return filename;
+        }
+        String[] command = new String[] { "hg", "annotate", "--number", "--file", filename };
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
+        if (status != 0) {
+            throwError(status, command, lines, errors);
+        }
+        Pattern pattern = ANNOTATED_LINE_PATTERN;
+        for (String line : lines) {
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.matches() == false) {
+                throw new IllegalArgumentException("Line \"" + line + "\" doesn't match annotation pattern (" + pattern + ").");
+            }
+            String revisionId = matcher.group(1);
+            if (revisionId.equals(revision.number) == false) {
+                continue;
+            }
+            return matcher.group(2);
+        }
+        return filename;
+    }
+    
     public String[] getAnnotateCommand(Revision revision, String filename) {
         ArrayList<String> command = new ArrayList<String>();
         command.add("hg");
         command.add("annotate");
-        command.add("-n");
+        command.add("--number");
+        command.add("--file");
         if (revision != Revision.LOCAL_REVISION) {
             command.add("-r");
             command.add(revision.number);
         }
-        command.add(filename);
+        command.add(followRenames(revision, filename));
         return command.toArray(new String[command.size()]);
     }
     
@@ -35,22 +65,22 @@ public class Mercurial extends RevisionControlSystem {
                 result.add(newerRevision.number);
             }
         }
-        result.add(filename);
+        result.add(followRenames(newerRevision, filename));
         return result.toArray(new String[result.size()]);
     }
     
     public String[] getLogCommand(String filename) {
-        return new String[] { "hg", "log", "-v", filename };
+        return new String[] { "hg", "log", "-v", "--follow", filename };
     }
     
     // 544: #!/bin/sh
     // 186: #
     //1599: # This is an example of using HGEDITOR to create of diff to review the
-    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+\\+?): (.*)$");
+    private static final Pattern ANNOTATED_LINE_PATTERN = Pattern.compile("^\\s*(\\d+\\+?)\\s+([^:]+): (.*)$");
     private static final Pattern LOCAL_REVISION_PATTERN = Pattern.compile("\\d+\\+");
     
     public AnnotatedLine parseAnnotatedLine(RevisionListModel revisions, String line) {
-        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 2, LOCAL_REVISION_PATTERN);
+        return AnnotatedLine.fromLine(revisions, line, ANNOTATED_LINE_PATTERN, 1, 3, LOCAL_REVISION_PATTERN);
     }
     
     //changeset:   2242:12e36dedf668c483df6fe0fbfb3f0efdaded8b4c
