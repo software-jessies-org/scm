@@ -14,24 +14,28 @@ public class Mercurial extends RevisionControlSystem {
         if (revision == Revision.LOCAL_REVISION) {
             return filename;
         }
-        String[] command = new String[] { "hg", "annotate", "--number", "--file", filename };
+        String[] command = new String[] { "hg", "diff", "--git", "-r", revision.number };
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
         }
-        Pattern pattern = ANNOTATED_LINE_PATTERN;
+        Pattern pattern = Pattern.compile("^(?:copy|rename) (to|from) (.+)$");
+        String to = "";
+        Collections.reverse(lines);
         for (String line : lines) {
             Matcher matcher = pattern.matcher(line);
             if (matcher.matches() == false) {
-                throw new IllegalArgumentException("Line \"" + line + "\" doesn't match annotation pattern (" + pattern + ").");
-            }
-            String revisionId = matcher.group(1);
-            if (revisionId.equals(revision.number) == false) {
                 continue;
             }
-            return matcher.group(2);
+            String direction = matcher.group(1);
+            String candidate = matcher.group(2);
+            if (direction.equals("to")) {
+                to = candidate;
+            } else if (to.equals(filename)) {
+                filename = candidate;
+            }
         }
         return filename;
     }
