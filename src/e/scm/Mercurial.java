@@ -268,6 +268,23 @@ public class Mercurial extends RevisionControlSystem {
         return statuses;
     }
     
+    public boolean isMerge() {
+        String[] command = new String[] { "hg", "heads" };
+        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
+        if (status != 0) {
+            throwError(status, command, lines, errors);
+        }
+        int heads = 0;
+        for (String line : lines) {
+            if (line.startsWith("changeset:")) {
+                ++ heads;
+            }
+        }
+        return heads > 1;
+    }
+    
     public void commit(String comment, List<FileStatus> fileStatuses) {
         scheduleNewFiles("hg", null, fileStatuses);
         ArrayList<String> command = new ArrayList<String>();
@@ -275,7 +292,15 @@ public class Mercurial extends RevisionControlSystem {
         command.add("commit");
         command.add("--logfile");
         command.add(createCommentFile(comment));
-        addFilenames(command, fileStatuses);
+        if (isMerge() == false) {
+            addFilenames(command, fileStatuses);
+        }
         execAndDump(command);
+    }
+    
+    public void approvePartialCommit() {
+        if (isMerge()) {
+            throw new RuntimeException("Mercurial won't let you commit a merge without including everything");
+        }
     }
 }

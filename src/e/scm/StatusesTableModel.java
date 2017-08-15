@@ -133,6 +133,10 @@ public class StatusesTableModel extends AbstractTableModel {
         return false;
     }
     
+    public boolean isEveryFileIncluded() {
+        return getIncludedFileCount() == getRowCount();
+    }
+    
     /**
      * Returns the index of the first row whose file is included, 0 if no
      * files are currently included.

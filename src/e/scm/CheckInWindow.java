@@ -260,6 +260,9 @@ public class CheckInWindow extends MainFrame {
         setEntireUiEnabled(false);
         
         final String comment = getCommentWithNewline();
+        if (statusesTableModel.isEveryFileIncluded() == false) {
+            backEnd.approvePartialCommit();
+        }
         final List<FileStatus> filenames = statusesTableModel.getIncludedFiles();
         
         new Thread(new BlockingWorker(statusesTable, "Committing changes...", statusReporter) {

@@ -227,6 +227,12 @@ public abstract class RevisionControlSystem {
      */
     public abstract void commit(String comment, List<FileStatus> fileStatuses);
     
+    /**
+     * Should throw if a commit that doesn't include every file is currently disallowed.
+     */
+    public void approvePartialCommit() {
+    }
+    
     public void execAndDump(List<String> commandAsList) {
         execAndDumpWithInput(commandAsList, "");
     }
