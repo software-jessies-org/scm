@@ -269,7 +269,7 @@ public class Mercurial extends RevisionControlSystem {
     }
     
     public boolean isMerge() {
-        String[] command = new String[] { "hg", "heads" };
+        String[] command = new String[] { "hg", "heads", "." };
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
