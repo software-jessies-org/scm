@@ -259,7 +259,12 @@ public class CheckInWindow extends MainFrame {
     private void commit() {
         final String comment = getCommentWithNewline();
         if (statusesTableModel.isEveryFileIncluded() == false) {
-            backEnd.approvePartialCommit();
+            try {
+                backEnd.approvePartialCommit();
+            } catch (RuntimeException ex) {
+                SimpleDialog.showAlert(CheckInWindow.this, "Commit disallowed", ex.getMessage());
+                return;
+            }
         }
         final List<FileStatus> filenames = statusesTableModel.getIncludedFiles();
         
