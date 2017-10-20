@@ -257,14 +257,13 @@ public class CheckInWindow extends MainFrame {
     }
     
     private void commit() {
-        setEntireUiEnabled(false);
-        
         final String comment = getCommentWithNewline();
         if (statusesTableModel.isEveryFileIncluded() == false) {
             backEnd.approvePartialCommit();
         }
         final List<FileStatus> filenames = statusesTableModel.getIncludedFiles();
         
+        setEntireUiEnabled(false);
         new Thread(new BlockingWorker(statusesTable, "Committing changes...", statusReporter) {
             public void work() {
                 try {
