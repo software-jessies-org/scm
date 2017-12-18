@@ -156,7 +156,7 @@ public class Git extends RevisionControlSystem {
     }
     
     public List<ChangeSetItem> listTouchedFilesInRevision(String filename, Revision revision) {
-        String[] command = new String[] { "git", "diff", "--name-status", revision.number };
+        String[] command = new String[] { "git", "diff-tree", "--no-commit-id", "--name-only", "-r", revision.number };
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
@@ -166,8 +166,8 @@ public class Git extends RevisionControlSystem {
         
         ArrayList<ChangeSetItem> result = new ArrayList<ChangeSetItem>();
         for (String line : lines) {
-            String path = line.substring(2);
-            result.add(new ChangeSetItem(path, revision.number, revision.number));
+            String path = line;
+            result.add(new ChangeSetItem(path, revision.number + "^", revision.number));
         }
         return result;
     }
