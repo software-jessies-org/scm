@@ -1,11 +1,8 @@
 This directory contains the scm package, currently comprising
 these front-ends:
 
-RevisionTool
-: revision history browser
-
-CheckInTool
-: check-in tool
+RevisionTool | revision history browser
+CheckInTool  | check-in tool
 
 And these back-ends:
 
