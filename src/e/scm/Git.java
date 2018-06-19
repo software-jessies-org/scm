@@ -12,7 +12,7 @@ public class Git extends RevisionControlSystem {
         if (revision == Revision.LOCAL_REVISION) {
             return filename;
         }
-        String[] command = new String[] { "git", "log", "--follow", "--name-status", revision.number.toString() + "..HEAD", "--", filename };
+        String[] command = new String[] { "git", "log", "-m", "--follow", "--name-status", revision.number.toString() + "..HEAD", "--", filename };
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
@@ -66,7 +66,7 @@ public class Git extends RevisionControlSystem {
     private static final String LOG_SEPARATOR = "a string that must never appear in a check-in comment\f";
 
     public String[] getLogCommand(String filename) {
-        return new String[] { "git", "log", "--follow", "--pretty=tformat:commit=%H%ncommitter=%ce%ndate=%ai%ncomment=%n%s%n%b" + LOG_SEPARATOR, "--", filename };
+        return new String[] { "git", "log", "-m", "--follow", "--pretty=tformat:commit=%H%ncommitter=%ce%ndate=%ai%ncomment=%n%s%n%b" + LOG_SEPARATOR, "--", filename };
     }
     
     // The above git annotate produces the like of the following fields, separated by tabs:

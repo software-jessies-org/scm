@@ -31,12 +31,14 @@ public class RevisionListModel extends AbstractListModel {
     public void addLocalRevision(Revision localRevision) {
         data.add(0, localRevision);
         updateCaches(localRevision);
+        fireIntervalAdded(this, 0, 0);
     }
 
     /** Adds a revision. */
     public void add(Revision revision) {
         data.add(revision);
         updateCaches(revision);
+        fireIntervalAdded(this, getSize() - 1, getSize() - 1);
     }
 
     private void updateCaches(Revision revision) {
