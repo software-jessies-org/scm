@@ -44,7 +44,7 @@ public class LineMapper {
     SortedMap<Integer, Integer> followingContextLines = treeMap.tailMap(fromLine);
     if (followingContextLines.isEmpty()) {
       printVerboseDiagnostics("Nothing after fromLine in map");
-      return new Integer(toLineAccordingToPreviousContext);
+      return Integer.valueOf(toLineAccordingToPreviousContext);
     }
     int offsetAtNextContextLine = getOffsetAtFromLine(followingContextLines.firstKey());
     int toLineAccordingToNextContext = fromLine.intValue() + offsetAtNextContextLine;
@@ -56,6 +56,6 @@ public class LineMapper {
       Log.warn("To line is somewhere between " + toLineAccordingToPreviousContext + " and " + toLineAccordingToNextContext);
       Log.warn("Splitting the difference to give an answer of " + averageToLine);
     }
-    return new Integer(averageToLine);
+    return Integer.valueOf(averageToLine);
   }
 }
