@@ -129,6 +129,7 @@ public class RevisionView extends JComponent {
     };
     
     private class DifferencesDoubleClickListener extends MouseAdapter {
+        @SuppressWarnings("deprecation") // getSelectedValueList requires Java 7.
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2) {
@@ -502,6 +503,7 @@ public class RevisionView extends JComponent {
     }
 
     private class RevisionListSelectionListener implements ListSelectionListener {
+        @SuppressWarnings("deprecation") // getSelectedValueList requires Java 7.
         public void valueChanged(ListSelectionEvent e) {
             if (e.getValueIsAdjusting()) {
                 // We're not interested in transitional states, particularly
