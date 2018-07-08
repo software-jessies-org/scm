@@ -1,0 +1,1 @@
+SCM is a cross-platform GPL front-end to revision control systems, able to work with Bazaar, BitKeeper, CVS, Git, Mercurial, and Subversion repositories.
