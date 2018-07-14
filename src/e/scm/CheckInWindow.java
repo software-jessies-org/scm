@@ -18,7 +18,7 @@ public class CheckInWindow extends MainFrame {
     private JTable statusesTable;
     private StatusesTableModel statusesTableModel;
     private PTextArea checkInCommentArea;
-    private PatchView patchView;
+    private PTextArea patchView;
     private StatusReporter statusReporter;
     private JButton commitButton;
     
@@ -67,14 +67,28 @@ public class CheckInWindow extends MainFrame {
         JSplitPane topUi = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, statusesScrollPane, ScmUtilities.makeScrollable(checkInCommentArea));
         topUi.setBorder(null);
         
-        patchView = new PatchView();
+        patchView = new PTextArea(20, 80);
+        patchView.setEditable(false);
+        patchView.setFont(ScmUtilities.CODE_FONT);
         patchView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() != 2) {
                     return;
                 }
-                int index = patchView.locationToIndex(e.getPoint());
-                int lineNumber = patchView.lineNumberInNewerRevisionAtIndex(index);
+                // Which line in the patch was double-clicked?
+                final int lineNumberInPatch = patchView.getNearestCoordinates(e.getPoint()).getLineIndex();
+                // Parse the patch hunk headers to work out what line in the file that is.
+                final String[] patchLines = patchView.getText().split("\n");
+                int lineNumber = 0;
+                for (int i = 0; i < lineNumberInPatch; ++i) {
+                    Patch.HunkRange hunkRange = new Patch.HunkRange(patchLines[i]);
+                    if (hunkRange.matches()) {
+                        lineNumber = hunkRange.toBegin() - 1;
+                    } else if (patchLines[i].startsWith("-") == false) {
+                        ++lineNumber;
+                    }
+                }
+                // ...and go there.
                 editFileAtLine(lineNumber);
             }
         });
@@ -149,8 +163,9 @@ public class CheckInWindow extends MainFrame {
         }
         
         FileStatus status = statusesTableModel.getFileStatus(selectedRow);
-        File file = new File(backEnd.getRoot(), status.getName());
-        long updateTime = file.lastModified();
+        final String filename = status.getName();
+        final File file = new File(backEnd.getRoot(), filename);
+        final long updateTime = file.lastModified();
         if (file.equals(lastPatchViewFile) && updateTime <= lastPatchViewUpdateTime) {
             return;
         }
@@ -158,11 +173,43 @@ public class CheckInWindow extends MainFrame {
         lastPatchViewFile = file;
         lastPatchViewUpdateTime = updateTime;
         
+        resetPatchView();
+        
         if (status.getState() == FileStatus.NEW) {
-            patchView.showNewFile(backEnd, status);
+            if (FileUtilities.isSymbolicLink(file)) {
+                patchView.setText("(" + filename + " is a symbolic link.)");
+            } else if (file.isDirectory()) {
+                patchView.setText("(" + filename + " is a directory.)");
+            } else if (FileUtilities.isTextFile(file) == false) {
+                patchView.setText("(" + filename + " is a binary file.)");
+            } else {
+                String content = StringUtilities.readFile(file);
+                if (content.isEmpty()) {
+                    patchView.setText("(" + filename + " is empty.)");
+                } else {
+                    FileType.guessFileType(filename, content).configureTextArea(patchView);
+                    patchView.setText(content);                    
+                }
+            }
         } else {
-            patchView.showPatch(backEnd, null, null, status.getName(), statusReporter);
+            WaitCursor waitCursor = new WaitCursor(this, "Getting patch...", statusReporter);
+            waitCursor.start();
+            try {
+                // TODO: if we could get the content for the head/ToT version of this file, we could use PatchDialog.runDiff to get intra-line diffs.
+                Patch patch = new Patch(backEnd, filename, null, null, false, false/*TODO:ignoreWhiteSpace*/);
+                List<String> annotatedPatchLines = PatchDialog.annotatePatchUsingTags(patch.getPatchLines());
+                FileType.guessFileType(filename, /*TODO:current content*/"").configureTextArea(patchView);
+                PatchDialog.showDiffInTextArea(patchView, annotatedPatchLines);
+            } finally {
+                waitCursor.stop();
+            }
         }
+    }
+    
+    private void resetPatchView() {
+        patchView.setText("");
+        patchView.removeHighlights(PPatchTextStyler.PatchHighlight.HIGHLIGHTER_NAME);
+        patchView.setCaretPosition(0);
     }
     
     private class EditFileAction extends AbstractAction {
@@ -488,9 +535,8 @@ public class CheckInWindow extends MainFrame {
                 /* Give some feedback to demonstrate we're not broken if there's nothing to show. */
                 boolean nothingModified = (statusesTableModel.getRowCount() == 0);
                 if (nothingModified) {
-                    DefaultListModel model = new DefaultListModel();
-                    model.addElement("(Nothing to check in.)");
-                    patchView.setModel(model);
+                    resetPatchView();
+                    patchView.setText("(Nothing to check in.)");
                 }
                 patchView.setEnabled(true);
                 

@@ -123,48 +123,4 @@ public class PatchView extends JList {
         patchFile.delete();
         return newLines;
     }
-    
-    void showNewFile(RevisionControlSystem backEnd, final FileStatus status) {
-        DefaultListModel model = new DefaultListModel();
-        File file = new File(backEnd.getRoot(), status.getName());
-        if (FileUtilities.isSymbolicLink(file)) {
-            model.addElement("(" + status.getName() + " is a symbolic link.)");
-        } else if (file.isDirectory()) {
-            model.addElement("(" + status.getName() + " is a directory.)");
-        } else if (FileUtilities.isTextFile(file) == false) {
-            model.addElement("(" + status.getName() + " is a binary file.)");
-        } else {
-            String[] lines = StringUtilities.readLinesFromFile(file.getAbsolutePath());
-            for (String line : lines) {
-                model.addElement(line);
-            }
-            if (model.getSize() == 0) {
-                model.addElement("(" + status.getName() + " is empty.)");
-            }
-        }
-
-        setCellRenderer(defaultCellRenderer);
-        setModel(model);
-        ensureIndexIsVisible(0);
-    }
-    
-    /**
-     * Given an index (that is, a line number in the patch), returns the
-     * line number in the newer revision. Used to implement double-clicking
-     * on a patch in CheckInWindow, which shows you that line in your
-     * editor.
-     */
-    public int lineNumberInNewerRevisionAtIndex(int index) {
-        int lineNumber = 0;
-        for (int i = 0; i <= index; ++i) {
-            String line = (String) getModel().getElementAt(i);
-            Patch.HunkRange hunkRange = new Patch.HunkRange(line);
-            if (hunkRange.matches()) {
-                lineNumber = hunkRange.toBegin() - 1;
-            } else if (line.startsWith("-") == false) {
-                ++lineNumber;
-            }
-        }
-        return lineNumber;
-    }
 }
