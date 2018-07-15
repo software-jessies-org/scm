@@ -10,7 +10,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 public class ScmUtilities {
-    public static final Font CODE_FONT = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
+    public static final Font CODE_FONT = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 14);
     
     public static void initAboutBox() {
         AboutBox aboutBox = AboutBox.getSharedInstance();
