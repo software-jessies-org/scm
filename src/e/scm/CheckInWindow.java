@@ -134,6 +134,16 @@ public class CheckInWindow extends MainFrame {
         contentPane.add(statusPanel, BorderLayout.SOUTH);
         setContentPane(contentPane);
         pack();
+        
+        // Are we taking a reasonable amount of the screen?
+        // Just letting `pack` size us lends to us being wide but short on modern screens.
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(getGraphicsConfiguration());
+        final int availableVerticalScreenSpace = screenSize.height - screenInsets.top - screenInsets.bottom;
+        if (getHeight() < (2 * availableVerticalScreenSpace) / 3) {
+            setSize(new Dimension(getSize().width, (2 * availableVerticalScreenSpace) / 3));
+        }
+        
         ScmUtilities.sanitizeSplitPaneDivider(ui);
         ScmUtilities.sanitizeSplitPaneDivider(topUi);
         setVisible(true);
