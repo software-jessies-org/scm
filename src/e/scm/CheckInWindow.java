@@ -19,6 +19,7 @@ public class CheckInWindow extends MainFrame {
     private StatusesTableModel statusesTableModel;
     private PTextArea checkInCommentArea;
     private PTextArea patchView;
+    private boolean ignoreWhiteSpace;
     private StatusReporter statusReporter;
     private JButton commitButton;
     
@@ -94,6 +95,15 @@ public class CheckInWindow extends MainFrame {
         });
         ComponentUtilities.divertPageScrollingFromTo(statusesTable, patchView);
         
+        EPopupMenu menu = new EPopupMenu(patchView);
+        menu.addMenuItemProvider(new MenuItemProvider() {
+            public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+                actions.add(new IgnoreWhiteSpaceAction());
+            }
+        });
+        
+        ignoreWhiteSpace = false;
+        
         // Whenever our window regains focus, make sure we're showing up-to-date information.
         addWindowFocusListener(new WindowAdapter() {
             @Override
@@ -147,6 +157,18 @@ public class CheckInWindow extends MainFrame {
         ScmUtilities.sanitizeSplitPaneDivider(ui);
         ScmUtilities.sanitizeSplitPaneDivider(topUi);
         setVisible(true);
+    }
+    
+    private class IgnoreWhiteSpaceAction extends AbstractAction {
+        IgnoreWhiteSpaceAction() {
+            super(ignoreWhiteSpace ? "Stop Ignoring White Space" : "Ignore White Space");
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            ignoreWhiteSpace = !ignoreWhiteSpace;
+            lastPatchViewUpdateTime = 0;
+            updatePatchView();
+        }
     }
     
     private void initStatusesList() {
@@ -206,7 +228,7 @@ public class CheckInWindow extends MainFrame {
             waitCursor.start();
             try {
                 // TODO: if we could get the content for the head/ToT version of this file, we could use PatchDialog.runDiff to get intra-line diffs.
-                Patch patch = new Patch(backEnd, filename, null, null, false, false/*TODO:ignoreWhiteSpace*/);
+                Patch patch = new Patch(backEnd, filename, null, null, false, ignoreWhiteSpace);
                 List<String> annotatedPatchLines = PatchDialog.annotatePatchUsingTags(patch.getPatchLines());
                 FileType.guessFileType(filename, /*TODO:current content*/"").configureTextArea(patchView);
                 PatchDialog.showDiffInTextArea(patchView, annotatedPatchLines);
