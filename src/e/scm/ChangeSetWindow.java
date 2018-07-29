@@ -10,7 +10,6 @@ import java.util.*;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.*;
-import org.jdesktop.swingworker.SwingWorker;
 
 public class ChangeSetWindow extends MainFrame {
     private RevisionControlSystem backEnd;
