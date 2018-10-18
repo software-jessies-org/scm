@@ -228,9 +228,9 @@ public abstract class RevisionControlSystem {
     public abstract void commit(String comment, List<FileStatus> fileStatuses);
     
     /**
-     * Should throw if a commit that doesn't include every file is currently disallowed.
+     * Should throw if a commit that doesn't include every file that would be included by default is currently disallowed.
      */
-    public void approvePartialCommit() {
+    public void approveNonDefaultCommit() {
     }
     
     public void execAndDump(List<String> commandAsList) {

@@ -337,9 +337,9 @@ public class CheckInWindow extends MainFrame {
     
     private void commit() {
         final String comment = getCommentWithNewline();
-        if (statusesTableModel.isEveryFileIncluded() == false) {
+        if (statusesTableModel.isDefaultCommit() == false) {
             try {
-                backEnd.approvePartialCommit();
+                backEnd.approveNonDefaultCommit();
             } catch (RuntimeException ex) {
                 SimpleDialog.showAlert(CheckInWindow.this, "Commit disallowed", ex.getMessage());
                 return;

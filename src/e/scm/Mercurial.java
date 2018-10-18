@@ -304,9 +304,9 @@ public class Mercurial extends RevisionControlSystem {
         execAndDump(command);
     }
     
-    public void approvePartialCommit() {
+    public void approveNonDefaultCommit() {
         if (isMerge()) {
-            throw new RuntimeException("Mercurial won't let you commit a merge without including everything");
+            throw new RuntimeException("Mercurial won't let you commit a merge unless you include every modified, renamed and removed file and don't include any new files");
         }
     }
 }
