@@ -273,6 +273,12 @@ public class Mercurial extends RevisionControlSystem {
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
+        // "Returns 0 if matching heads are found, 1 if not."
+        // With "no open branch heads found on branches default" on stderr.
+        // There are no heads in a repository that's just been through "hg init".
+        if (status == 1 && lines.isEmpty()) {
+            return false;
+        }
         if (status != 0) {
             throwError(status, command, lines, errors);
         }
