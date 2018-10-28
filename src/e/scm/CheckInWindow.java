@@ -209,7 +209,11 @@ public class CheckInWindow extends MainFrame {
         
         if (status.getState() == FileStatus.NEW) {
             if (FileUtilities.isSymbolicLink(file)) {
-                patchView.setText("(" + filename + " is a symbolic link.)");
+                if (file.exists()) {
+                    patchView.setText("(" + filename + " is a symbolic link.)");
+                } else {
+                    patchView.setText("(" + filename + " is a dangling symbolic link!)");
+                }
             } else if (file.isDirectory()) {
                 patchView.setText("(" + filename + " is a directory.)");
             } else if (FileUtilities.isTextFile(file) == false) {
