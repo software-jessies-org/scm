@@ -1,6 +1,7 @@
 package e.scm;
 
 import java.awt.*;
+import java.awt.desktop.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
@@ -33,12 +34,14 @@ public class CheckInWindow extends MainFrame {
     
     private void initQuitMonitoring() {
         // On the Mac, a user's likely to quit with C-Q, and not close our window at all.
-        new com.apple.eawt.Application().addApplicationListener(new com.apple.eawt.ApplicationAdapter() {
-            public void handleQuit(com.apple.eawt.ApplicationEvent e) {
-                CheckInWindow.this.handleQuit();
-                e.setHandled(true);
-            }
-        });
+        if (GuiUtilities.isMacOs()) {
+            Desktop.getDesktop().setQuitHandler(new QuitHandler() {
+                @Override public void handleQuitRequestWith(QuitEvent e, QuitResponse response) {
+                    CheckInWindow.this.handleQuit();
+                    response.performQuit();
+                }
+            });
+        }
         // Elsewhere, it's window closing we need to watch for.
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
