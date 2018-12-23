@@ -7,7 +7,7 @@ import e.util.*;
 
 public class BitKeeper extends RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("bk");
         command.add("annotate");
         if (revision != Revision.LOCAL_REVISION) {
@@ -18,7 +18,7 @@ public class BitKeeper extends RevisionControlSystem {
     }
 
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename, boolean ignoreWhiteSpace) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         result.add("bk");
         result.add("diffs");
         result.add("-u");
@@ -86,8 +86,8 @@ public class BitKeeper extends RevisionControlSystem {
         String[] command = new String[] {
             "bk", "sfiles", "-v", "-c", "-g", filename
         };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (String line : lines) {
             if (line.startsWith("lc") || line.startsWith("slc")) {
@@ -119,8 +119,8 @@ public class BitKeeper extends RevisionControlSystem {
      */
     private String getChangeSetNumberForRevision(String filename, Revision revision) {
         String[] command = new String[] { "bk", "r2c", "-r" + revision.number, filename };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
@@ -134,8 +134,8 @@ public class BitKeeper extends RevisionControlSystem {
     private List<String> getChangeSetByNumber(String changeSetNumber) {
         // bk-4.6b's rset.
         String[] command = new String[] { "bk", "changes", "-r" + changeSetNumber, "-v", "-n", "-d$if(:PARENT:){:GFILE:|:PARENT:..:REV:}" };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
@@ -150,7 +150,7 @@ public class BitKeeper extends RevisionControlSystem {
         // but still uses revision numbers for the ChangeSet.
         String revisionSpecifier = "(?:1(?:\\.\\d+)+|[-_A-Za-z0-9]{30})";
         Pattern pattern = Pattern.compile("^(.*)\\|(" + revisionSpecifier + "(?:\\+" + revisionSpecifier + ")?)\\.\\.(" + revisionSpecifier + ")$");
-        ArrayList<ChangeSetItem> result = new ArrayList<ChangeSetItem>();
+        ArrayList<ChangeSetItem> result = new ArrayList<>();
         for (String change : changeSet) {
             Matcher matcher = pattern.matcher(change);
             if (matcher.matches()) {
@@ -170,7 +170,7 @@ public class BitKeeper extends RevisionControlSystem {
     }
     
     public void revert(String filename) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("bk");
         command.add("unedit");
         command.add(filename);
@@ -182,8 +182,8 @@ public class BitKeeper extends RevisionControlSystem {
      */
     private int getRepositoryFileCount() {
         String[] command = new String[] { "bk", "log", "-hr+", "-d:HASHCOUNT:" };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0 || lines.size() != 1) {
             return -1;
@@ -213,8 +213,8 @@ public class BitKeeper extends RevisionControlSystem {
                 statusReporter.setProgressValue(value, fileCount);
             }
         };
-        ArrayList<String> notReallyTheOutput = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> notReallyTheOutput = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         ProcessUtilities.LineListener errorsListener = new ProcessUtilities.ArrayListLineListener(errors);
         int status = ProcessUtilities.backQuote(getRoot(), command, "", outputListener, errorsListener);
         if (status != 0) {
@@ -224,7 +224,7 @@ public class BitKeeper extends RevisionControlSystem {
         // Read in BitKeeper's real output.
         List<String> lines = Arrays.asList(StringUtilities.readLinesFromFile(temporaryFile.toString()));
         
-        ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
+        ArrayList<FileStatus> statuses = new ArrayList<>();
         Pattern pattern = Pattern.compile("^(.{4}|.{7})\\s+(.+)(@[0-9.]+)?$");
         for (String line : lines) {
             int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
@@ -267,8 +267,8 @@ public class BitKeeper extends RevisionControlSystem {
         String[] command = new String[] {
             "bk", "sfiles", "-pC", filename
         };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
@@ -290,7 +290,7 @@ public class BitKeeper extends RevisionControlSystem {
         for (FileStatus file : fileStatuses) {
             // The delta will fail if there's no modification, which is untidy.
             if (file.getState() != FileStatus.ADDED && file.getState() != FileStatus.REMOVED) {
-                ArrayList<String> command = new ArrayList<String>();
+                ArrayList<String> command = new ArrayList<>();
                 command.add("bk");
                 command.add("delta");
                 command.add("-a"); // Allow new files to be added without a separate 'bk new <file>'.
@@ -300,7 +300,7 @@ public class BitKeeper extends RevisionControlSystem {
             } else {
                 // If a pre-commit trigger fails, then the comment might have changed.
                 // This overwrites the default file comments on eg bk cp.
-                ArrayList<String> command = new ArrayList<String>();
+                ArrayList<String> command = new ArrayList<>();
                 command.add("bk");
                 command.add("comments");
                 command.add("-Y" + commentFilename);
@@ -311,7 +311,7 @@ public class BitKeeper extends RevisionControlSystem {
             input.append("\n");
         }
         
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("bk");
         command.add("commit");
         command.add("--standalone");

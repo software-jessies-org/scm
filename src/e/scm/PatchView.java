@@ -91,7 +91,7 @@ public class PatchView extends JList<String> {
     }
     
     private void showPatch(ArrayList<String> lines) {
-        DefaultListModel<String> differences = new DefaultListModel<String>();
+        DefaultListModel<String> differences = new DefaultListModel<>();
         for (String line : lines) {
             differences.addElement(line);
         }
@@ -104,8 +104,8 @@ public class PatchView extends JList<String> {
     }
     
     public static ArrayList<String> annotatePatchUsingTags(RevisionControlSystem backEnd, ArrayList<String> lines) {
-        ArrayList<String> newLines = new ArrayList<String>();
-        ArrayList<String> newErrors = new ArrayList<String>();
+        ArrayList<String> newLines = new ArrayList<>();
+        ArrayList<String> newErrors = new ArrayList<>();
         String patch = StringUtilities.join(lines, "\n") + "\n";
         String patchAnnotationTool = FileUtilities.findSupportScript("annotate-patch.rb");
         

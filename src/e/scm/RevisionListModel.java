@@ -9,8 +9,8 @@ import javax.swing.*;
  * the user interface.
  */
 public class RevisionListModel extends AbstractListModel<Revision> {
-    private ArrayList<Revision> data = new ArrayList<Revision>();
-    private HashMap<String, Revision> numberToRevisionMap = new HashMap<String, Revision>();
+    private ArrayList<Revision> data = new ArrayList<>();
+    private HashMap<String, Revision> numberToRevisionMap = new HashMap<>();
     private int maxAuthorNameLength = 0;
     private int maxRevisionNumberLength = 0;
     

@@ -5,7 +5,7 @@ import java.util.regex.*;
 import javax.swing.*;
 
 public class AnnotationModel extends AbstractListModel<AnnotatedLine> {
-    private ArrayList<AnnotatedLine> data = new ArrayList<AnnotatedLine>();
+    private ArrayList<AnnotatedLine> data = new ArrayList<>();
 
     public int getSize() {
         return data.size();

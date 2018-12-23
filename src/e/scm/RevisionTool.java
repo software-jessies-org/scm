@@ -7,7 +7,7 @@ import e.util.*;
 
 public class RevisionTool implements Launchable {
     private static final Pattern GREP_ADDRESS = Pattern.compile("(.*):([1-9][0-9]*):.*");
-    private ArrayList<Job> jobs = new ArrayList<Job>();
+    private ArrayList<Job> jobs = new ArrayList<>();
     
     public void parseCommandLine(List<String> arguments) {
         if (arguments.size() == 0) {

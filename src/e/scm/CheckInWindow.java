@@ -528,7 +528,7 @@ public class CheckInWindow extends MainFrame {
      * their back-end to ignore our files.
      */
     private List<FileStatus> removeScmDotFiles(List<FileStatus> list) {
-        ArrayList<FileStatus> result = new ArrayList<FileStatus>();
+        ArrayList<FileStatus> result = new ArrayList<>();
         for (FileStatus fileStatus : list) {
             if (fileStatus.getName().startsWith(".e.scm.") == false) {
                 result.add(fileStatus);

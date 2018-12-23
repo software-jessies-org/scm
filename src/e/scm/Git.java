@@ -13,8 +13,8 @@ public class Git extends RevisionControlSystem {
             return filename;
         }
         String[] command = new String[] { "git", "log", "-m", "--follow", "--name-status", revision.number.toString() + "..HEAD", "--", filename };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
@@ -31,7 +31,7 @@ public class Git extends RevisionControlSystem {
     }
     
     public String[] getAnnotateCommand(Revision revision, String filename) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("git");
         command.add("annotate");
         command.add("-l");
@@ -44,7 +44,7 @@ public class Git extends RevisionControlSystem {
     }
     
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename, boolean ignoreWhiteSpace) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         result.add("git");
         result.add("diff");
         result.add("--find-renames");
@@ -140,8 +140,8 @@ public class Git extends RevisionControlSystem {
     
     public boolean isLocallyModified(String filename) {
         String[] command = new String[] { "git", "diff", "--name-status", filename };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (String line : lines) {
             if (line.startsWith("M")) {
@@ -157,14 +157,14 @@ public class Git extends RevisionControlSystem {
     
     public List<ChangeSetItem> listTouchedFilesInRevision(String filename, Revision revision) {
         String[] command = new String[] { "git", "diff-tree", "--no-commit-id", "--name-only", "-r", revision.number };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
         }
         
-        ArrayList<ChangeSetItem> result = new ArrayList<ChangeSetItem>();
+        ArrayList<ChangeSetItem> result = new ArrayList<>();
         for (String line : lines) {
             String path = line;
             result.add(new ChangeSetItem(path, revision.number + "^", revision.number));
@@ -173,7 +173,7 @@ public class Git extends RevisionControlSystem {
     }
     
     public void revert(String filename) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("git");
         command.add("checkout");
         command.add(filename);
@@ -182,10 +182,10 @@ public class Git extends RevisionControlSystem {
     
     public List<FileStatus> getStatuses(StatusReporter statusReporter) {
         String[] statusCommand = new String[] { "git", "status", "-z" };
-        ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
+        ArrayList<FileStatus> statuses = new ArrayList<>();
 
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), statusCommand, lines, errors);
         if (status != 0) {
             throwError(status, statusCommand, lines, errors);
@@ -241,14 +241,14 @@ public class Git extends RevisionControlSystem {
             if (file.getState() == FileStatus.REMOVED) {
                 continue;
             }
-            ArrayList<String> command = new ArrayList<String>();
+            ArrayList<String> command = new ArrayList<>();
             command.add("git");
             command.add("add");
             command.add(file.getName());
             execAndDump(command);
         }
 
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("git");
         command.add("commit");
         command.add("--file=" + createCommentFile(comment));

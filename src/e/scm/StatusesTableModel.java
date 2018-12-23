@@ -85,7 +85,7 @@ public class StatusesTableModel extends AbstractTableModel {
     }
     
     public List<FileStatus> getIncludedFiles() {
-        ArrayList<FileStatus> result = new ArrayList<FileStatus>();
+        ArrayList<FileStatus> result = new ArrayList<>();
         for (int i = 0; i < getRowCount(); ++i) {
             if (isIncluded(i)) {
                 result.add(getFileStatus(i));
@@ -113,7 +113,7 @@ public class StatusesTableModel extends AbstractTableModel {
      * by invoking getName on each FileStatus.
      */
     private List<String> fileStatusListToFilenameList(List<FileStatus> files) {
-        ArrayList<String> names = new ArrayList<String>();
+        ArrayList<String> names = new ArrayList<>();
         for (FileStatus fileStatus : files) {
             names.add(fileStatus.getName());
         }

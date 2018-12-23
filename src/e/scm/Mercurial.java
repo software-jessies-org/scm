@@ -15,8 +15,8 @@ public class Mercurial extends RevisionControlSystem {
             return filename;
         }
         String[] command = new String[] { "hg", "diff", "--git", "-r", revision.number };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
@@ -41,7 +41,7 @@ public class Mercurial extends RevisionControlSystem {
     }
     
     public String[] getAnnotateCommand(Revision revision, String filename) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("hg");
         command.add("annotate");
         command.add("--number");
@@ -55,7 +55,7 @@ public class Mercurial extends RevisionControlSystem {
     }
     
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename, boolean ignoreWhiteSpace) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         result.add("hg");
         result.add("diff");
         if (ignoreWhiteSpace) {
@@ -101,7 +101,7 @@ public class Mercurial extends RevisionControlSystem {
     // Thu May  4 21:44:09 2006 -0700
     private static final Pattern TIMESTAMP_PATTERN = Pattern.compile("^date:        ... (\\S+) +(\\d+) (\\d{2}:\\d{2}:\\d{2}) (\\d{4}) ([-+]\\d{4})$");
     
-    private static final HashMap<String, Integer> monthMap = new HashMap<String, Integer>();
+    private static final HashMap<String, Integer> monthMap = new HashMap<>();
     static {
         monthMap.put("Jan", 1);
         monthMap.put("Feb", 2);
@@ -186,8 +186,8 @@ public class Mercurial extends RevisionControlSystem {
     
     public boolean isLocallyModified(String filename) {
         String[] command = new String[] { "hg", "status", filename };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (String line : lines) {
             if (line.startsWith("M ")) {
@@ -203,14 +203,14 @@ public class Mercurial extends RevisionControlSystem {
     
     public List<ChangeSetItem> listTouchedFilesInRevision(String filename, Revision revision) {
         String[] command = new String[] { "hg", "log", "-v", "-r", revision.number };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
         }
         
-        ArrayList<ChangeSetItem> result = new ArrayList<ChangeSetItem>();
+        ArrayList<ChangeSetItem> result = new ArrayList<>();
         for (String line : lines) {
             if (line.startsWith("files:       ")) {
                 // FIXME: how do they cope with filenames containing spaces? Experiment suggests "they don't".
@@ -227,7 +227,7 @@ public class Mercurial extends RevisionControlSystem {
     }
     
     public void revert(String filename) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("hg");
         command.add("revert");
         // We keep our own backups (though we should should make this clear in the UI).
@@ -238,20 +238,20 @@ public class Mercurial extends RevisionControlSystem {
     
     public List<FileStatus> getStatuses(StatusReporter statusReporter) {
         String[] command = new String[] { "hg", "status" };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
         }
         
-        HashMap<String, Integer> map = new HashMap<String, Integer>();
+        HashMap<String, Integer> map = new HashMap<>();
         map.put("A", FileStatus.ADDED);
         map.put("R", FileStatus.REMOVED);
         map.put("M", FileStatus.MODIFIED);
         map.put("?", FileStatus.NEW);
         
-        ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
+        ArrayList<FileStatus> statuses = new ArrayList<>();
         Pattern pattern = Pattern.compile("^([MAR?]) (.*)$");
         int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
         for (String line : lines) {
@@ -270,8 +270,8 @@ public class Mercurial extends RevisionControlSystem {
     
     public boolean isMerge() {
         String[] command = new String[] { "hg", "heads", "." };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         // "Returns 0 if matching heads are found, 1 if not."
         // With "no open branch heads found on branches default" on stderr.
@@ -293,7 +293,7 @@ public class Mercurial extends RevisionControlSystem {
     
     public void commit(String comment, List<FileStatus> fileStatuses) {
         scheduleNewFiles("hg", null, fileStatuses);
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("hg");
         command.add("commit");
         command.add("--logfile");

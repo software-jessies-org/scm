@@ -4,7 +4,7 @@ import e.util.*;
 import java.util.*;
 
 public class LineMapper {
-  private TreeMap<Integer, Integer> treeMap = new TreeMap<Integer, Integer>();
+  private TreeMap<Integer, Integer> treeMap = new TreeMap<>();
   
   public void addMapping(int fromLine, int toLine) {
     treeMap.put(fromLine, toLine);

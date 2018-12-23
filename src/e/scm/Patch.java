@@ -155,7 +155,7 @@ public class Patch {
     }
     
     public ArrayList<String> getPatchLines() {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         result.addAll(lines);
         return result;
     }

@@ -6,7 +6,7 @@ import e.util.*;
 
 public class Subversion extends RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("svn");
         command.add("annotate");
         if (revision != Revision.LOCAL_REVISION) {
@@ -18,7 +18,7 @@ public class Subversion extends RevisionControlSystem {
     }
 
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename, boolean ignoreWhiteSpace) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         result.add("svn");
         result.add("diff");
         if (ignoreWhiteSpace) {
@@ -92,8 +92,8 @@ public class Subversion extends RevisionControlSystem {
 
     public boolean isLocallyModified(String filename) {
         String[] command = new String[] { "svn", "status", filename };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (String line : lines) {
             if (line.charAt(0) == 'M' || line.charAt(1) == 'M') {
@@ -109,14 +109,14 @@ public class Subversion extends RevisionControlSystem {
     
     public List<ChangeSetItem> listTouchedFilesInRevision(String filename, Revision revision) {
         String[] command = new String[] { "svn", "log", "-v", "-r", revision.number };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
         }
         
-        ArrayList<ChangeSetItem> result = new ArrayList<ChangeSetItem>();
+        ArrayList<ChangeSetItem> result = new ArrayList<>();
         boolean inChangedPaths = false;
         Pattern changedPathPattern = Pattern.compile("^.... (.*)$");
         for (String line : lines) {
@@ -147,7 +147,7 @@ public class Subversion extends RevisionControlSystem {
     }
     
     public void revert(String filename) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("svn");
         command.add("revert");
         command.add(filename);
@@ -156,14 +156,14 @@ public class Subversion extends RevisionControlSystem {
 
     public List<FileStatus> getStatuses(StatusReporter statusReporter) {
         String[] command = new String[] { "svn", "status" };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
         }
         
-        ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
+        ArrayList<FileStatus> statuses = new ArrayList<>();
         Pattern pattern = Pattern.compile("^(.)(.)...\\s+(.+)$");
         for (String line : lines) {
             Matcher matcher = pattern.matcher(line);
@@ -224,7 +224,7 @@ public class Subversion extends RevisionControlSystem {
     
     public void commit(String comment, List<FileStatus> fileStatuses) {
         scheduleNewFiles("svn", "--non-recursive", fileStatuses);
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("svn");
         command.add("commit");
         command.add("--non-interactive");

@@ -11,8 +11,8 @@ public abstract class BackEndWorker implements Runnable {
   // A field so that it is accessible to an inner class.
   private Exception caughtException;
   
-  ArrayList<String> lines = new ArrayList<String>();
-  ArrayList<String> errors = new ArrayList<String>();
+  ArrayList<String> lines = new ArrayList<>();
+  ArrayList<String> errors = new ArrayList<>();
   String[] command;
   int status = 0;
   

@@ -7,7 +7,7 @@ import e.util.*;
 
 public class Cvs extends RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("cvs");
         command.add("annotate");
         if (revision != Revision.LOCAL_REVISION) {
@@ -19,7 +19,7 @@ public class Cvs extends RevisionControlSystem {
     }
 
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename, boolean ignoreWhiteSpace) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         result.add("cvs");
         result.add("diff");
         result.add("-u");
@@ -91,8 +91,8 @@ public class Cvs extends RevisionControlSystem {
 
     public boolean isLocallyModified(String filename) {
         String[] command = new String[] { "cvs", "status", filename };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (String line : lines) {
             if (line.contains("Status: Locally Modified")) {
@@ -120,7 +120,7 @@ public class Cvs extends RevisionControlSystem {
     public void revert(String filename) {
         File file = FileUtilities.fileFromParentAndString(getRoot().toString(), filename);
         file.delete();
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("cvs");
         command.add("update");
         // Although this might seem like the right thing to do, CVS will then
@@ -133,11 +133,11 @@ public class Cvs extends RevisionControlSystem {
 
     public List<FileStatus> getStatuses(StatusReporter statusReporter) {
         String[] command = new String[] { "cvs", "-q", "update", "-dP" };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         
-        ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
+        ArrayList<FileStatus> statuses = new ArrayList<>();
         Pattern pattern = Pattern.compile("^(.) (.+)$");
         for (String line : lines) {
             Matcher matcher = pattern.matcher(line);
@@ -168,7 +168,7 @@ public class Cvs extends RevisionControlSystem {
     
     public void commit(String comment, List<FileStatus> fileStatuses) {
         scheduleNewFiles("cvs", null, fileStatuses);
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("cvs");
         command.add("commit");
         command.add("-F");

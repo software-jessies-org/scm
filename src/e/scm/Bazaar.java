@@ -6,7 +6,7 @@ import e.util.*;
 
 public class Bazaar extends RevisionControlSystem {
     public String[] getAnnotateCommand(Revision revision, String filename) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("bzr");
         command.add("annotate");
         command.add("--all");
@@ -20,7 +20,7 @@ public class Bazaar extends RevisionControlSystem {
     }
     
     public String[] getDifferencesCommand(Revision olderRevision, Revision newerRevision, String filename, boolean ignoreWhiteSpace) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         result.add("bzr");
         result.add("diff");
         if (olderRevision != null) {
@@ -121,8 +121,8 @@ public class Bazaar extends RevisionControlSystem {
     
     public boolean isLocallyModified(String filename) {
         String[] command = new String[] { "bzr", "status", filename };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         for (String line : lines) {
             if (line.equals("modified:")) {
@@ -138,14 +138,14 @@ public class Bazaar extends RevisionControlSystem {
     
     public List<ChangeSetItem> listTouchedFilesInRevision(String filename, Revision revision) {
         String[] command = new String[] { "bzr", "log", "-v", "-r", revision.number };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
         }
         
-        ArrayList<ChangeSetItem> result = new ArrayList<ChangeSetItem>();
+        ArrayList<ChangeSetItem> result = new ArrayList<>();
         boolean inChangedPaths = false;
         for (String line : lines) {
             if (line.matches("^(added|modified|removed|renamed):$")) {
@@ -164,7 +164,7 @@ public class Bazaar extends RevisionControlSystem {
     }
     
     public void revert(String filename) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("bzr");
         command.add("revert");
         command.add("--no-backup");
@@ -174,14 +174,14 @@ public class Bazaar extends RevisionControlSystem {
     
     public List<FileStatus> getStatuses(StatusReporter statusReporter) {
         String[] command = new String[] { "bzr", "status" };
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
         }
         
-        HashMap<String, Integer> map = new HashMap<String, Integer>();
+        HashMap<String, Integer> map = new HashMap<>();
         map.put("added", FileStatus.ADDED);
         map.put("removed", FileStatus.REMOVED);
         map.put("renamed", FileStatus.NOT_RECOGNIZED_BY_BACK_END); // FIXME
@@ -189,7 +189,7 @@ public class Bazaar extends RevisionControlSystem {
         map.put("unchanged", FileStatus.NOT_RECOGNIZED_BY_BACK_END); // Shouldn't happen.
         map.put("unknown", FileStatus.NEW);
         
-        ArrayList<FileStatus> statuses = new ArrayList<FileStatus>();
+        ArrayList<FileStatus> statuses = new ArrayList<>();
         Pattern pattern = Pattern.compile("^(added|removed|renamed|modified|unchanged|unknown):$");
         int canonicalState = FileStatus.NOT_RECOGNIZED_BY_BACK_END;
         for (String line : lines) {
@@ -209,7 +209,7 @@ public class Bazaar extends RevisionControlSystem {
     
     public void commit(String comment, List<FileStatus> fileStatuses) {
         scheduleNewFiles("bzr", "--no-recurse", fileStatuses);
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("bzr");
         command.add("commit");
         command.add("--file");

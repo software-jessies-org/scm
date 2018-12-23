@@ -17,7 +17,7 @@ public class RevisionView extends JComponent {
     private static final String COMMENT_SEPARATOR = "---------------------------------------------------\n";
     
     public List<Revision> getRevisionRange(Revision fromRevision, Revision toRevision) {
-        ArrayList<Revision> range = new ArrayList<Revision>();
+        ArrayList<Revision> range = new ArrayList<>();
         Revision previousRevision = fromRevision;
         boolean withinRange = false;
         for (int i = 0; i < revisions.getSize(); ++i) {

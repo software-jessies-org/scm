@@ -243,8 +243,8 @@ public abstract class RevisionControlSystem {
     public void execAndDumpWithInput(List<String> commandAsList, String input) {
         String[] command = commandAsList.toArray(new String[commandAsList.size()]);
         String tool = command[0];
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         Log.warn(tool + ": running echo '" + input +"' | \"" + ProcessUtilities.shellQuotedFormOf(commandAsList) + "\"...");
         int status = ProcessUtilities.backQuote(repositoryRoot, command, input, lines, errors);
         for (int i = 0; i < lines.size(); ++i) {
@@ -296,7 +296,7 @@ public abstract class RevisionControlSystem {
     }
     
     public static List<FileStatus> justNewFiles(List<FileStatus> fileStatuses) {
-        ArrayList<FileStatus> result = new ArrayList<FileStatus>();
+        ArrayList<FileStatus> result = new ArrayList<>();
         for (FileStatus file : fileStatuses) {
             if (file.getState() == FileStatus.NEW) {
                 result.add(file);
@@ -313,7 +313,7 @@ public abstract class RevisionControlSystem {
         if (newFiles.isEmpty()) {
             return;
         }
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add(commandName);
         command.add("add");
         if (nonRecursiveSwitch != null) {
