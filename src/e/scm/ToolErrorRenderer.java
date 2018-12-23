@@ -3,14 +3,12 @@ package e.scm;
 import java.awt.*;
 import javax.swing.*;
 
-public class ToolErrorRenderer extends e.gui.EListCellRenderer {
+public class ToolErrorRenderer extends e.gui.EListCellRenderer<String> {
     public ToolErrorRenderer() {
         super(false);
     }
 
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean isFocused) {
-        super.getListCellRendererComponent(list, value, index, isSelected, isFocused);
+    @Override public void doCustomization(JList<String> list, String value, int index, boolean isSelected, boolean isFocused) {
         setForeground(Color.RED);
-        return this;
     }
 }

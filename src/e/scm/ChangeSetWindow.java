@@ -16,7 +16,7 @@ public class ChangeSetWindow extends MainFrame {
     private StatusReporter statusReporter;
     private Map<String, RevisionListModel> filePathToRevisionsMap;
     
-    private JList fileList;
+    private JList<ChangeSetItem> fileList;
     private PatchView patchView;
     private JButton showPatchButton;
     
@@ -99,10 +99,10 @@ public class ChangeSetWindow extends MainFrame {
     private void showPatch() {
         StringBuilder patch = new StringBuilder();
         patch.append("# " + getTitle() + "\n");
-        ListModel model = fileList.getModel();
+        ListModel<ChangeSetItem> model = fileList.getModel();
         String previousComment = "";
         for (int i = 0; i < model.getSize(); ++i) {
-            ChangeSetItem changeSetItem = (ChangeSetItem) model.getElementAt(i);
+            ChangeSetItem changeSetItem = model.getElementAt(i);
             
             RevisionListModel revisions = filePathToRevisionsMap.get(changeSetItem.filename);
             // The Subversion back-end gives us old revision numbers which aren't necessarily in the file's history.
@@ -143,9 +143,9 @@ public class ChangeSetWindow extends MainFrame {
             this.revision = revision;
             fileList.setEnabled(false);
             
-            DefaultListModel model = new DefaultListModel();
+            DefaultListModel<ChangeSetItem> model = new DefaultListModel<>();
             // FIXME: Specifying a revision that, with BitKeeper, is file-specific without specifying the file doesn't make sense.
-            model.addElement("Getting list of files in revision " + revision.number);
+            model.addElement(new ChangeSetItem("Getting list of files in revision " + revision.number, null, null));
             fileList.setModel(model);
         }
         
@@ -167,11 +167,11 @@ public class ChangeSetWindow extends MainFrame {
             }
             
             // Get the GUI component ready for real content.
-            DefaultListModel model = new DefaultListModel();
+            DefaultListModel<ChangeSetItem> model = new DefaultListModel<>();
             fileList.setModel(model);
             fileList.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
-                    ChangeSetItem changeSetItem = (ChangeSetItem) fileList.getSelectedValue();
+                    ChangeSetItem changeSetItem = fileList.getSelectedValue();
                     // For systems like BitKeeper, the newRevision of this file isn't necessarily the same as the Revision of the file we're showing the change set for.
                     Revision oldRevision = new Revision(changeSetItem.oldRevision, "pseudo revision");
                     Revision newRevision = new Revision(changeSetItem.newRevision, "pseudo revision");
@@ -203,7 +203,7 @@ public class ChangeSetWindow extends MainFrame {
         
         private ChangeSetItem lineForEvent(MouseEvent e) {
             int index = fileList.locationToIndex(e.getPoint());
-            return (ChangeSetItem) fileList.getModel().getElementAt(index);
+            return fileList.getModel().getElementAt(index);
         }
         
         private void doubleClick(ChangeSetItem changeSetItem) {

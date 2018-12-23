@@ -8,9 +8,9 @@ import javax.swing.*;
 public abstract class RevisionListWorker extends BackEndWorker {
   private RevisionControlSystem backEnd;
   protected String filePath;
-  private JList listForErrors;
+  private JList<?> listForErrors;
   
-  public RevisionListWorker(RevisionControlSystem backEnd, BackEndTask backEndTask, String filePath, JList listForErrors) {
+  public RevisionListWorker(RevisionControlSystem backEnd, BackEndTask backEndTask, String filePath, JList<?> listForErrors) {
     super(backEndTask);
     this.backEnd = backEnd;
     this.filePath = filePath;

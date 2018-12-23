@@ -8,7 +8,7 @@ import javax.swing.*;
  * Implements ListModel so that we can use the collection directly in
  * the user interface.
  */
-public class RevisionListModel extends AbstractListModel {
+public class RevisionListModel extends AbstractListModel<Revision> {
     private ArrayList<Revision> data = new ArrayList<Revision>();
     private HashMap<String, Revision> numberToRevisionMap = new HashMap<String, Revision>();
     private int maxAuthorNameLength = 0;
@@ -20,7 +20,7 @@ public class RevisionListModel extends AbstractListModel {
     }
     
     /** Implements ListModel. */
-    public Object getElementAt(int row) {
+    public Revision getElementAt(int row) {
         return data.get(row);
     }
     

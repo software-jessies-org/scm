@@ -5,7 +5,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-public class RevisionListCellRenderer extends JPanel implements ListCellRenderer {
+public class RevisionListCellRenderer extends JPanel implements ListCellRenderer<Revision> {
     private JLabel topLabel = new JLabel(" ");
     private JLabel bottomLabel = new JLabel(" ");
     private MutableMatteBorder matteBorder;
@@ -27,10 +27,8 @@ public class RevisionListCellRenderer extends JPanel implements ListCellRenderer
         bottomLabel.setFont(new Font(fontName, Font.PLAIN, 10));
     }
     
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(JList<? extends Revision> list, Revision revision, int index, boolean isSelected, boolean cellHasFocus) {
         setEnabled(list.isEnabled());
-        
-        Revision revision = (Revision) value;
         
         topLabel.setText(revision.date + " " + revision.time);
         bottomLabel.setText("  " + revision.author + " (" + revision.number + ")");

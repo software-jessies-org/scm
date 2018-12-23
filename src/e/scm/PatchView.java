@@ -10,8 +10,8 @@ import javax.swing.*;
 import e.gui.*;
 import e.util.*;
 
-public class PatchView extends JList {
-    private ListCellRenderer defaultCellRenderer;
+public class PatchView extends JList<String> {
+    private ListCellRenderer<? super String> defaultCellRenderer;
     private boolean ignoreWhiteSpace;
     
     private RevisionControlSystem backEnd;
@@ -23,18 +23,18 @@ public class PatchView extends JList {
     public PatchView() {
         // JList calculates its preferred size based on the first row of its model, so provide a fake model so that our initial preferred size is 80 columns.
         // We don't use setPrototypeCellValue because that would also affect our maximum size.
-        super(new AbstractListModel() {
+        super(new AbstractListModel<String>() {
             public int getSize() {
                 return 1;
             }
             
-            public Object getElementAt(int i) {
+            public String getElementAt(int i) {
                 return "                                                                                ";
             }
         });
         setFont(ScmUtilities.CODE_FONT);
         
-        EListCellRenderer renderer = new EListCellRenderer(false);
+        EListCellRenderer<String> renderer = new EListCellRenderer<>(false);
         // Disable HTML so we can render HTML files as source!
         renderer.putClientProperty("html.disable", Boolean.TRUE);
         setCellRenderer(renderer);
@@ -91,7 +91,7 @@ public class PatchView extends JList {
     }
     
     private void showPatch(ArrayList<String> lines) {
-        DefaultListModel differences = new DefaultListModel();
+        DefaultListModel<String> differences = new DefaultListModel<String>();
         for (String line : lines) {
             differences.addElement(line);
         }

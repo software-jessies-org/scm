@@ -4,14 +4,14 @@ import java.util.*;
 import java.util.regex.*;
 import javax.swing.*;
 
-public class AnnotationModel extends AbstractListModel {
+public class AnnotationModel extends AbstractListModel<AnnotatedLine> {
     private ArrayList<AnnotatedLine> data = new ArrayList<AnnotatedLine>();
 
     public int getSize() {
         return data.size();
     }
 
-    public Object getElementAt(int row) {
+    public AnnotatedLine getElementAt(int row) {
         return data.get(row);
     }
 

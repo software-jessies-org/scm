@@ -15,14 +15,13 @@ import e.util.*;
 
 public class RevisionView extends JComponent {
     private static final String COMMENT_SEPARATOR = "---------------------------------------------------\n";
-    private static final ListModel EMPTY_LIST_MODEL = new DefaultListModel();
     
     public List<Revision> getRevisionRange(Revision fromRevision, Revision toRevision) {
         ArrayList<Revision> range = new ArrayList<Revision>();
         Revision previousRevision = fromRevision;
         boolean withinRange = false;
         for (int i = 0; i < revisions.getSize(); ++i) {
-            Revision revision = (Revision) revisions.getElementAt(i);
+            Revision revision = revisions.getElementAt(i);
             if (withinRange) {
                 range.add(revision);
             }
@@ -137,9 +136,9 @@ public class RevisionView extends JComponent {
                 Revision newerRevision = (Revision) values[0];
                 Revision olderRevision = (Revision) values[values.length - 1];
                 
-                ListModel model = patchView.getModel();
+                ListModel<String> model = patchView.getModel();
                 final int index = patchView.locationToIndex(e.getPoint());
-                String lineOfInterest = (String) model.getElementAt(index);
+                String lineOfInterest = model.getElementAt(index);
                 
                 // Only lines removed or added can be jumped to.
                 if (lineOfInterest.matches("^[-+].*") == false) {
@@ -158,7 +157,7 @@ public class RevisionView extends JComponent {
                 int olderStartLine = 0;
                 int linesIntoHunk = 0;
                 for (int i = index; i >= 0; --i) {
-                    String line = (String) model.getElementAt(i);
+                    String line = model.getElementAt(i);
                     Patch.HunkRange hunkRange = new Patch.HunkRange(line);
                     if (hunkRange.matches()) {
                         olderStartLine = hunkRange.fromBegin();
@@ -204,11 +203,11 @@ public class RevisionView extends JComponent {
     private RevisionListModel revisions;
     
     private JSplitPane revisionsUi;
-    private JList revisionsList;
+    private JList<Revision> revisionsList;
     private PTextArea revisionCommentArea;
     
     private JTabbedPane mainView;
-    private JList annotationView;
+    @SuppressWarnings("rawtypes") private JList annotationView;
     private PatchView patchView;
     
     private StatusReporter statusReporter;
@@ -275,10 +274,10 @@ public class RevisionView extends JComponent {
             }
             
             private void findText(String searchTerm) {
-                JList list = getVisibleList();
+                JList<?> list = getVisibleList();
                 Pattern pattern = PatternUtilities.smartCaseCompile(searchTerm);
                 int currentIndex = list.getSelectedIndex();
-                ListModel model = list.getModel();
+                ListModel<?> model = list.getModel();
                 for (int i = currentIndex + 1; i < model.getSize(); ++i) {
                     String line = model.getElementAt(i).toString();
                     if (pattern.matcher(line).find()) {
@@ -289,7 +288,7 @@ public class RevisionView extends JComponent {
                 }
             }
             
-            private JList getVisibleList() {
+            private JList<?> getVisibleList() {
                 return (mainView.getSelectedIndex() == 0) ? annotationView : patchView;
             }
         });
@@ -318,7 +317,8 @@ public class RevisionView extends JComponent {
         revisionsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         revisionsList.addListSelectionListener(new RevisionListSelectionListener());
     }
-
+    
+    @SuppressWarnings("unchecked") // annotationView is a raw JList.
     private void initAnnotationView() {
         annotationView = ScmUtilities.makeList();
         annotationView.setCellRenderer(new AnnotatedLineRenderer(this));
@@ -392,6 +392,7 @@ public class RevisionView extends JComponent {
         }).start();
     }
 
+    @SuppressWarnings("unchecked") // annotationView is a raw JList.
     private void updateAnnotationModel(Revision revision, List<String> lines) {
         annotationModel = parseAnnotations(lines);
         if (revision == Revision.LOCAL_REVISION) {
@@ -414,7 +415,7 @@ public class RevisionView extends JComponent {
         return result;
     }
 
-    private void showSpecificLineInList(int lineNumber, final JList list) {
+    private void showSpecificLineInList(int lineNumber, final JList<?> list) {
         // FIXME: this only works while the implementation is synchronous.
         final int index = lineNumber - 1;
         EventQueue.invokeLater(new Runnable() {
@@ -450,16 +451,17 @@ public class RevisionView extends JComponent {
     private String summaryOfAllRevisions() {
         StringBuilder summary = new StringBuilder();
         for (int i = 0; i < revisions.getSize(); ++i) {
-            Revision revision = (Revision) revisions.getElementAt(i);
+            Revision revision = revisions.getElementAt(i);
             summary.append(revision.summary());
             summary.append(COMMENT_SEPARATOR);
         }
         return summary.toString();
     }
     
+    @SuppressWarnings("unchecked") // annotationView is a raw JList.
     private void showSummaryOfAllRevisions() {
         showComment(summaryOfAllRevisions());
-        annotationView.setModel(EMPTY_LIST_MODEL);
+        annotationView.setModel(new DefaultListModel<String>());
     }
 
     private void showLog() {
@@ -467,7 +469,7 @@ public class RevisionView extends JComponent {
     }
 
     public Revision getAnnotatedRevision() {
-        return (Revision) revisionsList.getSelectedValue();
+        return revisionsList.getSelectedValue();
     }
     
     private void readListOfRevisions(final int initialLineNumber) {
@@ -512,7 +514,7 @@ public class RevisionView extends JComponent {
                 return;
             }
             
-            JList list = (JList) e.getSource();
+            JList<?> list = (JList<?>) e.getSource();
             Object[] values = list.getSelectedValues();
             
             // FIXME: this should only be enabled if the particular revision touched more than one file. I think Revision needs to contain this information, so our initial "svn log" (or whatever) should be "svn log -v", and we can skip making effectively the same request again if/when the user asks to see the change set.

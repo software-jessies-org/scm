@@ -20,8 +20,8 @@ public class ScmUtilities {
         aboutBox.addCopyright("All Rights Reserved.");
     }
     
-    public static JList makeList() {
-        JList list = new JList();
+    public static <T> JList<T> makeList() {
+        JList<T> list = new JList<>();
         list.setFont(ScmUtilities.CODE_FONT);
         JListCopyAction.fixCopyFor(list);
         return list;
@@ -43,12 +43,14 @@ public class ScmUtilities {
         return BorderFactory.createEmptyBorder(10, 10, 10, 10);
     }
     
-    public static void showToolError(JList list, ArrayList<String> lines) {
-        list.setCellRenderer(new ToolErrorRenderer());
-        list.setModel(new ToolErrorListModel(lines));
+    public static void showToolError(JList<?> list, ArrayList<String> lines) {
+        // We're going to replace whatever model the JList has with a String model...
+        @SuppressWarnings("unchecked") JList<String> stringList = (JList<String>) list;
+        stringList.setCellRenderer(new ToolErrorRenderer());
+        stringList.setModel(new ToolErrorListModel(lines));
     }
     
-    public static void showToolError(JList list, ArrayList<String> lines, String[] command, int status) {
+    public static void showToolError(JList<?> list, ArrayList<String> lines, String[] command, int status) {
         if (status != 0) {
             lines.add("[Command '" + StringUtilities.join(command, " ") + "' returned status " + status + ".]");
         }

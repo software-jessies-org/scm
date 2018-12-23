@@ -8,7 +8,7 @@ import javax.swing.*;
  * which uses an anonymous inner class. Since updated to use a collection
  * class instead of an array. This is 2004, after all.
  */
-public class ToolErrorListModel extends AbstractListModel {
+public class ToolErrorListModel extends AbstractListModel<String> {
     private ArrayList<String> lines;
 
     public ToolErrorListModel(ArrayList<String> lines) {
@@ -19,7 +19,7 @@ public class ToolErrorListModel extends AbstractListModel {
         return lines.size();
     }
 
-    public Object getElementAt(int row) {
+    public String getElementAt(int row) {
         return lines.get(row);
     }
 }

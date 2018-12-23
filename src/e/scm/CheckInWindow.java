@@ -54,7 +54,7 @@ public class CheckInWindow extends MainFrame {
     private void handleQuit() {
         // If we got as far as being fully initialized, save our state.
         if (statusesTableModel != null) {
-                updateSavedState();
+            updateSavedState();
         }
     }
     
