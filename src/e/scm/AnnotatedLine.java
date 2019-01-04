@@ -4,9 +4,6 @@ import java.text.*;
 import java.util.regex.*;
 
 public class AnnotatedLine {
-    private static final SimpleDateFormat INPUT_DATE_FORMAT = new SimpleDateFormat("dd-MMM-yy");
-    private static final SimpleDateFormat OUTPUT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
     /** The revision number this line belongs to. */
     public Revision revision;
 
