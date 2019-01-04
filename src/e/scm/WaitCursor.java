@@ -3,7 +3,6 @@ package e.scm;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import e.util.*;
 
 public class WaitCursor {
     private static final Cursor DEFAULT_CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);

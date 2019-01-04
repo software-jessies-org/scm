@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import e.forms.*;
 import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;

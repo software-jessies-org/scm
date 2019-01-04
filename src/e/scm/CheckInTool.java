@@ -1,6 +1,5 @@
 package e.scm;
 
-import e.gui.*;
 import e.util.*;
 import java.util.*;
 

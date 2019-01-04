@@ -1,7 +1,6 @@
 package e.scm;
 
 import java.util.*;
-import java.util.regex.*;
 import javax.swing.*;
 
 public class AnnotationModel extends AbstractListModel<AnnotatedLine> {

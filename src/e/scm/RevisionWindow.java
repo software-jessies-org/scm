@@ -2,7 +2,6 @@ package e.scm;
 
 import e.gui.*;
 import e.util.*;
-import javax.swing.*;
 
 public class RevisionWindow extends MainFrame {
     private RevisionControlSystem backEnd;

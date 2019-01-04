@@ -1,9 +1,7 @@
 package e.scm;
 
-import java.awt.*;
 import java.io.*;
 import java.util.*;
-import java.util.List;
 import java.util.regex.*;
 import e.util.*;
 

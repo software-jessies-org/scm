@@ -4,10 +4,8 @@ import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.*;
 
 public class ScmUtilities {
     public static final Font CODE_FONT = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 14);

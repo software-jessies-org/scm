@@ -2,7 +2,6 @@ package e.scm;
 
 import e.util.*;
 import java.awt.*;
-import java.util.*;
 import javax.swing.*;
 
 public abstract class RevisionListWorker extends BackEndWorker {

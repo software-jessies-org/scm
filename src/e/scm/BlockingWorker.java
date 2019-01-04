@@ -2,7 +2,6 @@ package e.scm;
 
 import e.gui.*;
 import java.awt.*;
-import javax.swing.*;
 
 public abstract class BlockingWorker implements Runnable {
     private Component component;

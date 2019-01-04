@@ -3,7 +3,6 @@ package e.scm;
 import java.io.File;
 import java.io.*;
 import java.util.*;
-import e.gui.*;
 import e.util.*;
 
 /**

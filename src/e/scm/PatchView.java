@@ -1,11 +1,8 @@
 package e.scm;
 
-import java.awt.*;
-import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
-import java.util.regex.*;
 import javax.swing.*;
 import e.gui.*;
 import e.util.*;
