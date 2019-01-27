@@ -34,14 +34,7 @@ public class CheckInWindow extends MainFrame {
     private void initQuitMonitoring() {
         // On the Mac, a user's likely to quit with C-Q, and not close our window at all.
         if (GuiUtilities.isMacOs()) {
-/* TODO: proxy this
-            Desktop.getDesktop().setQuitHandler(new QuitHandler() {
-                @Override public void handleQuitRequestWith(QuitEvent e, QuitResponse response) {
-                    CheckInWindow.this.handleQuit();
-                    response.performQuit();
-                }
-            });
-*/
+            GuiUtilities.setQuitHandler(this::handleQuit);
         }
         // Elsewhere, it's window closing we need to watch for.
         addWindowListener(new WindowAdapter() {
@@ -51,11 +44,12 @@ public class CheckInWindow extends MainFrame {
         });
     }
     
-    private void handleQuit() {
+    private boolean handleQuit() {
         // If we got as far as being fully initialized, save our state.
         if (statusesTableModel != null) {
             updateSavedState();
         }
+        return true;
     }
     
     private void makeUserInterface() {
