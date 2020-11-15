@@ -20,7 +20,7 @@ public class ScmUtilities {
     
     public static <T> JList<T> makeList() {
         JList<T> list = new JList<>();
-        list.setFont(ScmUtilities.CODE_FONT);
+        list.setFont(GuiUtilities.applyFontScaling(ScmUtilities.CODE_FONT));
         JListCopyAction.fixCopyFor(list);
         return list;
     }

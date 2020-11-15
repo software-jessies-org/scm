@@ -23,8 +23,8 @@ public class RevisionListCellRenderer extends JPanel implements ListCellRenderer
         add(bottomLabel, BorderLayout.SOUTH);
         
         String fontName = UIManager.getFont("Label.font").getFontName();
-        topLabel.setFont(new Font(fontName, Font.BOLD, 12));
-        bottomLabel.setFont(new Font(fontName, Font.PLAIN, 10));
+        topLabel.setFont(GuiUtilities.applyFontScaling(new Font(fontName, Font.BOLD, 12)));
+        bottomLabel.setFont(GuiUtilities.applyFontScaling(new Font(fontName, Font.PLAIN, 10)));
     }
     
     public Component getListCellRendererComponent(JList<? extends Revision> list, Revision revision, int index, boolean isSelected, boolean cellHasFocus) {

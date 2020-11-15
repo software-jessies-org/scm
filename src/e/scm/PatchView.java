@@ -29,7 +29,7 @@ public class PatchView extends JList<String> {
                 return "                                                                                ";
             }
         });
-        setFont(ScmUtilities.CODE_FONT);
+        setFont(GuiUtilities.applyFontScaling(ScmUtilities.CODE_FONT));
         
         EListCellRenderer<String> renderer = new EListCellRenderer<>(false);
         // Disable HTML so we can render HTML files as source!
