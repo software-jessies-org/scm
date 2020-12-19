@@ -3,6 +3,8 @@ package e.scm;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.*;
@@ -164,7 +166,7 @@ public class CheckInWindow extends MainFrame {
         
         public void actionPerformed(ActionEvent e) {
             ignoreWhiteSpace = !ignoreWhiteSpace;
-            lastPatchViewUpdateTime = 0;
+            lastPatchViewUpdateTime = FileTime.fromMillis(0);
             updatePatchView();
         }
     }
@@ -183,60 +185,64 @@ public class CheckInWindow extends MainFrame {
         });
     }
     
-    private File lastPatchViewFile = null;
-    private long lastPatchViewUpdateTime = 0;
+    private Path lastPatchViewFile = null;
+    private FileTime lastPatchViewUpdateTime = FileTime.fromMillis(0);
     
     private void updatePatchView() {
-        final int selectedRow = statusesTable.getSelectedRow();
-        if (selectedRow == -1) {
-            return;
-        }
-        
-        FileStatus status = statusesTableModel.getFileStatus(selectedRow);
-        final String filename = status.getName();
-        final File file = new File(backEnd.getRoot(), filename);
-        final long updateTime = file.lastModified();
-        if (file.equals(lastPatchViewFile) && updateTime <= lastPatchViewUpdateTime) {
-            return;
-        }
-        
-        lastPatchViewFile = file;
-        lastPatchViewUpdateTime = updateTime;
-        
-        resetPatchView();
-        
-        if (status.getState() == FileStatus.NEW) {
-            if (FileUtilities.isSymbolicLink(file)) {
-                if (file.exists()) {
-                    patchView.setText("(" + filename + " is a symbolic link.)");
+        try {
+            final int selectedRow = statusesTable.getSelectedRow();
+            if (selectedRow == -1) {
+                return;
+            }
+            
+            FileStatus status = statusesTableModel.getFileStatus(selectedRow);
+            final String filename = status.getName();
+            final Path path = Paths.get(backEnd.getRoot().toString(), filename);
+            final FileTime updateTime = Files.getLastModifiedTime(path);
+            if (path.equals(lastPatchViewFile) && updateTime.compareTo(lastPatchViewUpdateTime) <= 0) {
+                return;
+            }
+            
+            lastPatchViewFile = path;
+            lastPatchViewUpdateTime = updateTime;
+            
+            resetPatchView();
+            
+            if (status.getState() == FileStatus.NEW) {
+                if (Files.isSymbolicLink(path)) {
+                    if (Files.exists(path)) {
+                        patchView.setText("(" + filename + " is a symbolic link.)");
+                    } else {
+                        patchView.setText("(" + filename + " is a dangling symbolic link!)");
+                    }
+                } else if (Files.isDirectory(path)) {
+                    patchView.setText("(" + filename + " is a directory.)");
+                } else if (FileUtilities.isTextFile(path.toFile()) == false) {
+                    patchView.setText("(" + filename + " is a binary file.)");
                 } else {
-                    patchView.setText("(" + filename + " is a dangling symbolic link!)");
+                    String content = StringUtilities.readFile(path);
+                    if (content.isEmpty()) {
+                        patchView.setText("(" + filename + " is empty.)");
+                    } else {
+                        FileType.guessFileType(filename, content).configureTextArea(patchView);
+                        patchView.setText(content);
+                    }
                 }
-            } else if (file.isDirectory()) {
-                patchView.setText("(" + filename + " is a directory.)");
-            } else if (FileUtilities.isTextFile(file) == false) {
-                patchView.setText("(" + filename + " is a binary file.)");
             } else {
-                String content = StringUtilities.readFile(file);
-                if (content.isEmpty()) {
-                    patchView.setText("(" + filename + " is empty.)");
-                } else {
-                    FileType.guessFileType(filename, content).configureTextArea(patchView);
-                    patchView.setText(content);                    
+                WaitCursor waitCursor = new WaitCursor(this, "Getting patch...", statusReporter);
+                waitCursor.start();
+                try {
+                    // TODO: if we could get the content for the head/ToT version of this file, we could use PatchDialog.runDiff to get intra-line diffs.
+                    Patch patch = new Patch(backEnd, filename, null, null, false, ignoreWhiteSpace);
+                    List<String> annotatedPatchLines = PatchDialog.annotatePatchUsingTags(patch.getPatchLines());
+                    FileType.guessFileType(filename, /*TODO:current content*/"").configureTextArea(patchView);
+                    PatchDialog.showDiffInTextArea(patchView, annotatedPatchLines);
+                } finally {
+                    waitCursor.stop();
                 }
             }
-        } else {
-            WaitCursor waitCursor = new WaitCursor(this, "Getting patch...", statusReporter);
-            waitCursor.start();
-            try {
-                // TODO: if we could get the content for the head/ToT version of this file, we could use PatchDialog.runDiff to get intra-line diffs.
-                Patch patch = new Patch(backEnd, filename, null, null, false, ignoreWhiteSpace);
-                List<String> annotatedPatchLines = PatchDialog.annotatePatchUsingTags(patch.getPatchLines());
-                FileType.guessFileType(filename, /*TODO:current content*/"").configureTextArea(patchView);
-                PatchDialog.showDiffInTextArea(patchView, annotatedPatchLines);
-            } finally {
-                waitCursor.stop();
-            }
+        } catch (IOException ex) {
+            Log.warn("Failed to update patch view", ex);
         }
     }
     

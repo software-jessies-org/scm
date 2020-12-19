@@ -1,7 +1,7 @@
 package e.scm;
 
-import java.io.File;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import e.util.*;
 
@@ -17,7 +17,14 @@ public abstract class RevisionControlSystem {
      * use with the given file or directory.
      */
     public static RevisionControlSystem forPath(String path) {
-        File root = findRepositoryRoot(path);
+        Path root;
+        try {
+            root = FileUtilities.pathFrom(path).toRealPath();
+        } catch (IOException ex) {
+            Log.warn("Couldn't canonicalize path.", ex);
+            return null;
+        }
+        root = findRepositoryRoot(root);
         if (root == null) {
             return null;
         }
@@ -31,65 +38,65 @@ public abstract class RevisionControlSystem {
      * still contains a revision control system directory of the kind found
      * at the given point.
      */
-    private static File findRepositoryRoot(final String path) {
-        String canonicalPath = path;
-        try {
-            canonicalPath = FileUtilities.fileFromString(path).getCanonicalPath();
-        } catch (IOException ex) {
-            Log.warn("Couldn't canonicalize path.", ex);
-        }
-        File file = new File(canonicalPath);
-        if (file.exists() == false) {
-            Log.warn("\"" + file + "\" does not exist.");
+    private static Path findRepositoryRoot(final Path canonicalPath) {
+       if (!Files.exists(canonicalPath)) {
+            Log.warn("\"" + canonicalPath + "\" does not exist.");
             // We can still usefully run when the target file doesn't exist.
             // BitKeeper often doesn't check-out files in BitKeeper/deleted/ but will happily allow you to look at the history.
             // I've seen similar behavior in other systems too.
         }
         
         // Is there evidence of revision control in this directory?
-        // This is carefully crafted such that, if "file" doesn't exist, we look at its parent directory.
-        File directory = file.isDirectory() ? file : new File(file.getParent());
-        for (String sibling : directory.list()) {
-            if (sibling.equals(".bzr")) {
-                return ascendUntilSubdirectoryDisappears(directory, ".bzr");
-            } else if (sibling.equals("CVS")) {
-                return ascendUntilSubdirectoryDisappears(directory, "CVS");
-            } else if (sibling.equals(".hg")) {
-                return ascendUntilSubdirectoryDisappears(directory, ".hg");
-            } else if (sibling.equals("SCCS") || sibling.equals(".bk")) {
-                return ascendUntilSubdirectoryAppears(directory, "BitKeeper");
-            } else if (sibling.equals(".svn")) {
-                return ascendUntilSubdirectoryDisappears(directory, ".svn");
-            } else if (sibling.equals(".git")) {
-                return directory;
+        // This is carefully crafted such that, if "canonicalPath" doesn't exist, we look at its parent directory.
+        Path directory = Files.isDirectory(canonicalPath) ? canonicalPath : canonicalPath.getParent();
+        try {
+            Optional<Path> result = Files.list(directory)
+                .map(v -> repositoryRootAt(directory, v))
+                .filter(v -> v != null)
+                .findFirst();
+            if (result.isPresent()) {
+                return result.get();
             }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
         
-        // We've found nothing yet, so try again in the parent.
-        String parent = file.getParent();
-        if (parent != null) {
-            return findRepositoryRoot(parent);
+        // We've found nothing yet, so try again in the parent if there is one.
+        Path parent = directory.getParent();
+        return parent == null ? null : findRepositoryRoot(parent);
+    }
+    
+    private static Path repositoryRootAt(final Path directory, final Path path) {
+        String base = path.getFileName().toString();
+        if (base == null) {
+            return null;
+        } else if (base.equals(".bzr")) {
+            return ascendUntilSubdirectoryDisappears(directory, ".bzr");
+        } else if (base.equals("CVS")) {
+            return ascendUntilSubdirectoryDisappears(directory, "CVS");
+        } else if (base.equals(".hg")) {
+            return ascendUntilSubdirectoryDisappears(directory, ".hg");
+        } else if (base.equals("SCCS") || base.equals(".bk")) {
+            return ascendUntilSubdirectoryAppears(directory, "BitKeeper");
+        } else if (base.equals(".svn")) {
+            return ascendUntilSubdirectoryDisappears(directory, ".svn");
+        } else if (base.equals(".git")) {
+            return directory;
         }
-        
-        // We're in "/", so admit defeat.
         return null;
     }
     
-    private static boolean isScmDirectoryAbsent(final File directory, final String subdirectoryName) {
-        File scmDirectory = new File(directory, subdirectoryName);
-        return scmDirectory.exists() == false || scmDirectory.isDirectory() == false;
+    private static boolean isScmDirectoryPresent(final Path directory, final String subdirectoryName) {
+       return Files.isDirectory(Paths.get(directory.toString(), subdirectoryName));
     }
-    private static File ascendUntilSubdirectoryAppearsOrDisappears(final File directory, final String subdirectoryName, final boolean stopWhenAbsent) {
-        File previousRoot = null;
-        File root = directory;
-        while (isScmDirectoryAbsent(root, subdirectoryName) != stopWhenAbsent) {
-            String parentName = root.getParent();
-            if (parentName == null) {
-                return null;
-            }
+    
+    private static Path ascendUntilSubdirectoryAppearsOrDisappears(final Path directory, final String subdirectoryName, final boolean stopWhenAbsent) {
+        Path previousRoot = null;
+        Path root = directory;
+        while (isScmDirectoryPresent(root, subdirectoryName) == stopWhenAbsent) {
             previousRoot = root;
-            root = new File(parentName);
-            if (root.exists() == false || root.isDirectory() == false) {
+            root = root.getParent();
+            if (root == null || !Files.isDirectory(root)) {
                 return null;
             }
         }
@@ -98,11 +105,11 @@ public abstract class RevisionControlSystem {
         return stopWhenAbsent ? previousRoot : root;
     }
     
-    private static File ascendUntilSubdirectoryDisappears(final File directory, final String subdirectoryName) {
+    private static Path ascendUntilSubdirectoryDisappears(final Path directory, final String subdirectoryName) {
         return ascendUntilSubdirectoryAppearsOrDisappears(directory, subdirectoryName, true);
     }
     
-    private static File ascendUntilSubdirectoryAppears(final File directory, final String subdirectoryName) {
+    private static Path ascendUntilSubdirectoryAppears(final Path directory, final String subdirectoryName) {
         return ascendUntilSubdirectoryAppearsOrDisappears(directory, subdirectoryName, false);
     }
     
@@ -112,34 +119,50 @@ public abstract class RevisionControlSystem {
      * whether there's a .bk, .bzr, CVS, .hg, SCCS, .git or .svn directory
      * in the same directory as the file.
      */
-    private static RevisionControlSystem selectRevisionControlSystem(File repositoryRoot) {
-        for (String sibling : repositoryRoot.list()) {
-            if (sibling.equals(".bzr")) {
-                return new Bazaar();
-            } else if (sibling.equals("CVS")) {
-                return new Cvs();
-            } else if (sibling.equals(".hg")) {
-                return new Mercurial();
-            } else if (sibling.equals("SCCS") || sibling.equals(".bk")) {
-                return new BitKeeper();
-            } else if (sibling.equals(".git")) {
-                return new Git();
-            } else if (sibling.equals(".svn")) {
-                return new Subversion();
+    private static RevisionControlSystem selectRevisionControlSystem(Path repositoryRoot) {
+        try {
+            Optional<RevisionControlSystem> result = Files.list(repositoryRoot)
+                .map(v -> revisionControlSystemFor(v))
+                .filter(v -> v != null)
+                .findFirst();
+            if (result.isPresent()) {
+                return result.get();
             }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
         // We know this is wrong, but CVS is likely to be installed,
         // and will give a reasonably good error when invoked.
         return new Cvs();
     }
     
-    private File repositoryRoot;
+    private static RevisionControlSystem revisionControlSystemFor(final Path path) {
+        String base = path.getFileName().toString();
+        if (base == null) {
+            return null;
+        } else if (base.equals(".bzr")) {
+            return new Bazaar();
+        } else if (base.equals("CVS")) {
+            return new Cvs();
+        } else if (base.equals(".hg")) {
+            return new Mercurial();
+        } else if (base.equals("SCCS") || base.equals(".bk")) {
+            return new BitKeeper();
+        } else if (base.equals(".svn")) {
+            return new Subversion();
+        } else if (base.equals(".git")) {
+            return new Git();
+        }
+        return null;
+    }
     
-    private void setRoot(File root) {
+    private Path repositoryRoot;
+    
+    private void setRoot(Path root) {
         this.repositoryRoot = root;
     }
     
-    public File getRoot() {
+    public Path getRoot() {
         return repositoryRoot;
     }
 

@@ -1,6 +1,7 @@
 package e.scm;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
 import e.util.*;
@@ -108,7 +109,7 @@ public class Patch {
     }
     
     public Patch(RevisionControlSystem backEnd, String filePath, Revision olderRevision, Revision newerRevision, boolean isPatchReversed, boolean ignoreWhiteSpace) {
-        File directory = backEnd.getRoot();
+        Path directory = backEnd.getRoot();
         String[] command = backEnd.getDifferencesCommand(olderRevision, newerRevision, filePath, ignoreWhiteSpace);
         this.lines = new ArrayList<String>();
         this.errors = new ArrayList<String>();
