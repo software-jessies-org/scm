@@ -17,14 +17,7 @@ public abstract class RevisionControlSystem {
      * use with the given file or directory.
      */
     public static RevisionControlSystem forPath(String path) {
-        Path root;
-        try {
-            root = FileUtilities.pathFrom(path).toRealPath();
-        } catch (IOException ex) {
-            Log.warn("Couldn't canonicalize path.", ex);
-            return null;
-        }
-        root = findRepositoryRoot(root);
+        Path root = findRepositoryRoot(FileUtilities.pathFrom(path));
         if (root == null) {
             return null;
         }
@@ -38,9 +31,12 @@ public abstract class RevisionControlSystem {
      * still contains a revision control system directory of the kind found
      * at the given point.
      */
-    private static Path findRepositoryRoot(final Path canonicalPath) {
-       if (!Files.exists(canonicalPath)) {
-            Log.warn("\"" + canonicalPath + "\" does not exist.");
+    private static Path findRepositoryRoot(final Path path) {
+        Path canonicalPath = path;
+        try {
+            canonicalPath = path.toRealPath();
+        } catch (IOException ex) {
+            Log.warn("\"" + path + "\" couldn't be canonicalized.", ex);
             // We can still usefully run when the target file doesn't exist.
             // BitKeeper often doesn't check-out files in BitKeeper/deleted/ but will happily allow you to look at the history.
             // I've seen similar behavior in other systems too.
