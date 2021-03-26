@@ -12,22 +12,28 @@ public class Git extends RevisionControlSystem {
         if (revision == Revision.LOCAL_REVISION) {
             return filename;
         }
-        String[] command = new String[] { "git", "log", "-m", "--follow", "--name-status", revision.number.toString() + "..HEAD", "--", filename };
+        // revision^ doesn't exist for the first revision.
+        // revision.. excludes the revision itself.
+        // The last commit displayed isn't always the one immediately after the requested revision.
+        String[] command = new String[] { "git", "log", "-z", "-m", "--follow", "--name-status", "--", filename };
         ArrayList<String> lines = new ArrayList<>();
         ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(getRoot(), command, lines, errors);
         if (status != 0) {
             throwError(status, command, lines, errors);
         }
-        if (lines.size() == 0) {
-            return filename;
+        String output = StringUtilities.join(lines, "\n");
+        String[] commits = output.split("\0\0");
+        for (String commit: commits) {
+            String[] fields = commit.split("\0");
+            if (fields[0].startsWith("commit " + revision.number.toString() + "\n")) {
+                // R100\0old name\0new name
+                // M\0name
+                String newName = fields[fields.length - 1];
+                return newName;
+            }
         }
-        String lastLine = lines.get(lines.size() - 1);
-        // R100\told name\tnew name
-        // M\tname
-        String[] fields = lastLine.split("\t");
-        String oldName = fields[1];
-        return oldName;
+        return filename;
     }
     
     public String[] getAnnotateCommand(Revision revision, String filename) {
