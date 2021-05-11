@@ -232,6 +232,10 @@ public class Git extends RevisionControlSystem {
                 canonicalState = FileStatus.NEW;
             } else if (x == 'R' && y == ' ') {
                 canonicalState = FileStatus.ADDED;
+            } else if (x == 'A' && y == ' ') {
+                canonicalState = FileStatus.ADDED;
+            } else {
+                Log.warn("git status reported as x, y == '" + x + "', '" + y + "' for " + name);
             }
             // FIXME: All the other combinations.
             if (canonicalState != FileStatus.IGNORED) {
