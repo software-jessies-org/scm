@@ -243,7 +243,7 @@ public abstract class RevisionControlSystem {
      * Commits the files from the given list of FileStatus objects using the comment
      * supplied.
      */
-    public abstract void commit(String comment, List<FileStatus> fileStatuses);
+    public abstract void commit(String comment, List<FileStatus> fileStatuses, List<FileStatus> excluded);
     
     /**
      * Should throw if a commit that doesn't include every file that would be included by default is currently disallowed.

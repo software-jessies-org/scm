@@ -207,7 +207,7 @@ public class Bazaar extends RevisionControlSystem {
         return statuses;
     }
     
-    public void commit(String comment, List<FileStatus> fileStatuses) {
+    public void commit(String comment, List<FileStatus> fileStatuses, List<FileStatus> excluded) {
         scheduleNewFiles("bzr", "--no-recurse", fileStatuses);
         ArrayList<String> command = new ArrayList<>();
         command.add("bzr");

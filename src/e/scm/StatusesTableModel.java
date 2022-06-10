@@ -84,14 +84,22 @@ public class StatusesTableModel extends AbstractTableModel {
         }
     }
     
-    public List<FileStatus> getIncludedFiles() {
+    public List<FileStatus> getFilesIf(boolean included) {
         ArrayList<FileStatus> result = new ArrayList<>();
         for (int i = 0; i < getRowCount(); ++i) {
-            if (isIncluded(i)) {
+            if (isIncluded(i) == included) {
                 result.add(getFileStatus(i));
             }
         }
         return result;
+    }
+
+    public List<FileStatus> getIncludedFiles() {
+        return getFilesIf(true);
+    }
+
+    public List<FileStatus> getExcludedFiles() {
+        return getFilesIf(false);
     }
     
     public List<String> getIncludedFilenames() {

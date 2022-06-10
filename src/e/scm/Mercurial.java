@@ -291,7 +291,7 @@ public class Mercurial extends RevisionControlSystem {
         return heads > 1;
     }
     
-    public void commit(String comment, List<FileStatus> fileStatuses) {
+    public void commit(String comment, List<FileStatus> fileStatuses, List<FileStatus> excluded) {
         scheduleNewFiles("hg", null, fileStatuses);
         ArrayList<String> command = new ArrayList<>();
         command.add("hg");

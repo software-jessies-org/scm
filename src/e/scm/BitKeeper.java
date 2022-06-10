@@ -277,7 +277,7 @@ public class BitKeeper extends RevisionControlSystem {
         return lines.get(0);
     }
     
-    public void commit(String comment, List<FileStatus> fileStatuses) {
+    public void commit(String comment, List<FileStatus> fileStatuses, List<FileStatus> excluded) {
         Path resync = Paths.get(getRoot().toString(), "RESYNC");
         if (Files.isDirectory(resync) || getRoot().getFileName().toString().equals("RESYNC")) {
             throw new RuntimeException("This repository has a RESYNC directory. SCM's BitKeeper back-end doesn't support resolving merge conflicts, nor committing while there are merge conflicts to be resolved. Please use \"bk resolve\" to fix the problem.");

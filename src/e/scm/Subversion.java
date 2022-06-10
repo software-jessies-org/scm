@@ -222,7 +222,7 @@ public class Subversion extends RevisionControlSystem {
         }
     }
     
-    public void commit(String comment, List<FileStatus> fileStatuses) {
+    public void commit(String comment, List<FileStatus> fileStatuses, List<FileStatus> excluded) {
         scheduleNewFiles("svn", "--non-recursive", fileStatuses);
         ArrayList<String> command = new ArrayList<>();
         command.add("svn");

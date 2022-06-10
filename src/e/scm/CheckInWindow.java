@@ -353,13 +353,14 @@ public class CheckInWindow extends MainFrame {
                 return;
             }
         }
-        final List<FileStatus> filenames = statusesTableModel.getIncludedFiles();
+        final List<FileStatus> included = statusesTableModel.getIncludedFiles();
+        final List<FileStatus> excluded = statusesTableModel.getExcludedFiles();
         
         setEntireUiEnabled(false);
         new Thread(new BlockingWorker(statusesTable, "Committing changes...", statusReporter) {
             public void work() {
                 try {
-                    backEnd.commit(comment, filenames);
+                    backEnd.commit(comment, included, excluded);
                 } catch (RuntimeException ex) {
                     // If the commit partly succeeded, then a retry won't do the right thing unless we've updated our state.
                     updateFileStatuses();

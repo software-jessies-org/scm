@@ -246,7 +246,7 @@ public class Git extends RevisionControlSystem {
         return statuses;
     }
     
-    public void commit(String comment, List<FileStatus> fileStatuses) {
+    public void commit(String comment, List<FileStatus> fileStatuses, List<FileStatus> excluded) {
         for (FileStatus file : fileStatuses) {
             if (file.getState() == FileStatus.REMOVED) {
                 continue;
@@ -254,6 +254,16 @@ public class Git extends RevisionControlSystem {
             ArrayList<String> command = new ArrayList<>();
             command.add("git");
             command.add("add");
+            command.add(file.getName());
+            execAndDump(command);
+        }
+        for (FileStatus file : excluded) {
+            if (file.getState() != FileStatus.ADDED) {
+                continue;
+            }
+            ArrayList<String> command = new ArrayList<>();
+            command.add("git");
+            command.add("reset");
             command.add(file.getName());
             execAndDump(command);
         }
