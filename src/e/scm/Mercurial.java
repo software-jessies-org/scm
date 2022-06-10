@@ -307,7 +307,7 @@ public class Mercurial extends RevisionControlSystem {
 
     public void commit(String comment, List<FileStatus> fileStatuses, List<FileStatus> excluded) {
         boolean merge = isMerge();
-        if (isDefaultCommit() == false && merge) {
+        if (isDefaultCommit(fileStatuses, excluded) == false && merge) {
             throw new RuntimeException("Mercurial won't let you commit a merge unless you include every modified, renamed and removed file and don't include any new files");
         }
         scheduleNewFiles("hg", null, fileStatuses);
