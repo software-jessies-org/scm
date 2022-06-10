@@ -141,17 +141,6 @@ public class StatusesTableModel extends AbstractTableModel {
         return false;
     }
     
-    public boolean isDefaultCommit() {
-        for (int i = 0; i < getRowCount(); ++i) {
-            FileStatus fileStatus = getFileStatus(i);
-            boolean wouldBeIncludedByDefault = fileStatus.getState() != FileStatus.NEW;
-            if (isIncluded(i) != wouldBeIncludedByDefault) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
     /**
      * Returns the index of the first row whose file is included, 0 if no
      * files are currently included.

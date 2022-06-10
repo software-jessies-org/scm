@@ -291,22 +291,34 @@ public class Mercurial extends RevisionControlSystem {
         return heads > 1;
     }
     
+    private boolean isDefaultCommit(List<FileStatus> fileStatuses, List<FileStatus> excluded) {
+        for (FileStatus file : fileStatuses) {
+            if (file.getState() == FileStatus.NEW) {
+                return false;
+            }
+        }
+        for (FileStatus file : excluded) {
+            if (file.getState() != FileStatus.NEW) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void commit(String comment, List<FileStatus> fileStatuses, List<FileStatus> excluded) {
+        boolean merge = isMerge();
+        if (isDefaultCommit() == false && merge) {
+            throw new RuntimeException("Mercurial won't let you commit a merge unless you include every modified, renamed and removed file and don't include any new files");
+        }
         scheduleNewFiles("hg", null, fileStatuses);
         ArrayList<String> command = new ArrayList<>();
         command.add("hg");
         command.add("commit");
         command.add("--logfile");
         command.add(createCommentFile(comment));
-        if (isMerge() == false) {
+        if (merge == false) {
             addFilenames(command, fileStatuses);
         }
         execAndDump(command);
-    }
-    
-    public void approveNonDefaultCommit() {
-        if (isMerge()) {
-            throw new RuntimeException("Mercurial won't let you commit a merge unless you include every modified, renamed and removed file and don't include any new files");
-        }
     }
 }

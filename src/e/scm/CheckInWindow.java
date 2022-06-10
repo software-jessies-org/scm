@@ -345,14 +345,6 @@ public class CheckInWindow extends MainFrame {
     
     private void commit() {
         final String comment = getCommentWithNewline();
-        if (statusesTableModel.isDefaultCommit() == false) {
-            try {
-                backEnd.approveNonDefaultCommit();
-            } catch (RuntimeException ex) {
-                SimpleDialog.showAlert(CheckInWindow.this, "Commit disallowed", ex.getMessage());
-                return;
-            }
-        }
         final List<FileStatus> included = statusesTableModel.getIncludedFiles();
         final List<FileStatus> excluded = statusesTableModel.getExcludedFiles();
         

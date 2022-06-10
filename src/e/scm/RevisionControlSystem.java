@@ -245,12 +245,6 @@ public abstract class RevisionControlSystem {
      */
     public abstract void commit(String comment, List<FileStatus> fileStatuses, List<FileStatus> excluded);
     
-    /**
-     * Should throw if a commit that doesn't include every file that would be included by default is currently disallowed.
-     */
-    public void approveNonDefaultCommit() {
-    }
-    
     public void execAndDump(List<String> commandAsList) {
         execAndDumpWithInput(commandAsList, "");
     }
