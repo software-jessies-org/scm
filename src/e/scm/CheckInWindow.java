@@ -564,6 +564,11 @@ public class CheckInWindow extends MainFrame {
                 statusesTableModel.fireTableDataChanged();
                 readSavedFilenames();
                 configureCheckInCommentArea(true);
+                for (FileStatus fileStatus : statuses) {
+                    if (fileStatus.getState() == FileStatus.ADDED || fileStatus.getState() == FileStatus.REMOVED) {
+                        statusesTableModel.includeFilenames(Arrays.asList(fileStatus.getName()));
+                    }
+                }
                 
                 /* Give some feedback to demonstrate we're not broken if there's nothing to show. */
                 boolean nothingModified = (statusesTableModel.getRowCount() == 0);
