@@ -72,7 +72,7 @@ public class Git extends RevisionControlSystem {
     private static final String LOG_SEPARATOR = "a string that must never appear in a check-in comment\f";
 
     public String[] getLogCommand(String filename) {
-        return new String[] { "git", "log", "-m", "--follow", "--pretty=tformat:commit=%H%ncommitter=%ce%ndate=%ai%ncomment=%n%s%n%b" + LOG_SEPARATOR, "--", filename };
+        return new String[] { "git", "log", "-m", "--follow", "--pretty=tformat:commit=%H%ncommitter=%ce%ndate=%ai%ncomment=%n%s%n%b%n" + LOG_SEPARATOR, "--", filename };
     }
     
     // The above git annotate produces the like of the following fields, separated by tabs:
@@ -130,6 +130,10 @@ public class Git extends RevisionControlSystem {
                 while (++i < lines.length && lines[i].equals(LOG_SEPARATOR) == false) {
                     comment.append(lines[i]);
                     comment.append("\n");
+                }
+                // Remove the newline we added before LOG_SEPARATOR in case the %body didn't end in a newline.
+                if (comment.length() > 0) {
+                    comment.setLength(comment.length() - 1);
                 }
                 if (number == null || author == null || date == null || time == null || comment == null) {
                     throw new RuntimeException("incomplete log record: number=" + number + ",author=" + author + ",date=" + date + ",time=" + time + ",comment" + comment);

@@ -13,7 +13,7 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class RevisionView extends JComponent {
-    private static final String COMMENT_SEPARATOR = "---------------------------------------------------\n";
+    private static final String COMMENT_SEPARATOR = "\n---------------------------------------------------\n";
     
     public List<Revision> getRevisionRange(Revision fromRevision, Revision toRevision) {
         ArrayList<Revision> range = new ArrayList<>();

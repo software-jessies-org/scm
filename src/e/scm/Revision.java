@@ -38,6 +38,6 @@ public class Revision {
     }
     
     public String summary() {
-        return date + " " + time + " " + author + " (" + number + ")" + "\n\n" + comment + "\n";
+        return date + " " + time + " " + author + " (" + number + ")" + "\n\n" + comment;
     }
 }
